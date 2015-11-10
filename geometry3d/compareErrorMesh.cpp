@@ -118,7 +118,7 @@ main(int argc,char **argv)
   trace.info()<< "Hausdorff error: " << maxOfMin << std::endl;
   
   std::ofstream outMesh;
-  outMesh.open(outputMeshName, std::ofstream::out);
+  outMesh.open(outputMeshName.c_str(), std::ofstream::out);
   MeshWriter<Z3i::RealPoint>::export2OFF(outMesh, theNewMeshError,true);
   
 
