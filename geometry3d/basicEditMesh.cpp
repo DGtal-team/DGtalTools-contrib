@@ -177,7 +177,7 @@ main(int argc,char **argv)
   trace.info()<< "nbFaces init: " << theNewMesh.nbFaces() << std::endl;
   trace.info()<< "New nbFaces: " << theMesh.nbFaces() << std::endl;  
   std::ofstream outMesh;
-  outMesh.open(outputMeshName, std::ofstream::out);
+  outMesh.open(outputMeshName.c_str(), std::ofstream::out);
   MeshWriter<Z3i::RealPoint>::export2OFF(outMesh, theNewMesh);
   
 
