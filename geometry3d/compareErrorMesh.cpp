@@ -5,8 +5,8 @@
 #include "DGtal/helpers/StdDefs.h"
 #include "DGtal/io/readers/MeshReader.h"
 #include "DGtal/io/writers/MeshWriter.h"
-#include <DGtal/io/colormaps/GradientColorMap.h>
-#include <DGTal/io/colormaps/HueShadeColorMap.h>
+#include "DGtal/io/colormaps/GradientColorMap.h"
+#include "DGtal/io/colormaps/HueShadeColorMap.h"
 
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
