@@ -37,16 +37,12 @@
 
 #include "DGtal/base/Common.h"
 #include "DGtal/helpers/StdDefs.h"
-
-#include "DGtal/shapes/ShapeFactory.h"
-#include "DGtal/shapes/Shapes.h"
 #include "DGtal/topology/helpers/Surfaces.h"
 
 //image
 #include "DGtal/io/readers/PointListReader.h"
 #include "DGtal/io/Color.h"
 #include "DGtal/io/readers/GenericReader.h"
-
 
 #include "DGtal/geometry/curves/SaturatedSegmentation.h"
 #include "DGtal/io/boards/Board2D.h"
@@ -62,9 +58,30 @@ using namespace DGtal;
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
 
+
+
+template<typename TIterator, typename TComputer>
+void 
+drawPencil(Board2D &aBoard, TComputer computer,
+           unsigned int index, TIterator itBegin, TIterator itEnd){  
+  firstMaximalSegment(computer, itBegin+index, itBegin, itBegin);
+  TComputer first (computer);
+  lastMaximalSegment(computer, itBegin+index, itBegin, itEnd);
+  TComputer last (computer);       
+  while(first.end() != last.end()){
+    aBoard << SetMode(first.className(), "BoundingBox");
+    aBoard << first;
+    nextMaximalSegment(first, itEnd);
+  }
+  aBoard << SetMode(first.className(), "BoundingBox");
+  aBoard << first;
+}
+
+
+
 int main( int argc, char** argv )
 {
-  typedef Z2i::Point Point;
+  typedef Z2i::RealPoint Point;
   typedef std::vector<Point>::const_iterator RAConstIterator;
   typedef Circulator<RAConstIterator> ConstCirculator;
   typedef AlphaThickSegmentComputer<Point, ConstCirculator> AlphaThickSegmentComputer2D;
@@ -73,7 +90,6 @@ int main( int argc, char** argv )
   typedef AlphaThickSegmentComputer<Point> AlphaThickSegmentComputer2DOpen;
   typedef SaturatedSegmentation<AlphaThickSegmentComputer2DOpen> AlphaSegmentationOpen;
  
-
   
   // parse command line ----------------------------------------------
   po::options_description general_opt("Allowed options are: ");
@@ -116,12 +132,12 @@ int main( int argc, char** argv )
   std::string fileName = vm["input"].as<std::string>();
   double width = vm["width"].as<double>();
   bool openContour = vm.count("openContour");
-  std::vector<Point> aContour = PointListReader<Z2i::Point>::getPointsFromFile(fileName);
+  std::vector<Point> aContour = PointListReader<Point>::getPointsFromFile(fileName);
   std::string outFileName = vm["output"].as<std::string>();
    
-   // Display the source contour as voxel
+   // Display the source contour as pixel
    for(unsigned int i =0; i< aContour.size(); i++){
-     aBoard << DGtal::Z2i::Point((int)aContour[i][0], (int)aContour[i][1]);
+     aBoard << aContour[i];
    }
 
    if (!openContour){
@@ -129,56 +145,32 @@ int main( int argc, char** argv )
      AlphaThickSegmentComputer2D computer(width, def);
      if(vm.count("index")){
        unsigned int index = vm["index"].as<unsigned int>();
-       firstMaximalSegment(computer, circu+index, circu, circu);
-       AlphaThickSegmentComputer2D first (computer);
-       lastMaximalSegment(computer, circu+index, circu, circu);
-       AlphaThickSegmentComputer2D last (computer);       
-       while(first.end() != last.end()){
-         aBoard << SetMode(first.className(), "BoundingBox");
-         aBoard << first;
-         nextMaximalSegment(first, circu);
-       }
-       aBoard << SetMode(first.className(), "BoundingBox");
-       aBoard << first;
+       drawPencil(aBoard, computer, index, circu, circu);
      }else{
          aBoard << SetMode(computer.className(), "BoundingBox");
          AlphaSegmentation segmentator(circu, circu, computer);
          AlphaSegmentation::SegmentComputerIterator i = segmentator.begin();
          AlphaSegmentation::SegmentComputerIterator end = segmentator.end();
-
          for ( ; i != end; ++i) {
            AlphaThickSegmentComputer2D current(*i);
            aBoard << current;
          }
-         
      }
    }else{
      AlphaThickSegmentComputer2DOpen computer(width, def);
      computer.init(aContour.begin());
      if(vm.count("index")){
        unsigned int index = vm["index"].as<unsigned int>();
-       firstMaximalSegment(computer, aContour.begin()+index, aContour.begin(), aContour.end());
-       AlphaThickSegmentComputer2DOpen first (computer);
-       lastMaximalSegment(computer, aContour.begin()+index, aContour.begin(), aContour.end());
-       AlphaThickSegmentComputer2DOpen last (computer);       
-       while(first.end() != last.end()){
-         aBoard << SetMode(first.className(), "BoundingBox");
-         aBoard << first;
-         nextMaximalSegment(first, aContour.begin());
-       }
-       aBoard << SetMode(first.className(), "BoundingBox");
-       aBoard << first;
+       drawPencil(aBoard, computer, index, aContour.begin(), aContour.end());
      }else{
          aBoard << SetMode(computer.className(), "BoundingBox");
          AlphaSegmentationOpen segmentator(aContour.begin(), aContour.end(), computer);
          AlphaSegmentationOpen::SegmentComputerIterator i = segmentator.begin();
          AlphaSegmentationOpen::SegmentComputerIterator end = segmentator.end();
-
          for ( ; i != end; ++i) {
            AlphaThickSegmentComputer2DOpen current(*i);
            aBoard << current;
          }
-         
      }
    }
      
