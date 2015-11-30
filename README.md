@@ -2,9 +2,6 @@
 Various tools from the community built using DGtal.
 
 
-Organisation
-============
-
 This project is actually organized as follows:
 
  - [Geometry2d](#geometry2d)
@@ -27,7 +24,7 @@ Actually it contains this tool:
 Geometry3d
 ----------
 
-As the previous section but in 3d, it contains actually thes tools:
+As the previous section but in 3d, it contains actually these tools:
 
    - basicEditMesh: to apply basic mesh edition (scale change, mesh face contraction, face filtering).
    - compareErrorMesh: compute hausdorf distance between two meshes.
