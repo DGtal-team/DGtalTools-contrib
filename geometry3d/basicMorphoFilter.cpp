@@ -33,11 +33,9 @@
 #include "DGtal/io/writers/GenericWriter.h"
 
 #include "DGtal/images/ImageContainerBySTLVector.h"
-
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
-
 
 using namespace DGtal;
 namespace po = boost::program_options;
@@ -124,7 +122,6 @@ applyErodeDilate(const TImage &anImage, unsigned int size, bool isErode){
 
 
 
-
 int
 main(int argc,char **argv)
 
@@ -132,21 +129,18 @@ main(int argc,char **argv)
   
   typedef typename Image3D::Domain::ConstIterator ImageDomIterator;
 
-  
-  
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
-  ("help,h", "display this message")
-  ("input,i", po::value<std::string>(), "input file name of mesh vertex given as OFF format.")
-  ("sizeFilter,s", po::value<unsigned int>(), "size of the filter")
-  ("erode,e",  "apply erosion repeated")
-  ("median,m",  "apply median filter")
-  ("dilate,d",  "apply dilatation repeated")
-  ("closure,c", "apply closure repeated")
-  ("nbRepeat,n", po::value<unsigned int>()->default_value(1), "Repeat the selected type of operation" )
-  ("output,o", po::value<std::string>(),  "arg = file.off : export the resulting mesh associated to the fiber extraction.");
-  
-  
+    ("help,h", "display this message")
+    ("input,i", po::value<std::string>(), "input file name in 3d volume.")
+    ("sizeFilter,s", po::value<unsigned int>(), "size of the filter")
+    ("erode,e",  "apply erosion")
+    ("median,m",  "apply median filter")
+    ("dilate,d",  "apply dilatation")
+    ("closure,c", "apply closure")
+    ("nbRepeat,n", po::value<unsigned int>()->default_value(1), "repeat the selected type of operation" )
+    ("output,o", po::value<std::string>(),  "export the filtered volume extracted");
+    
   bool parseOK=true;
   po::variables_map vm;
   try{
@@ -158,12 +152,11 @@ main(int argc,char **argv)
   po::notify(vm);
   if(vm.count("help")||argc<=1|| !parseOK )
   {
-    trace.info()<< "Compare error between two meshes (hausdorff) " <<std::endl << "Options: "<<std::endl
+    trace.info()<< "Apply basic morpho filter from a cubical structurant element" <<std::endl << "Options: "<<std::endl
 		  << general_opt << "\n";
     return 0;
   }
-  
-  
+    
   std::string inputVol = vm["input"].as<std::string>();
   std::string outputVol = vm["output"].as<std::string>();
   bool erode = vm.count("erode");
@@ -171,22 +164,16 @@ main(int argc,char **argv)
   bool closure = vm.count("closure");
   bool median = vm.count("median");
   unsigned int nbRepeat = vm["nbRepeat"].as<unsigned int>();
-  unsigned int size = vm["sizeFilter"].as<unsigned int>();
-  
-  
+  unsigned int size = vm["sizeFilter"].as<unsigned int>();    
   
   Image3D inputImage = VolReader<Image3D>::importVol(inputVol);
   Image3D imageRes(inputImage);
-  int max = 0;
+
   for(ImageDomIterator it = inputImage.domain().begin(); it != inputImage.domain().end(); it++){
     imageRes.setValue(*it,inputImage(*it));
-    if(imageRes(*it)>max){
-      max = imageRes(*it);
-    }
   }
-  trace.info() << "val inout max:" << max << std::endl;
-  for (unsigned int i=0; i<nbRepeat; i++) {
-    
+
+  for (unsigned int i=0; i<nbRepeat; i++) {    
     if(median){
       trace.info() << std::endl;
       trace.info() << "applying " << "median" << std::endl;
@@ -208,7 +195,8 @@ main(int argc,char **argv)
       imageRes = applyErodeDilate(imageRes, size, true);
     }
   }
-  
+
+  trace.info() << std::endl;
   imageRes >>  outputVol;
     
 }
