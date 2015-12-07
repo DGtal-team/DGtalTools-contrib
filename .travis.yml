@@ -36,6 +36,6 @@ before_script:
   - cd ..
 
 script: 
-   - cmake . -DCMAKE_BUILD_TYPE=Debug -DDGtal_DIR=$PWD/DGtal/build
+   - cmake . -DCMAKE_BUILD_TYPE=Debug -DDGtal_DIR=$PWD/DGtal
    - make
 
