@@ -19,7 +19,12 @@ Geometry2d
 This section can contains various utilities related to 2d geometry (2d estimators, 2d contour tools, ...):
 
    - meaningFullThickness: to display the meaningful thickness of digital contour.
-   
+     [Bertrand Kerautret, Jacques-Olivier Lachaud and  Mouhammad Said;
+      ~Meaningful Thickness Detection on Polygonal Curve~ ;
+      Proceedings of the 1st International Conference on Pattern Recognition Applications and Methods
+       2012 pp. 372--379)]
+
+
 
 Geometry3d
 ----------
