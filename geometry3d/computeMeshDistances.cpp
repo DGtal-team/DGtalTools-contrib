@@ -39,18 +39,54 @@
 #include <boost/program_options/variables_map.hpp>
 
 #include "DGtal/shapes/Mesh.h"
+#include "DGtal/math/linalg/SimpleMatrix.h"
+#include "DGtal/kernel/BasicPointFunctors.h"
 
 
 using namespace DGtal;
 namespace po = boost::program_options;
 
-typedef typename Z3i::RealPoint TPoint;
 
+
+template<typename TPoint>
+static
 bool
-isInsideFace(const TPoint &p0, const TPoint &p1, const TPoint &p2, const TPoint &q){
-  return ((p1-p0).dot(q-p0) >= 0 && (p2-p1).dot(q-p1) >= 0 && (p0-p2).dot(q-p2) >= 0)||
-  ((p1-p0).dot(q-p0) <= 0 && (p2-p1).dot(q-p1) <= 0 && (p0-p2).dot(q-p2) <= 0);
+isInsideFaceTriangle(const TPoint &p, const TPoint &q, const TPoint &r, const TPoint &aPoint ){
+  double triangleArea = ((q-p).crossProduct(r-q)).norm()/2.0;
+  double alpha  = ((q-aPoint).crossProduct(r-aPoint)).norm()/(2.0*triangleArea);
+  double beta  = ((r-aPoint).crossProduct(p-aPoint)).norm()/(2.0*triangleArea);
+  double sigma = 1.0 - alpha - beta;
+  return alpha <= 1.0 && beta <= 1.0 && sigma <= 1.0 && sigma >=0.0;
 }
+
+
+
+template<typename TMesh>
+static
+bool
+isInsideFace(const TMesh &aMesh,const typename TMesh::MeshFace &aFace, const typename TMesh::Point &aPoint){
+  if (aFace.size() >= 4 ){
+    typename TMesh::Point p = aMesh.getVertex(aFace[0]);
+    typename TMesh::Point q = aMesh.getVertex(aFace[1]);
+    typename TMesh::Point r = aMesh.getVertex(aFace[2]);
+    typename TMesh::Point s = aMesh.getVertex(aFace[3]);
+    return  isInsideFaceTriangle(p,q,r, aPoint) || isInsideFaceTriangle(r, s, p, aPoint);
+  } else if (aFace.size() == 3 ){
+    typename TMesh::Point p = aMesh.getVertex(aFace[0]);
+    typename TMesh::Point q = aMesh.getVertex(aFace[1]);
+    typename TMesh::Point r = aMesh.getVertex(aFace[2]);
+    return  isInsideFaceTriangle(p,q,r, aPoint);
+  }
+  else{
+    trace.warning() << "face with more 4 vertex ... returning false.";
+  }
+  return  false;
+}
+
+
+
+
+typedef typename Z3i::RealPoint TPoint;
 
 
 bool
@@ -133,10 +169,8 @@ main(int argc,char **argv)
     trace.progressBar(cptFace, theMeshRef.nbFaces());
     double distanceMin = std::numeric_limits<double>::max();
     
-    TPoint p0 = theMeshRef.getVertex(aFace.at(0));
-    TPoint p1 = theMeshRef.getVertex(aFace.at(1));
-    TPoint p2 = theMeshRef.getVertex(aFace.at(2));
-    TPoint cA = (p0+p1+p2)/3.0;
+    TPoint cA = theMeshRef.getFaceBarycenter(i);
+    
     enum ProjType {INSIDE, EDGE, CENTER};
     ProjType aProjType = INSIDE;
     vectNearestPt.push_back(cA);
@@ -147,7 +181,7 @@ main(int argc,char **argv)
       TPoint pB0 = theMeshComp.getVertex(aFaceB.at(0));
       TPoint pB1 = theMeshComp.getVertex(aFaceB.at(1));
       TPoint pB2 = theMeshComp.getVertex(aFaceB.at(2));
-      TPoint cB = (pB0+pB1+pB2)/3.0;
+      TPoint cB =  theMeshComp.getFaceBarycenter(j);
       
       if (useFaceCenterDistance){
         double distance = (cB-cA).norm();
@@ -160,9 +194,11 @@ main(int argc,char **argv)
       
       TPoint normal = (pB1-pB0).crossProduct(pB2 - pB0);
       double norm = normal.norm();
+      
       if (norm == 0.0){
         continue;
       }
+     
       double d = -(normal[0]*cB[0]+normal[1]*cB[1]+normal[2]*cB[2]);
       double lambda = -(normal[0]*cA[0] + normal[1]*cA[1] + normal[2]*cA[2] + d)/
       (normal[0]*normal[0]+normal[1]*normal[1]+normal[2]*normal[2]);
@@ -170,7 +206,8 @@ main(int argc,char **argv)
       TPoint proj = (lambda*normal)+cA;
       double distance = std::abs(normal[0]*cA[0] + normal[1]*cA[1] + normal[2]*cA[2] + d);
      	distance /=  norm;
-      if(!isInsideFace(pB0, pB1, pB2, proj)){
+      if(!isInsideFace(theMeshComp, aFaceB, proj)){
+        
         // if the projection is outside the face, we approximate the distance with the projection on the face edges
         TPoint p = cA;
         bool lineProjOK1 = lineProject(pB0, pB1, p);
@@ -201,6 +238,7 @@ main(int argc,char **argv)
        }
         
       }else{
+        distance = (proj-cA).norm();
         if (distance < distanceMin){
           aProjType = INSIDE;
           distanceMin = distance;
@@ -232,15 +270,16 @@ main(int argc,char **argv)
   }
   outDistances << std::endl;
 
+
   DGtal::GradientColorMap<double, CMAP_JET>  gradientShade(minScaleDistance, maxScaleDistance );
   for (unsigned int i=0; i< theNewMeshDistance.nbFaces(); i++){
-    TPoint center = theNewMeshDistance.getVertex(theNewMeshDistance.getFace(i)[0]);
-    theNewMeshDistance.setFaceColor(i, gradientShade(std::min(squaredDistance ? vectFaceDistances[i] :
-                                                              1.0 * vectFaceDistances[i], maxScaleDistance)));
+    TPoint center = theNewMeshDistance.getFaceBarycenter(i);
+    theNewMeshDistance.setFaceColor(i, gradientShade(std::min((squaredDistance ? vectFaceDistances[i] :
+                                                              1.0 )* vectFaceDistances[i], maxScaleDistance)));
     outDistances << center[0] << " " << center[1] << " " << center[2] << " " << vectFaceDistances[i];
     if (saveNearestPoint)
     {
-      outDistances << " " << vectNearestPt[0][i] << " " << vectNearestPt[i][1] << " " << vectNearestPt[i][2];
+      outDistances << " " << vectNearestPt[i][0] << " " << vectNearestPt[i][1] << " " << vectNearestPt[i][2];
     }
     outDistances<< std::endl;
   }
