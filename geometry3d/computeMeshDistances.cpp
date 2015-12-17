@@ -46,17 +46,28 @@
 using namespace DGtal;
 namespace po = boost::program_options;
 
+static const double approxSamePlane = 0.1;
+
+template <typename TPoint>
+static
+bool sameSide(const TPoint &p1,const TPoint &p2, const TPoint &a,const TPoint &b)
+{
+  TPoint cp1 = (b-a).crossProduct(p1-a);
+  TPoint cp2 = (b-a).crossProduct(p2-a);
+  return cp1.dot(cp2) >= 0;
+}
 
 
 template<typename TPoint>
 static
 bool
 isInsideFaceTriangle(const TPoint &p, const TPoint &q, const TPoint &r, const TPoint &aPoint ){
-  double triangleArea = ((q-p).crossProduct(r-q)).norm()/2.0;
-  double alpha  = ((q-aPoint).crossProduct(r-aPoint)).norm()/(2.0*triangleArea);
-  double beta  = ((r-aPoint).crossProduct(p-aPoint)).norm()/(2.0*triangleArea);
-  double sigma = 1.0 - alpha - beta;
-  return alpha <= 1.0 && beta <= 1.0 && sigma <= 1.0 && sigma >=0.0;
+  if (sameSide(aPoint, p, q, r) && sameSide(aPoint, q, p, r) && sameSide(aPoint, r, p, q))
+  {
+    TPoint vc1 =  (p-q).crossProduct(p-r);
+    return std::abs((p-aPoint).dot(vc1)) <= approxSamePlane;
+  }
+  return false;
 }
 
 
@@ -65,7 +76,7 @@ template<typename TMesh>
 static
 bool
 isInsideFace(const TMesh &aMesh,const typename TMesh::MeshFace &aFace, const typename TMesh::Point &aPoint){
-  if (aFace.size() >= 4 ){
+  if (aFace.size() == 4 ){
     typename TMesh::Point p = aMesh.getVertex(aFace[0]);
     typename TMesh::Point q = aMesh.getVertex(aFace[1]);
     typename TMesh::Point r = aMesh.getVertex(aFace[2]);
@@ -82,6 +93,18 @@ isInsideFace(const TMesh &aMesh,const typename TMesh::MeshFace &aFace, const typ
   }
   return  false;
 }
+
+
+template<typename TPoint>
+static
+TPoint
+getProjectedPoint(const TPoint &normal, const TPoint &aPlanePt, const TPoint &p ){
+  double d = -(normal[0]*aPlanePt[0]+normal[1]*aPlanePt[1]+normal[2]*aPlanePt[2]);
+  double lambda = -(normal[0]*p[0] + normal[1]*p[1] + normal[2]*p[2] + d)/
+  (normal[0]*normal[0]+normal[1]*normal[1]+normal[2]*normal[2]);
+  return (lambda*normal+p);
+}
+
 
 
 
@@ -192,22 +215,11 @@ main(int argc,char **argv)
         continue;
       }
       
-      TPoint normal = (pB1-pB0).crossProduct(pB2 - pB0);
-      double norm = normal.norm();
+      TPoint normal = ((pB0-pB1).crossProduct(pB2 - pB1));
+      TPoint proj = getProjectedPoint(normal, cB, cA);
+      double distance = (proj-cA).norm();
       
-      if (norm == 0.0){
-        continue;
-      }
-     
-      double d = -(normal[0]*cB[0]+normal[1]*cB[1]+normal[2]*cB[2]);
-      double lambda = -(normal[0]*cA[0] + normal[1]*cA[1] + normal[2]*cA[2] + d)/
-      (normal[0]*normal[0]+normal[1]*normal[1]+normal[2]*normal[2]);
-      
-      TPoint proj = (lambda*normal)+cA;
-      double distance = std::abs(normal[0]*cA[0] + normal[1]*cA[1] + normal[2]*cA[2] + d);
-     	distance /=  norm;
       if(!isInsideFace(theMeshComp, aFaceB, proj)){
-        
         // if the projection is outside the face, we approximate the distance with the projection on the face edges
         TPoint p = cA;
         bool lineProjOK1 = lineProject(pB0, pB1, p);
@@ -238,7 +250,6 @@ main(int argc,char **argv)
        }
         
       }else{
-        distance = (proj-cA).norm();
         if (distance < distanceMin){
           aProjType = INSIDE;
           distanceMin = distance;
@@ -246,6 +257,7 @@ main(int argc,char **argv)
         }
       }
     }
+
     if(distanceMin>maxOfMin){
       maxOfMin = distanceMin;
     }
@@ -253,8 +265,6 @@ main(int argc,char **argv)
     
     vectFaceDistances.push_back(distanceMin);
   }
-  
-  
   
   std::ofstream outDistances;
   outDistances.open("distances.dat", std::ofstream::out);
