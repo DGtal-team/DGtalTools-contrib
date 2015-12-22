@@ -47,7 +47,6 @@ using namespace Z3i;
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
 
-
 typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char> Image3D;
 
 
@@ -64,7 +63,6 @@ isLocalMax(const TImage &anImage, const Z3i::Point &aPoint, double aRadius){
   gaussDig.init(DGtal::Z3i::Point(aPoint[0]-(int)aRadius-1, aPoint[1]-(int)aRadius-1, aPoint[2]-(int)aRadius-1),
                 DGtal::Z3i::Point(aPoint[0]+(int)aRadius+1, aPoint[1]+(int)aRadius+1, aPoint[2]+(int)aRadius+1), 1);
   DGtal::Z3i::Domain dom = gaussDig.getDomain();
-  
   for( DGtal::Z3i::Domain::ConstIterator it = dom.begin(); it!=dom.end(); it++){
     if( *it != aPoint){
       if(gaussDig(*it) && anImage.domain().isInside(*it) ){
@@ -87,9 +85,9 @@ int main( int argc, char** argv )
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
   ("help,h", "display this message")
-  ("input,i", po::value<std::string>(), "vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm (with 3 dims)) file or sdp (sequence of discrete points)" )
+  ("input,i", po::value<std::string>(), "vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm (with 3 dims)) file." )
   ("output,o", po::value<std::string>(), "Output SDP filename" )
-  ("ballSize,b",  po::value<double>()->default_value(3.0), "set the ball size" );
+  ("ballSize,b",  po::value<double>()->default_value(3.0), "set the ball size." );
   
   
   bool parseOK=true;
@@ -105,8 +103,7 @@ int main( int argc, char** argv )
   po::notify(vm);
   if( !parseOK || vm.count("help")||argc<=1)
   {
-    std::cout << "Usage: " << argv[0] << " [input-file]\n"
-    << "Extraction the local maximal of a vol images. \n"
+    std::cout << "Usage: " << argv[0] << " [input-file]\n" << "Extraction the local maximal of a vol images. \n"
     << general_opt << "\n";
     return 0;
   }
@@ -134,15 +131,12 @@ int main( int argc, char** argv )
   for( auto & pt : image.domain()){
     pos++;
     trace.progressBar(pos, image.domain().size());
-
     if (isLocalMax(image,pt, ballSize)) {
       outStream << pt[0] << " " << pt[1] << " " << pt[2] << " " << (int)image(pt) << std::endl;
     }
   }
   outStream.close();
  
-  
-  
   
   return 0;
 }
