@@ -180,7 +180,8 @@ ViewerMesh<Space, KSpace>::deleteCurrents(){
   DGtal::Viewer3D<Space, KSpace>::operator<<(myMesh);
   DGtal::Viewer3D<Space, KSpace>::updateList(false);
   DGtal::Viewer3D<Space, KSpace>::updateGL();
-
+  // the selection history is cleared since it can produce wrong reference from index faces changes.
+  myUndoQueueSelected.clear();
 }
 
 
@@ -195,7 +196,6 @@ ViewerMesh<Space, KSpace>::addToDelete(DGtal::Z3i::RealPoint p){
       myVectFaceToDelete.push_back(i);
     }
   }
-
   displaySelectionOnMesh();
 }
 
