@@ -97,7 +97,7 @@ ViewerMesh< Space, KSpace>::keyPressEvent ( QKeyEvent *e )
     (*this).displayMessage(QString(ss.str().c_str()), 100000);
     handled=true;
   }
-  if( e->key() == Qt::Key_Minus){
+   if( e->key() == Qt::Key_Minus){
     myPenSize -= 1;
     std::stringstream ss;
     ss << "Pen size: " << myPenSize;
@@ -124,11 +124,15 @@ ViewerMesh< Space, KSpace>::keyPressEvent ( QKeyEvent *e )
       myVectFaceToDelete = myUndoQueueSelected.front();
       myUndoQueueSelected.pop_front();
     }
-    DGtal::Viewer3D<Space, KSpace>::clear();
-    DGtal::Viewer3D<Space, KSpace>::operator<<(myMesh);
-    DGtal::Viewer3D<Space, KSpace>::updateList(false);
-    DGtal::Viewer3D<Space, KSpace>::updateGL();
-
+    if(myMode==ERASE_MODE){
+        displaySelectionOnMesh();
+    }else{
+      DGtal::Viewer3D<Space, KSpace>::clear();
+      DGtal::Viewer3D<Space, KSpace>::operator<<(myMesh);
+      DGtal::Viewer3D<Space, KSpace>::updateList(false);
+      DGtal::Viewer3D<Space, KSpace>::updateGL();
+      
+    }
     handled=true;
   }
   if( e->key() == Qt::Key_D){
@@ -184,21 +188,15 @@ ViewerMesh<Space, KSpace>::deleteCurrents(){
 template< typename Space, typename KSpace>
 void
 ViewerMesh<Space, KSpace>::addToDelete(DGtal::Z3i::RealPoint p){
-  addCurrentMeshToQueue();
+  myUndoQueueSelected.push_front(myVectFaceToDelete);
   for (unsigned int i = 0; i < myMesh.nbFaces(); i++) {
     DGtal::Z3i::RealPoint c = myMesh.getFaceBarycenter(i);
     if ((c-p).norm() <= myPenSize/myPenScale){
       myVectFaceToDelete.push_back(i);
-      myMesh.setFaceColor(i, DGtal::Color::Red);
     }
   }
-  myUndoQueueSelected.push_front(myVectFaceToDelete);
 
-  DGtal::Viewer3D<Space, KSpace>::clear();
-  DGtal::Viewer3D<Space, KSpace>::operator<<(myMesh);
-  DGtal::Viewer3D<Space, KSpace>::updateList(false);
-  DGtal::Viewer3D<Space, KSpace>::updateGL();
-
+  displaySelectionOnMesh();
 }
 
 
@@ -219,15 +217,35 @@ ViewerMesh<Space, KSpace>::deleteFacesFromDist(DGtal::Z3i::RealPoint p)
   DGtal::Viewer3D<Space, KSpace>::updateGL();
 }
 
+
 template< typename Space, typename KSpace>
 void
 ViewerMesh<Space, KSpace>::addCurrentMeshToQueue(){
   myUndoQueue.push_front(myMesh);
   if (myUndoQueue.size()> MAXUNDO){
     myUndoQueue.pop_back();
+  }  
+}
+
+
+template< typename Space, typename KSpace>
+void
+ViewerMesh<Space, KSpace>::displaySelectionOnMesh()
+{
+  RealMesh tmp = myMesh;
+  
+  for (unsigned int i = 0; i < myVectFaceToDelete.size(); i++) {
+    tmp.setFaceColor(myVectFaceToDelete[i], DGtal::Color::Red);
   }
   
+  DGtal::Viewer3D<Space, KSpace>::clear();
+  DGtal::Viewer3D<Space, KSpace>::operator<<(tmp);
+  DGtal::Viewer3D<Space, KSpace>::updateList(false);
+  DGtal::Viewer3D<Space, KSpace>::updateGL();
+
 }
+
+
 
 
 

@@ -40,6 +40,8 @@ public:
   void deleteFacesFromDist(DGtal::Z3i::RealPoint p);
   void addToDelete(DGtal::Z3i::RealPoint p);
   void deleteCurrents();
+  void displaySelectionOnMesh();
+
   double myPenScale;
   DGtal::Color myPenColor;
   
