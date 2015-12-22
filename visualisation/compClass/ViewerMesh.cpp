@@ -93,14 +93,14 @@ ViewerMesh< Space, KSpace>::keyPressEvent ( QKeyEvent *e )
   if( e->key() == Qt::Key_Plus){
     myPenSize += 1;
     std::stringstream ss;
-    ss << "Pen size: " << myPenSize;
+    ss << "Pen size: " << myPenSize*myPenScale;
     (*this).displayMessage(QString(ss.str().c_str()), 100000);
     handled=true;
   }
    if( e->key() == Qt::Key_Minus){
     myPenSize -= 1;
     std::stringstream ss;
-    ss << "Pen size: " << myPenSize;
+    ss << "Pen size: " << myPenSize*myPenScale;
     (*this).displayMessage(QString(ss.str().c_str()), 100000);
     handled=true;
   }
@@ -191,7 +191,7 @@ ViewerMesh<Space, KSpace>::addToDelete(DGtal::Z3i::RealPoint p){
   myUndoQueueSelected.push_front(myVectFaceToDelete);
   for (unsigned int i = 0; i < myMesh.nbFaces(); i++) {
     DGtal::Z3i::RealPoint c = myMesh.getFaceBarycenter(i);
-    if ((c-p).norm() <= myPenSize/myPenScale){
+    if ((c-p).norm() <= myPenSize*myPenScale){
       myVectFaceToDelete.push_back(i);
     }
   }
@@ -207,7 +207,7 @@ ViewerMesh<Space, KSpace>::deleteFacesFromDist(DGtal::Z3i::RealPoint p)
   addCurrentMeshToQueue();
   for (unsigned int i = 0; i < myMesh.nbFaces(); i++) {
     DGtal::Z3i::RealPoint c = myMesh.getFaceBarycenter(i);
-    if ((c-p).norm() <= myPenSize/myPenScale){
+    if ((c-p).norm() <= myPenSize*myPenScale){
       myMesh.setFaceColor(i, myPenColor);
     }
   }
