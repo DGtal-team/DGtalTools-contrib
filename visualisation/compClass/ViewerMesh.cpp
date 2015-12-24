@@ -1,16 +1,4 @@
 
-/**
- * @file ViewerMesh.cpp
- * @author Bertrand Kerautret (\c kerautre@loria.fr )
- * LORIA (CNRS, UMR 7503), University of Nancy, France
- *
- * @date 2011/01/03
- *
- * Implementation of methods defined in ViewerMesh.h
- *
- * This file is part of the DGtal library.
- */
-
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "ViewerMesh.h"
@@ -40,6 +28,7 @@ template < typename Space, typename KSpace>
 void
 ViewerMesh< Space, KSpace>::init(){
    DGtal::Viewer3D<>::init();
+   (*this).setForegroundColor(QColor::QColor(255,55,55,255));
    QGLViewer::setKeyDescription ( Qt::Key_D|Qt::MetaModifier, "Delete the current selected faces (highlighted in red)" );
    QGLViewer::setKeyDescription ( Qt::Key_D, "Change the current mode to Delete mode" );
    QGLViewer::setKeyDescription ( Qt::Key_C, "Change the current mode to Color mode" );
@@ -105,42 +94,22 @@ ViewerMesh< Space, KSpace>::keyPressEvent ( QKeyEvent *e )
     handled=true;
   }
   if( e->key() == Qt::Key_C){
-    (*this).displayMessage(QString("Color Mode"), 100000);
-    myMode = COLOR_MODE;
+    setColorMode();
     handled=true;
   }
   if( e->key() == Qt::Key_S){
-    myMesh >> myOutMeshName;
-    (*this).displayMessage(QString("SAVED"), 100000);
+    save();
     handled=true;
   }
   if( e->key() == Qt::Key_U){
-    (*this).displayMessage(QString("UNDO"), 100000);
-    if(myUndoQueue.size()>0){
-        myMesh = myUndoQueue.front();
-        myUndoQueue.pop_front();
-    }
-    if(myUndoQueueSelected.size()>0){
-      myVectFaceToDelete = myUndoQueueSelected.front();
-      myUndoQueueSelected.pop_front();
-    }
-    if(myMode==ERASE_MODE){
-        displaySelectionOnMesh();
-    }else{
-      DGtal::Viewer3D<Space, KSpace>::clear();
-      DGtal::Viewer3D<Space, KSpace>::operator<<(myMesh);
-      DGtal::Viewer3D<Space, KSpace>::updateList(false);
-      DGtal::Viewer3D<Space, KSpace>::updateGL();
-      
-    }
+    undo();
     handled=true;
   }
   if( e->key() == Qt::Key_D){
     if (e->modifiers() & Qt::MetaModifier){
       deleteCurrents();
     }else{
-      (*this).displayMessage(QString("Delete Mode"), 100000);
-      myMode = ERASE_MODE;
+      setDeleteMode();
     }
     handled=true;
   }
@@ -245,10 +214,57 @@ ViewerMesh<Space, KSpace>::displaySelectionOnMesh()
 
 }
 
+template< typename Space, typename KSpace>
+void 
+ViewerMesh<Space, KSpace>::setDeleteMode()
+{
+  (*this).displayMessage(QString("Delete Mode: select face with SHIFT+CLICK then delete faces with CTRL-D "), 100000);
+  myMode = ERASE_MODE;
+}
 
 
 
+template< typename Space, typename KSpace>
+void 
+ViewerMesh<Space, KSpace>::setColorMode()
+{
+  (*this).displayMessage(QString("Color Mode"), 100000);
+  myMode = COLOR_MODE;
+}
 
+template< typename Space, typename KSpace>
+void 
+ViewerMesh<Space, KSpace>::undo()
+{
+    (*this).displayMessage(QString("UNDO"), 100000);
+    if(myUndoQueue.size()>0){
+        myMesh = myUndoQueue.front();
+        myUndoQueue.pop_front();
+    }
+    if(myUndoQueueSelected.size()>0){
+      myVectFaceToDelete = myUndoQueueSelected.front();
+      myUndoQueueSelected.pop_front();
+    }
+    if(myMode==ERASE_MODE){
+        displaySelectionOnMesh();
+    }else{
+      DGtal::Viewer3D<Space, KSpace>::clear();
+      DGtal::Viewer3D<Space, KSpace>::operator<<(myMesh);
+      DGtal::Viewer3D<Space, KSpace>::updateList(false);
+      DGtal::Viewer3D<Space, KSpace>::updateGL();
+      
+    }
+  
+}
+
+
+template< typename Space, typename KSpace>
+void 
+ViewerMesh<Space, KSpace>::save()
+{
+  myMesh >> myOutMeshName;
+  (*this).displayMessage(QString("SAVED"), 100000);
+}
 
 
 

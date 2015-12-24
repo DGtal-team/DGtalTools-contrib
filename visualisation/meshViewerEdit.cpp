@@ -14,11 +14,11 @@
  *
  **/
 /**
- * @file 3dSDPViewer.cpp
+ * @file meshViewerEdit.cpp
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
- * @date 2014/04/01
+ * @date 2015/12/20
  *
  * An simple mesh viewer which allow basic edition (coloring, face removing).
  *
@@ -28,6 +28,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 
+
+#ifndef Q_MOC_RUN
 #include "DGtal/base/Common.h"
 #include "DGtal/helpers/StdDefs.h"
 #include "DGtal/io/viewers/Viewer3D.h"
@@ -42,8 +44,11 @@
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
+#endif
 
-#include "compClass/ViewerMesh.cpp"
+
+#include "meshViewerEdit.h"
+#include "ui_meshViewerEdit.h"
 
 
 using namespace std;
@@ -54,6 +59,58 @@ using namespace Z3i;
 namespace po = boost::program_options;
 
 
+
+
+MainWindow::MainWindow(ViewerMesh<> *aViewer,
+                       QWidget *parent, Qt::WindowFlags flags) :
+  QMainWindow(parent),
+  ui(new Ui::MainWindow),
+  myViewer(aViewer)
+{
+  ui->setupUi(this);
+  ui->verticalLayout->addWidget(aViewer);  
+  QObject::connect(ui->scaleSlider, SIGNAL(valueChanged(int)), this, SLOT(updateScale()));
+  QObject::connect(ui->deleteButton, SIGNAL(clicked()), this, SLOT(setDeleteMode()));
+  QObject::connect(ui->colorButton, SIGNAL(clicked()), this, SLOT(setColorMode()));
+  QObject::connect(ui->saveButton, SIGNAL(clicked()), this, SLOT(save()));
+  QObject::connect(ui->undoButton, SIGNAL(clicked()), this, SLOT(undo()));
+  updateScale();
+}
+
+
+void 
+MainWindow::setDeleteMode(){
+  myViewer->setDeleteMode();
+}
+
+void 
+MainWindow::setColorMode(){
+  myViewer->setColorMode();
+}
+
+void 
+MainWindow::undo(){
+  myViewer->undo();
+}
+
+void 
+MainWindow::save(){
+  myViewer->save();
+}
+
+
+void 
+MainWindow::updateScale(){
+(*myViewer).myPenScale = ui->scaleSlider->value();
+stringstream s; s << ui->scaleSlider->value();
+ui->labelPenSize->setText(QString(s.str().c_str()));
+}
+
+
+MainWindow::~MainWindow()
+{
+  delete ui;
+}
 
 int main( int argc, char** argv )
 {
@@ -94,24 +151,25 @@ int main( int argc, char** argv )
   
   QApplication application(argc,argv);
  
-  ViewerMesh<> viewer(aMesh, outputFilename );
+  ViewerMesh<> *viewer = new ViewerMesh<> (aMesh, outputFilename );
   if (vm.count("scalePen")){
-    viewer.myPenScale = vm["scalePen"].as<double>();
+    viewer->myPenScale = vm["scalePen"].as<double>();
   }
   if(vm.count("penColor")){
     std::vector<unsigned int> colors = vm["penColor"].as<std::vector<unsigned int> >();
     if (colors.size()!=4){
       trace.warning() << "you need to precise R,G,B, A values, taking default blue color..." << std::endl;
     }else{
-      viewer.myPenColor = DGtal::Color(colors[0], colors[1], colors[2], colors[3]);
+      viewer->myPenColor = DGtal::Color(colors[0], colors[1], colors[2], colors[3]);
     }
   }
   
-  viewer.setWindowTitle("Mesh interaction Viewer");
-  viewer.show();
-  viewer << aMesh;
+  MainWindow w(viewer, 0,0);
+  w.setWindowTitle("Simple Mesh Edit");
+  w.show();
+  *viewer << aMesh;
   
-  viewer << Viewer3D<>::updateDisplay;
+  *viewer << Viewer3D<>::updateDisplay;
   return application.exec();
 }
 
