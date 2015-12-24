@@ -53,7 +53,7 @@ typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char> Image3D;
 
 template<typename TImage>
 bool
-isLocalMax(const TImage &anImage, const Z3i::Point &aPoint, const double aRadius){
+isStrictLocalMax(const TImage &anImage, const Z3i::Point &aPoint, const double aRadius){
   typedef DGtal::ImplicitBall<DGtal::Z3i::Space> EuclideanBall;
   typedef DGtal::GaussDigitizer<DGtal::Z3i::Space, EuclideanBall> DigitalShape;
   EuclideanBall aBall (DGtal::Z3i::Point(aPoint[0], aPoint[1], aPoint[2]), aRadius);
@@ -100,7 +100,7 @@ int main( int argc, char** argv )
   po::notify(vm);
   if( !parseOK || vm.count("help")||argc<=1)
   {
-    std::cout << "Usage: " << argv[0] << " [input-file]\n" << "extraction of local maxima of a vol image within a spherical kernel of radius '--ballSize' \n"
+    std::cout << "Usage: " << argv[0] << " [input-file]\n" << "extraction of (strict) local maxima of a vol image within a spherical kernel of radius '--ballSize' \n"
     << general_opt << "\n";
     return 0;
   }
@@ -128,7 +128,7 @@ int main( int argc, char** argv )
   for( auto & pt : image.domain()){
     pos++;
     trace.progressBar(pos, image.domain().size());
-    if (isLocalMax(image,pt, ballSize)) {
+    if (isStrictLocalMax(image,pt, ballSize)) {
       outStream << pt[0] << " " << pt[1] << " " << pt[2] << " " << (int)image(pt) << std::endl;
     }
   }
