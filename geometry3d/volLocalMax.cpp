@@ -15,7 +15,7 @@
  *
  **/
 /**
- * @file vol2obj.cpp
+ * @file volLocalMax.cpp
  * @author Bertrand Kerautret (\c bertrand.kerautret@loria.fr)
  *
  * @date 2015/12/22
@@ -53,24 +53,21 @@ typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char> Image3D;
 
 template<typename TImage>
 bool
-isLocalMax(const TImage &anImage, const Z3i::Point &aPoint, double aRadius){
+isLocalMax(const TImage &anImage, const Z3i::Point &aPoint, const double aRadius){
   typedef DGtal::ImplicitBall<DGtal::Z3i::Space> EuclideanBall;
   typedef DGtal::GaussDigitizer<DGtal::Z3i::Space, EuclideanBall> DigitalShape;
   EuclideanBall aBall (DGtal::Z3i::Point(aPoint[0], aPoint[1], aPoint[2]), aRadius);
-  unsigned int myVal = anImage(aPoint);
   DigitalShape  gaussDig;
   gaussDig.attach (aBall);
   gaussDig.init(DGtal::Z3i::Point(aPoint[0]-(int)aRadius-1, aPoint[1]-(int)aRadius-1, aPoint[2]-(int)aRadius-1),
                 DGtal::Z3i::Point(aPoint[0]+(int)aRadius+1, aPoint[1]+(int)aRadius+1, aPoint[2]+(int)aRadius+1), 1);
   DGtal::Z3i::Domain dom = gaussDig.getDomain();
   for( DGtal::Z3i::Domain::ConstIterator it = dom.begin(); it!=dom.end(); it++){
-    if( *it != aPoint){
       if(gaussDig(*it) && anImage.domain().isInside(*it) ){
-        if (myVal <= anImage(*it) ) {
+        if (anImage(aPoint) <= anImage(*it) && aPoint != *it) {
           return false;
         }
       }
-    }
   }
   return  true;
 }
@@ -103,7 +100,7 @@ int main( int argc, char** argv )
   po::notify(vm);
   if( !parseOK || vm.count("help")||argc<=1)
   {
-    std::cout << "Usage: " << argv[0] << " [input-file]\n" << "Extraction the local maximal of a vol images. \n"
+    std::cout << "Usage: " << argv[0] << " [input-file]\n" << "extraction of local maxima of a vol image within a spherical kernel of radius '--ballSize' \n"
     << general_opt << "\n";
     return 0;
   }
