@@ -33,7 +33,7 @@
 #include "DGtal/io/boards/Board3D.h"
 #include "DGtal/io/DrawWithDisplay3DModifier.h"
 #include "DGtal/shapes/implicit/ImplicitBall.h"
-#include "DGTal/shapes/GaussDigitizer.h"
+#include "DGtal/shapes/GaussDigitizer.h"
 
 
 #include <boost/program_options/options_description.hpp>
