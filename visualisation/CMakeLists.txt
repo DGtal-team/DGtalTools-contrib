@@ -17,6 +17,8 @@ ENDFOREACH(FILE)
 
 
 if (  WITH_VISU3D_QGLVIEWER )
+  include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
   if (WITH_QT4)
     QT4_WRAP_UI(ui_meshViewerEdit_FORMS_HEADERS meshViewerEdit.ui)
     QT4_WRAP_CPP(meshViewerEdit_HEADERS_MOC meshViewerEdit.h  OPTIONS -DBOOST_TT_HAS_OPERATOR_HPP_INCLUDED)
