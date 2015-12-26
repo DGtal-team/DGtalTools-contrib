@@ -24,7 +24,7 @@ if (  WITH_VISU3D_QGLVIEWER )
     QT4_WRAP_CPP(meshViewerEdit_HEADERS_MOC meshViewerEdit.h  OPTIONS -DBOOST_TT_HAS_OPERATOR_HPP_INCLUDED)
     add_executable(meshViewerEdit meshViewerEdit.cpp compClass/ViewerMesh ${meshViewerEdit_HEADERS_MOC}
                                                ${ui_meshViewerEdit_FORMS_HEADERS})
-    target_link_libraries (meshViewerEdit ${DGTAL_LIBRARIES}  ${DGtalToolsLibDependencies})
+    target_link_libraries (meshViewerEdit ${DGTAL_LIBRARIES}  ${DGtalToolsContribLibDependencies})
 
   elseif (WITH_QT5)
     set(CMAKE_AUTOMOC ON)
@@ -35,7 +35,7 @@ if (  WITH_VISU3D_QGLVIEWER )
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5OpenGL_EXECUTABLE_COMPILE_FLAGS}")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Xml_EXECUTABLE_COMPILE_FLAGS}")
     add_executable(meshViewerEdit meshViewerEdit compClass/ViewerMesh ${ui_meshViewerEdit_FORMS_HEADERS})
-    target_link_libraries(meshViewerEdit ${DGTAL_LIBRARIES}  ${DGtalToolsLibDependencies})
+    target_link_libraries(meshViewerEdit ${DGTAL_LIBRARIES}  ${DGtalToolsContribLibDependencies})
     qt5_use_modules(meshViewerEdit Widgets OpenGL Xml)
   endif (WITH_QT4)
 
