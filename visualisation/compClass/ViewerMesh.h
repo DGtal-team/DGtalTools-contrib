@@ -53,13 +53,14 @@ class ViewerMesh: public DGtal::Viewer3D <Space, KSpace>
 {
 
   static const unsigned int MAXUNDO=10;
-
   typedef DGtal::Mesh<DGtal::Z3i::RealPoint> RealMesh;
 
 
 public:
   
-  ViewerMesh(RealMesh &aMesh, std::string outMeshName): myPenScale(1.0), myPenColor(DGtal::Color::Blue), myMesh(aMesh), myOutMeshName(outMeshName),myPenSize(5.0), myMode(COLOR_MODE) {
+  ViewerMesh(RealMesh &aMesh, std::string outMeshName): myPenScale(1.0), myPenColor(DGtal::Color::Blue), 
+                                                        myMesh(aMesh), myOutMeshName(outMeshName),
+                                                        myPenSize(5.0), myMode(COLOR_MODE) {
   }
   
   
@@ -73,20 +74,19 @@ public:
   void undo();
   void save();
 
-
   double myPenScale;
   DGtal::Color myPenColor;
+  double myPenSize;
+
   
 protected:
   virtual QString helpString() const;  
   virtual void keyPressEvent ( QKeyEvent *e );
   virtual void init();
-  void addCurrentMeshToQueue();
-  
+  void addCurrentMeshToQueue();  
   
   RealMesh &myMesh;
   std::string myOutMeshName;
-  double myPenSize;
   EditMode myMode;
   std::vector<unsigned int> myVectFaceToDelete;
   std::deque<RealMesh> myUndoQueue;

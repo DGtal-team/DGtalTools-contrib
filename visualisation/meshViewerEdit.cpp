@@ -69,12 +69,12 @@ MainWindow::MainWindow(ViewerMesh<> *aViewer,
 {
   ui->setupUi(this);
   ui->verticalLayout->addWidget(aViewer);  
-  QObject::connect(ui->scaleSlider, SIGNAL(valueChanged(int)), this, SLOT(updateScale()));
+  QObject::connect(ui->scaleSlider, SIGNAL(valueChanged(int)), this, SLOT(updatePenSize()));
   QObject::connect(ui->deleteButton, SIGNAL(clicked()), this, SLOT(setDeleteMode()));
   QObject::connect(ui->colorButton, SIGNAL(clicked()), this, SLOT(setColorMode()));
   QObject::connect(ui->saveButton, SIGNAL(clicked()), this, SLOT(save()));
   QObject::connect(ui->undoButton, SIGNAL(clicked()), this, SLOT(undo()));
-  updateScale();
+  updatePenSize();
 }
 
 
@@ -100,10 +100,10 @@ MainWindow::save(){
 
 
 void 
-MainWindow::updateScale(){
-(*myViewer).myPenScale = ui->scaleSlider->value();
-stringstream s; s << ui->scaleSlider->value();
-ui->labelPenSize->setText(QString(s.str().c_str()));
+MainWindow::updatePenSize(){
+  (*myViewer).myPenSize = ui->scaleSlider->value();
+  stringstream s; s << ui->scaleSlider->value();
+  ui->labelPenSize->setText(QString(s.str().c_str()));
 }
 
 

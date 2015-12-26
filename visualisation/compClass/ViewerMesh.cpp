@@ -211,7 +211,6 @@ ViewerMesh<Space, KSpace>::displaySelectionOnMesh()
   DGtal::Viewer3D<Space, KSpace>::operator<<(tmp);
   DGtal::Viewer3D<Space, KSpace>::updateList(false);
   DGtal::Viewer3D<Space, KSpace>::updateGL();
-
 }
 
 template< typename Space, typename KSpace>
@@ -251,8 +250,7 @@ ViewerMesh<Space, KSpace>::undo()
       DGtal::Viewer3D<Space, KSpace>::clear();
       DGtal::Viewer3D<Space, KSpace>::operator<<(myMesh);
       DGtal::Viewer3D<Space, KSpace>::updateList(false);
-      DGtal::Viewer3D<Space, KSpace>::updateGL();
-      
+      DGtal::Viewer3D<Space, KSpace>::updateGL();      
     }
   
 }
