@@ -46,7 +46,7 @@
 #include <boost/program_options/variables_map.hpp>
 #endif
 
-
+#include <QInputDialog>
 #include "meshViewerEdit.h"
 #include "ui_meshViewerEdit.h"
 
@@ -74,6 +74,7 @@ MainWindow::MainWindow(ViewerMesh<> *aViewer,
   QObject::connect(ui->colorButton, SIGNAL(clicked()), this, SLOT(setColorMode()));
   QObject::connect(ui->saveButton, SIGNAL(clicked()), this, SLOT(save()));
   QObject::connect(ui->undoButton, SIGNAL(clicked()), this, SLOT(undo()));
+  QObject::connect(ui->filterButton, SIGNAL(clicked()), this, SLOT(filterVisibleFace()));
   updatePenSize();
 }
 
@@ -98,6 +99,17 @@ MainWindow::save(){
   myViewer->save();
 }
 
+
+void 
+MainWindow::filterVisibleFace()
+{
+  bool ok;
+  double angle = QInputDialog::getDouble(this, tr("QInputDialog::getDouble()"),
+                                       tr("max allowed angle (rad):"), 
+                                           1.0,0.0,3.14, 3, &ok);
+(*myViewer).filterVisibleFaces(angle);
+
+}
 
 void 
 MainWindow::updatePenSize(){

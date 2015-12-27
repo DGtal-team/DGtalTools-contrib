@@ -36,13 +36,6 @@
     <bool>true</bool>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <item row="2" column="0" colspan="3">
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <property name="sizeConstraint">
-       <enum>QLayout::SetMinimumSize</enum>
-      </property>
-     </layout>
-    </item>
     <item row="1" column="0" colspan="3">
      <widget class="QGroupBox" name="groupBox">
       <property name="sizePolicy">
@@ -71,7 +64,7 @@
         <rect>
          <x>20</x>
          <y>30</y>
-         <width>761</width>
+         <width>814</width>
          <height>41</height>
         </rect>
        </property>
@@ -102,6 +95,13 @@
           </property>
           <property name="text">
            <string>color mode</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="filterButton">
+          <property name="text">
+           <string>filter visible faces</string>
           </property>
          </widget>
         </item>
@@ -195,6 +195,13 @@
        </layout>
       </widget>
      </widget>
+    </item>
+    <item row="2" column="0" colspan="3">
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="sizeConstraint">
+       <enum>QLayout::SetMinimumSize</enum>
+      </property>
+     </layout>
     </item>
    </layout>
   </widget>

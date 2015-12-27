@@ -65,7 +65,7 @@ public slots:
   void setColorMode();
   void undo();
   void save();
-
+  void filterVisibleFace();
 
 public slots:
   

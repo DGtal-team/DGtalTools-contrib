@@ -63,7 +63,6 @@ public:
                                                         myPenSize(5.0), myMode(COLOR_MODE) {
   }
   
-  
   void postSelection(const QPoint& point);
   void deleteFacesFromDist(DGtal::Z3i::RealPoint p);
   void addToDelete(DGtal::Z3i::RealPoint p);
@@ -73,7 +72,9 @@ public:
   void setColorMode();
   void undo();
   void save();
-
+  void filterVisibleFaces(const double anAngleMax);
+  
+  
   double myPenScale;
   DGtal::Color myPenColor;
   double myPenSize;

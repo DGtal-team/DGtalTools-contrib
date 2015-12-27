@@ -113,6 +113,11 @@ ViewerMesh< Space, KSpace>::keyPressEvent ( QKeyEvent *e )
     }
     handled=true;
   }
+  if( e->key() == Qt::Key_F){
+    filterVisibleFaces(1);
+    
+    handled=true;
+  }
   
   if ( !handled )
     DGtal::Viewer3D<>::keyPressEvent ( e );
@@ -201,8 +206,7 @@ template< typename Space, typename KSpace>
 void
 ViewerMesh<Space, KSpace>::displaySelectionOnMesh()
 {
-  RealMesh tmp = myMesh;
-  
+  RealMesh tmp = myMesh;  
   for (unsigned int i = 0; i < myVectFaceToDelete.size(); i++) {
     tmp.setFaceColor(myVectFaceToDelete[i], DGtal::Color::Red);
   }
@@ -261,8 +265,39 @@ void
 ViewerMesh<Space, KSpace>::save()
 {
   myMesh >> myOutMeshName;
-  (*this).displayMessage(QString("SAVED"), 100000);
+  stringstream ss;
+  ss << "Current mesh saved in file: " << myOutMeshName ;
+  (*this).displayMessage(QString(ss.str().c_str()), 100000);
 }
 
 
+
+template< typename Space, typename KSpace>
+void 
+ViewerMesh<Space, KSpace>::filterVisibleFaces(const double anAngleMax){
+  addCurrentMeshToQueue();
+  DGtal::Z3i::RealPoint mainDir = {QGLViewer::camera()->viewDirection().x,
+                                   QGLViewer::camera()->viewDirection().y,
+                                   QGLViewer::camera()->viewDirection().z};
+
+  std::vector<unsigned int> vectFaceToRemove;
+  for (unsigned int i = 0; i < myMesh.nbFaces(); i++) {
+    DGtal::Z3i::RealPoint c = myMesh.getFaceBarycenter(i);
+    RealMesh::MeshFace aFace = myMesh.getFace(i);
+    DGtal::Z3i::RealPoint p0 = myMesh.getVertex(aFace.at(1));
+    DGtal::Z3i::RealPoint p1 = myMesh.getVertex(aFace.at(0));
+    DGtal::Z3i::RealPoint p2 = myMesh.getVertex(aFace.at(2));
+    DGtal::Z3i::RealPoint vectNormal = ((p1-p0).crossProduct(p2 - p0)).getNormalized();    
+    vectNormal /= vectNormal.norm();
+    if((mainDir.getNormalized()).dot(vectNormal) > cos(anAngleMax)){
+      vectFaceToRemove.push_back(i);
+    }
+  }  
+  myMesh.removeFaces(vectFaceToRemove);
+  DGtal::Viewer3D<Space, KSpace>::clear();
+  DGtal::Viewer3D<Space, KSpace>::operator<<(myMesh);
+  DGtal::Viewer3D<Space, KSpace>::updateList(false);
+  DGtal::Viewer3D<Space, KSpace>::updateGL();
+  
+}
 
