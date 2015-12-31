@@ -152,7 +152,7 @@ main(int argc,char **argv)
   po::notify(vm);
   if(vm.count("help")||argc<=1|| !parseOK )
   {
-    trace.info()<< "Apply basic morpho filter from a cubical structurant element" <<std::endl << "Options: "<<std::endl
+    trace.info()<< "Apply basic morpho filter from a cubical structural element" <<std::endl << "Options: "<<std::endl
 		  << general_opt << "\n";
     return 0;
   }
