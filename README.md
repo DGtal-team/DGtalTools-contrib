@@ -33,7 +33,7 @@ As the previous section but in 3d, it contains actually these tools:
 
    - basicEditMesh: to apply basic mesh edition (scale change, mesh face contraction, face filtering).
    - computeMeshDistances: computes for each face of a mesh A the minimal distance to another mesh B.
-
+   - volLocalMax: extract the local maximas of a vol image within a spherical kernel.
 
 
 Visualisation
@@ -46,5 +46,3 @@ This section, can contain all tools related to visualisation:
 
 
 
- - volLocalMax: extract the local maximas of a vol image within a spherical 
-   kernel.
