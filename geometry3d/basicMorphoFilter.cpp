@@ -65,7 +65,7 @@ applyMedian(const TImage &anImage, unsigned int size){
       for (int l = -(int)size; l <= (int) size; l++) {
         for (int m = -(int)size; m <= (int) size; m++) {
           Point3D p (((int)(pt[0]))+k, (int)(pt[1])+l, ((int)(pt[2]))+m);
-          if(anImage.domain().isInside(p)){
+          if(anImage.domain().isInside(p) && (p-pt).norm() < size ){
             vectVal.push_back(anImage(p));
           }          
         }
@@ -101,7 +101,7 @@ applyErodeDilate(const TImage &anImage, unsigned int size, bool isErode){
       for (int l = -(int)size; l <= (int) size; l++) {
         for (int m = -(int)size; m <= (int) size; m++) {
           Point3D p (((int)(pt[0]))+k, (int)(pt[1])+l, ((int)(pt[2]))+m);
-          if (anImage.domain().isInside(p)) {
+          if (anImage.domain().isInside(p) && (p-pt).norm() < size ) {
             if(extremVal > anImage(p) && isErode){
               extremVal = anImage(p);
             }
@@ -152,7 +152,7 @@ main(int argc,char **argv)
   po::notify(vm);
   if(vm.count("help")||argc<=1|| !parseOK )
   {
-    trace.info()<< "Apply basic morpho filter from a cubical structural element" <<std::endl << "Options: "<<std::endl
+    trace.info()<< "Apply basic morpho filter from a ball structural element" <<std::endl << "Options: "<<std::endl
 		  << general_opt << "\n";
     return 0;
   }
