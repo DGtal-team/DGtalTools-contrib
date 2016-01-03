@@ -109,7 +109,7 @@ ViewerMesh< Space, KSpace>::keyPressEvent ( QKeyEvent *e )
     if (e->modifiers() & Qt::MetaModifier){
       deleteCurrents();
     }else{
-      setDeleteMode();
+      setSelectMode();
     }
     handled=true;
   }
@@ -133,8 +133,8 @@ ViewerMesh<Space, KSpace>::postSelection ( const QPoint& point )
   bool found;
   Vec p  = DGtal::Viewer3D<Space, KSpace>::camera()->pointUnderPixel ( point, found ) ;
   if (found){
-    if(myMode == ERASE_MODE){
-      addToDelete(DGtal::Z3i::RealPoint(p.x, p.y, p.z));
+    if(myMode == SELECT_MODE){
+      addToSelected(DGtal::Z3i::RealPoint(p.x, p.y, p.z));
     }else if (myMode == COLOR_MODE){
       deleteFacesFromDist(DGtal::Z3i::RealPoint(p.x, p.y, p.z));
     }
@@ -148,8 +148,8 @@ template< typename Space, typename KSpace>
 void
 ViewerMesh<Space, KSpace>::deleteCurrents(){
   addCurrentMeshToQueue();
-  myMesh.removeFaces(myVectFaceToDelete);
-  myVectFaceToDelete.clear();
+  myMesh.removeFaces(myVectFaceSelected);
+  myVectFaceSelected.clear();
   DGtal::Viewer3D<Space, KSpace>::clear();
   DGtal::Viewer3D<Space, KSpace>::operator<<(myMesh);
   DGtal::Viewer3D<Space, KSpace>::updateList(false);
@@ -162,12 +162,12 @@ ViewerMesh<Space, KSpace>::deleteCurrents(){
 
 template< typename Space, typename KSpace>
 void
-ViewerMesh<Space, KSpace>::addToDelete(DGtal::Z3i::RealPoint p){
-  myUndoQueueSelected.push_front(myVectFaceToDelete);
+ViewerMesh<Space, KSpace>::addToSelected(DGtal::Z3i::RealPoint p){
+  myUndoQueueSelected.push_front(myVectFaceSelected);
   for (unsigned int i = 0; i < myMesh.nbFaces(); i++) {
     DGtal::Z3i::RealPoint c = myMesh.getFaceBarycenter(i);
     if ((c-p).norm() <= myPenSize*myPenScale){
-      myVectFaceToDelete.push_back(i);
+      myVectFaceSelected.push_back(i);
     }
   }
   displaySelectionOnMesh();
@@ -207,8 +207,8 @@ void
 ViewerMesh<Space, KSpace>::displaySelectionOnMesh()
 {
   RealMesh tmp = myMesh;  
-  for (unsigned int i = 0; i < myVectFaceToDelete.size(); i++) {
-    tmp.setFaceColor(myVectFaceToDelete[i], DGtal::Color::Red);
+  for (unsigned int i = 0; i < myVectFaceSelected.size(); i++) {
+    tmp.setFaceColor(myVectFaceSelected[i], DGtal::Color::Red);
   }
   
   DGtal::Viewer3D<Space, KSpace>::clear();
@@ -219,10 +219,10 @@ ViewerMesh<Space, KSpace>::displaySelectionOnMesh()
 
 template< typename Space, typename KSpace>
 void 
-ViewerMesh<Space, KSpace>::setDeleteMode()
+ViewerMesh<Space, KSpace>::setSelectMode()
 {
-  (*this).displayMessage(QString("Delete Mode: select face with SHIFT+CLICK then delete faces with CTRL-D "), 100000);
-  myMode = ERASE_MODE;
+  (*this).displayMessage(QString("Select Mode: select face with SHIFT+CLICK then apply action (e.g delete faces with CTRL-D) "), 100000);
+  myMode = SELECT_MODE;
 }
 
 
@@ -245,10 +245,10 @@ ViewerMesh<Space, KSpace>::undo()
         myUndoQueue.pop_front();
     }
     if(myUndoQueueSelected.size()>0){
-      myVectFaceToDelete = myUndoQueueSelected.front();
+      myVectFaceSelected = myUndoQueueSelected.front();
       myUndoQueueSelected.pop_front();
     }
-    if(myMode==ERASE_MODE){
+    if(myMode==SELECT_MODE){
         displaySelectionOnMesh();
     }else{
       DGtal::Viewer3D<Space, KSpace>::clear();

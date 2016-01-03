@@ -70,7 +70,7 @@ MainWindow::MainWindow(ViewerMesh<> *aViewer,
   ui->setupUi(this);
   ui->verticalLayout->addWidget(aViewer);  
   QObject::connect(ui->scaleSlider, SIGNAL(valueChanged(int)), this, SLOT(updatePenSize()));
-  QObject::connect(ui->deleteButton, SIGNAL(clicked()), this, SLOT(setDeleteMode()));
+  QObject::connect(ui->selectButton, SIGNAL(clicked()), this, SLOT(setSelectMode()));
   QObject::connect(ui->colorButton, SIGNAL(clicked()), this, SLOT(setColorMode()));
   QObject::connect(ui->saveButton, SIGNAL(clicked()), this, SLOT(save()));
   QObject::connect(ui->undoButton, SIGNAL(clicked()), this, SLOT(undo()));
@@ -80,8 +80,8 @@ MainWindow::MainWindow(ViewerMesh<> *aViewer,
 
 
 void 
-MainWindow::setDeleteMode(){
-  myViewer->setDeleteMode();
+MainWindow::setSelectMode(){
+  myViewer->setSelectMode();
 }
 
 void 

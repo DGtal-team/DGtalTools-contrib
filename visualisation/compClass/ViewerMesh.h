@@ -45,7 +45,7 @@
 #include "DGtal/images/ConstImageAdapter.h"
 #include <deque>
 
-enum EditMode {ERASE_MODE, COLOR_MODE};
+enum EditMode {SELECT_MODE, COLOR_MODE};
 
 
 template < typename Space = DGtal::Z3i::Space, typename KSpace = DGtal::Z3i::KSpace>
@@ -58,17 +58,17 @@ class ViewerMesh: public DGtal::Viewer3D <Space, KSpace>
 
 public:
   
-  ViewerMesh(RealMesh &aMesh, std::string outMeshName): myPenScale(1.0), myPenColor(DGtal::Color::Blue), 
+  ViewerMesh(RealMesh &aMesh, std::string outMeshName): myPenScale(1.0), myPenColor(DGtal::Color::Blue),myPenSize(5.0),
                                                         myMesh(aMesh), myOutMeshName(outMeshName),
-                                                        myPenSize(5.0), myMode(COLOR_MODE) {
+                                                        myMode(COLOR_MODE) {
   }
   
   void postSelection(const QPoint& point);
   void deleteFacesFromDist(DGtal::Z3i::RealPoint p);
-  void addToDelete(DGtal::Z3i::RealPoint p);
+  void addToSelected(DGtal::Z3i::RealPoint p);
   void deleteCurrents();
   void displaySelectionOnMesh();
-  void setDeleteMode();
+  void setSelectMode();
   void setColorMode();
   void undo();
   void save();
@@ -89,7 +89,7 @@ protected:
   RealMesh &myMesh;
   std::string myOutMeshName;
   EditMode myMode;
-  std::vector<unsigned int> myVectFaceToDelete;
+  std::vector<unsigned int> myVectFaceSelected;
   std::deque<RealMesh> myUndoQueue;
   std::deque<std::vector<unsigned int>> myUndoQueueSelected;
   
@@ -99,4 +99,9 @@ protected:
 #endif // undefined viewer3dimage
 #undef ViewerMesh_RECURSES
 #endif // else defined(ViewerMesh_RECURSES)
+
+
+
+
+
 

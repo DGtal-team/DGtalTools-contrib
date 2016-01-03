@@ -64,7 +64,7 @@
         <rect>
          <x>20</x>
          <y>30</y>
-         <width>814</width>
+         <width>864</width>
          <height>41</height>
         </rect>
        </property>
@@ -73,7 +73,7 @@
          <enum>QLayout::SetMinAndMaxSize</enum>
         </property>
         <item>
-         <widget class="QPushButton" name="deleteButton">
+         <widget class="QPushButton" name="selectButton">
           <property name="maximumSize">
            <size>
             <width>150</width>
@@ -81,7 +81,7 @@
            </size>
           </property>
           <property name="text">
-           <string>delete mode</string>
+           <string>select mode</string>
           </property>
          </widget>
         </item>

@@ -60,8 +60,8 @@ public:
   
 public slots:
 
-  void  updatePenSize();
-  void setDeleteMode();
+  void updatePenSize();
+  void setSelectMode();
   void setColorMode();
   void undo();
   void save();
