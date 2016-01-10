@@ -2,6 +2,7 @@ SET(DGTAL_TOOLS_DEVEL_SRC
     basicEditMesh
     computeMeshDistances
     volLocalMax
+	basicMorphoFilter
 )
 
 
