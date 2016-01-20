@@ -24,6 +24,12 @@ This section can contains various utilities related to 2d geometry (2d estimator
       Proceedings of the 1st International Conference on Pattern Recognition Applications and Methods
        2012 pp. 372--379)]
 
+   - distanceTransform:
+
+      - LUTBasedNSDistanceTransform: Compute the 2D translated
+        neighborhood-sequence distance transform of a binary image.
+      - CumulativeSequenceTest and RationalBeattySequenceTest: tests from
+        LUTBasedNSDistanceTransform.
 
 
 Geometry3d
