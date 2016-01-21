@@ -26,7 +26,8 @@ using namespace qglviewer;
 
 template < typename Space, typename KSpace>
 void
-ViewerMesh< Space, KSpace>::init(){
+ViewerMesh< Space, KSpace>::init()
+{
    DGtal::Viewer3D<>::init();
    (*this).setForegroundColor(QColor::QColor(255,55,55,255));
    QGLViewer::setKeyDescription ( Qt::Key_D|Qt::MetaModifier, "Delete the current selected faces (highlighted in red)" );
@@ -56,7 +57,7 @@ ViewerMesh< Space, KSpace>::helpString() const
   text += "Press <b>F</b> to display the frame rate, <b>A</b> for the world axis, ";
   text += "<b>Alt+Return</b> for full screen mode and <b>Control+S</b> to save a snapshot. ";
   text += "See the <b>Keyboard</b> tab in this window for a complete shortcut list.<br><br>";
-  text += "Double clicks automates single click actions: A left button double click aligns the closer axis with the camera (if close enough). ";
+  text += "Double clicks automate single click actions: A left button double click aligns the closer axis with the camera (if close enough). ";
   text += "A middle button double click fits the zoom of the camera and the right button re-centers the scene.<br><br>";
   text += "A left button double click while holding right button pressed defines the camera <i>Revolve Around Point</i>. ";
   text += "See the <b>Mouse</b> tab and the documentation web pages for details.<br><br>";
@@ -79,48 +80,57 @@ ViewerMesh< Space, KSpace>::keyPressEvent ( QKeyEvent *e )
 {
   
   bool handled = false;
-  if( e->key() == Qt::Key_Plus){
-    myPenSize += 1;
-    std::stringstream ss;
-    ss << "Pen size: " << myPenSize*myPenScale;
-    (*this).displayMessage(QString(ss.str().c_str()), 100000);
-    handled=true;
-  }
-   if( e->key() == Qt::Key_Minus){
-    myPenSize -= 1;
-    std::stringstream ss;
-    ss << "Pen size: " << myPenSize*myPenScale;
-    (*this).displayMessage(QString(ss.str().c_str()), 100000);
-    handled=true;
-  }
-  if( e->key() == Qt::Key_C){
-    setColorMode();
-    handled=true;
-  }
-  if( e->key() == Qt::Key_S){
-    save();
-    handled=true;
-  }
-  if( e->key() == Qt::Key_U){
-    undo();
-    handled=true;
-  }
-  if( e->key() == Qt::Key_D){
-    if (e->modifiers() & Qt::MetaModifier){
-      deleteCurrents();
-    }else{
-      setSelectMode();
+  if( e->key() == Qt::Key_Plus)
+    {
+      myPenSize += 1;
+      std::stringstream ss;
+      ss << "Pen size: " << myPenSize*myPenScale;
+      (*this).displayMessage(QString(ss.str().c_str()), 100000);
+      handled=true;
     }
-    handled=true;
-  }
-  if( e->key() == Qt::Key_F){
-    filterVisibleFaces(1);
-    
-    handled=true;
-  }
-  
-  if ( !handled )
-    DGtal::Viewer3D<>::keyPressEvent ( e );
+   if( e->key() == Qt::Key_Minus)
+     {
+       myPenSize -= 1;
+       std::stringstream ss;
+       ss << "Pen size: " << myPenSize*myPenScale;
+       (*this).displayMessage(QString(ss.str().c_str()), 100000);
+       handled=true;
+     }
+   if( e->key() == Qt::Key_C)
+     {
+       setColorMode();
+       handled=true;
+     }
+   if( e->key() == Qt::Key_S)
+     {
+       save();
+       handled=true;
+     }
+   if( e->key() == Qt::Key_U)
+     {
+       undo();
+       handled=true;
+     }
+   
+   if( e->key() == Qt::Key_D)
+     {
+       if (e->modifiers() & Qt::MetaModifier)
+         {
+           deleteCurrents();
+         }
+       else
+         {
+           setSelectMode();
+         }
+       handled=true;
+     }
+   if( e->key() == Qt::Key_F)
+     {
+       filterVisibleFaces(1);
+       handled=true;
+     }
+   if ( !handled )
+     DGtal::Viewer3D<>::keyPressEvent ( e );
 }  
 
 
@@ -133,11 +143,14 @@ ViewerMesh<Space, KSpace>::postSelection ( const QPoint& point )
   bool found;
   Vec p  = DGtal::Viewer3D<Space, KSpace>::camera()->pointUnderPixel ( point, found ) ;
   if (found){
-    if(myMode == SELECT_MODE){
-      addToSelected(DGtal::Z3i::RealPoint(p.x, p.y, p.z));
-    }else if (myMode == COLOR_MODE){
-      deleteFacesFromDist(DGtal::Z3i::RealPoint(p.x, p.y, p.z));
-    }
+    if(myMode == SELECT_MODE)
+      {
+        addToSelected(DGtal::Z3i::RealPoint(p.x, p.y, p.z));
+      }
+    else if (myMode == COLOR_MODE)
+      {
+        deleteFacesFromDist(DGtal::Z3i::RealPoint(p.x, p.y, p.z));
+      }
   }
 }
 
@@ -146,7 +159,8 @@ ViewerMesh<Space, KSpace>::postSelection ( const QPoint& point )
 
 template< typename Space, typename KSpace>
 void
-ViewerMesh<Space, KSpace>::deleteCurrents(){
+ViewerMesh<Space, KSpace>::deleteCurrents()
+{
   addCurrentMeshToQueue();
   myMesh.removeFaces(myVectFaceSelected);
   myVectFaceSelected.clear();
@@ -162,14 +176,17 @@ ViewerMesh<Space, KSpace>::deleteCurrents(){
 
 template< typename Space, typename KSpace>
 void
-ViewerMesh<Space, KSpace>::addToSelected(DGtal::Z3i::RealPoint p){
+ViewerMesh<Space, KSpace>::addToSelected(DGtal::Z3i::RealPoint p)
+{
   myUndoQueueSelected.push_front(myVectFaceSelected);
-  for (unsigned int i = 0; i < myMesh.nbFaces(); i++) {
-    DGtal::Z3i::RealPoint c = myMesh.getFaceBarycenter(i);
-    if ((c-p).norm() <= myPenSize*myPenScale){
-      myVectFaceSelected.push_back(i);
+  for (unsigned int i = 0; i < myMesh.nbFaces(); i++)
+    {
+      DGtal::Z3i::RealPoint c = myMesh.getFaceBarycenter(i);
+      if ((c-p).norm() <= myPenSize*myPenScale)
+        {
+          myVectFaceSelected.push_back(i);
+        }
     }
-  }
   displaySelectionOnMesh();
 }
 
@@ -179,12 +196,14 @@ void
 ViewerMesh<Space, KSpace>::deleteFacesFromDist(DGtal::Z3i::RealPoint p)
 {
   addCurrentMeshToQueue();
-  for (unsigned int i = 0; i < myMesh.nbFaces(); i++) {
-    DGtal::Z3i::RealPoint c = myMesh.getFaceBarycenter(i);
-    if ((c-p).norm() <= myPenSize*myPenScale){
-      myMesh.setFaceColor(i, myPenColor);
+  for (unsigned int i = 0; i < myMesh.nbFaces(); i++)
+    {
+      DGtal::Z3i::RealPoint c = myMesh.getFaceBarycenter(i);
+      if ((c-p).norm() <= myPenSize*myPenScale)
+        {
+          myMesh.setFaceColor(i, myPenColor);
+        }
     }
-  }
   DGtal::Viewer3D<Space, KSpace>::clear();
   DGtal::Viewer3D<Space, KSpace>::operator<<(myMesh);
   DGtal::Viewer3D<Space, KSpace>::updateList(false);
@@ -194,11 +213,13 @@ ViewerMesh<Space, KSpace>::deleteFacesFromDist(DGtal::Z3i::RealPoint p)
 
 template< typename Space, typename KSpace>
 void
-ViewerMesh<Space, KSpace>::addCurrentMeshToQueue(){
+ViewerMesh<Space, KSpace>::addCurrentMeshToQueue()
+{
   myUndoQueue.push_front(myMesh);
-  if (myUndoQueue.size()> MAXUNDO){
-    myUndoQueue.pop_back();
-  }  
+  if (myUndoQueue.size()> MAXUNDO)
+    {
+      myUndoQueue.pop_back();
+    }  
 }
 
 
@@ -207,9 +228,10 @@ void
 ViewerMesh<Space, KSpace>::displaySelectionOnMesh()
 {
   RealMesh tmp = myMesh;  
-  for (unsigned int i = 0; i < myVectFaceSelected.size(); i++) {
-    tmp.setFaceColor(myVectFaceSelected[i], DGtal::Color::Red);
-  }
+  for (unsigned int i = 0; i < myVectFaceSelected.size(); i++)
+    {
+      tmp.setFaceColor(myVectFaceSelected[i], DGtal::Color::Red);
+    }
   
   DGtal::Viewer3D<Space, KSpace>::clear();
   DGtal::Viewer3D<Space, KSpace>::operator<<(tmp);
@@ -240,22 +262,27 @@ void
 ViewerMesh<Space, KSpace>::undo()
 {
     (*this).displayMessage(QString("UNDO"), 100000);
-    if(myUndoQueue.size()>0){
+    if(myUndoQueue.size()>0)
+      {
         myMesh = myUndoQueue.front();
         myUndoQueue.pop_front();
-    }
-    if(myUndoQueueSelected.size()>0){
-      myVectFaceSelected = myUndoQueueSelected.front();
-      myUndoQueueSelected.pop_front();
-    }
-    if(myMode==SELECT_MODE){
+      }
+    if(myUndoQueueSelected.size()>0)
+      {
+        myVectFaceSelected = myUndoQueueSelected.front();
+        myUndoQueueSelected.pop_front();
+      }
+    if(myMode==SELECT_MODE)
+      {
         displaySelectionOnMesh();
-    }else{
-      DGtal::Viewer3D<Space, KSpace>::clear();
-      DGtal::Viewer3D<Space, KSpace>::operator<<(myMesh);
-      DGtal::Viewer3D<Space, KSpace>::updateList(false);
-      DGtal::Viewer3D<Space, KSpace>::updateGL();      
-    }
+      }
+    else
+      {
+        DGtal::Viewer3D<Space, KSpace>::clear();
+        DGtal::Viewer3D<Space, KSpace>::operator<<(myMesh);
+        DGtal::Viewer3D<Space, KSpace>::updateList(false);
+        DGtal::Viewer3D<Space, KSpace>::updateGL();      
+      }
   
 }
 
@@ -274,25 +301,28 @@ ViewerMesh<Space, KSpace>::save()
 
 template< typename Space, typename KSpace>
 void 
-ViewerMesh<Space, KSpace>::filterVisibleFaces(const double anAngleMax){
+ViewerMesh<Space, KSpace>::filterVisibleFaces(const double anAngleMax)
+{
   addCurrentMeshToQueue();
   DGtal::Z3i::RealPoint mainDir = {QGLViewer::camera()->viewDirection().x,
                                    QGLViewer::camera()->viewDirection().y,
                                    QGLViewer::camera()->viewDirection().z};
 
   std::vector<unsigned int> vectFaceToRemove;
-  for (unsigned int i = 0; i < myMesh.nbFaces(); i++) {
-    DGtal::Z3i::RealPoint c = myMesh.getFaceBarycenter(i);
-    RealMesh::MeshFace aFace = myMesh.getFace(i);
-    DGtal::Z3i::RealPoint p0 = myMesh.getVertex(aFace.at(1));
-    DGtal::Z3i::RealPoint p1 = myMesh.getVertex(aFace.at(0));
-    DGtal::Z3i::RealPoint p2 = myMesh.getVertex(aFace.at(2));
-    DGtal::Z3i::RealPoint vectNormal = ((p1-p0).crossProduct(p2 - p0)).getNormalized();    
-    vectNormal /= vectNormal.norm();
-    if((mainDir.getNormalized()).dot(vectNormal) > cos(anAngleMax)){
-      vectFaceToRemove.push_back(i);
-    }
-  }  
+  for (unsigned int i = 0; i < myMesh.nbFaces(); i++)
+    {
+      DGtal::Z3i::RealPoint c = myMesh.getFaceBarycenter(i);
+      RealMesh::MeshFace aFace = myMesh.getFace(i);
+      DGtal::Z3i::RealPoint p0 = myMesh.getVertex(aFace.at(1));
+      DGtal::Z3i::RealPoint p1 = myMesh.getVertex(aFace.at(0));
+      DGtal::Z3i::RealPoint p2 = myMesh.getVertex(aFace.at(2));
+      DGtal::Z3i::RealPoint vectNormal = ((p1-p0).crossProduct(p2 - p0)).getNormalized();    
+      vectNormal /= vectNormal.norm();
+      if((mainDir.getNormalized()).dot(vectNormal) > cos(anAngleMax))
+        {
+          vectFaceToRemove.push_back(i);
+        }
+    }  
   myMesh.removeFaces(vectFaceToRemove);
   DGtal::Viewer3D<Space, KSpace>::clear();
   DGtal::Viewer3D<Space, KSpace>::operator<<(myMesh);

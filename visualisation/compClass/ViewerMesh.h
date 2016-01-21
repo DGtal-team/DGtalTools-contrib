@@ -60,7 +60,8 @@ public:
   
   ViewerMesh(RealMesh &aMesh, std::string outMeshName): myPenScale(1.0), myPenColor(DGtal::Color::Blue),myPenSize(5.0),
                                                         myMesh(aMesh), myOutMeshName(outMeshName),
-                                                        myMode(COLOR_MODE) {
+                                                        myMode(COLOR_MODE)
+  {
   }
   
   void postSelection(const QPoint& point);
