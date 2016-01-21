@@ -58,24 +58,32 @@
 // For tangential cover
 #include "DGtal/geometry/curves/AlphaThickSegmentComputer.h"
 #include "DGtal/geometry/curves/SaturatedSegmentation.h"
-#include "DGtal/geometry/helpers/ScaleProfile.h"
 #include "DGtal/geometry/tools/Hull2DHelpers.h"
+#include "DGtal/math/Profile.h"
+#include "DGtal/math/MeaningfulScaleAnalysis.h"
 #include "DGtal/base/Circulator.h"
 #include "DGtal/math/MultiStatistics.h"
+
 
 using namespace DGtal;
 
 typedef functions::Hull2D::ThicknessDefinition ThickDef;
 
+struct LogFct{
+ double operator()(const double &a) const {
+   return log(a);
+  }
+};
+
 
 template <typename TInputIterator>
-std::vector<ScaleProfile>
+std::vector<Profile<LogFct> >
 getScaleProfiles(std::vector<double> vectScale, TInputIterator begin, TInputIterator end, ThickDef thDef){
   unsigned int size = std::distance(begin, end);
-  std::vector<ScaleProfile> vectResult;
+  std::vector<Profile<LogFct> > vectResult;
   // Initialisation of the resulting scale profiles
   for (TInputIterator it = begin; it != end; it++) {
-    ScaleProfile s;
+    Profile<LogFct> s;
     s.init(vectScale.size());
     vectResult.push_back(s);
   }
@@ -124,9 +132,11 @@ getNoiseLevels(const std::vector<TInputPoint> &vectContour,
                const std::vector<double> & vectScalesValues, ThickDef thDef){
   
   std::vector<double> vectResults;
-  std::vector<ScaleProfile> vScaleProfile = getScaleProfiles(vectScalesValues, vectContour.begin(), vectContour.end(), thDef);
+  std::vector<Profile<LogFct> > vScaleProfile = getScaleProfiles(vectScalesValues, vectContour.begin(), 
+                                                                 vectContour.end(), thDef);
   for(unsigned int i =0 ;i < vectContour.size(); i++){
-    vectResults.push_back(vectScalesValues[vScaleProfile[i].noiseLevel(1)]);
+    MeaningfulScaleAnalysis<Profile<LogFct> > msa (vScaleProfile[i]);
+    vectResults.push_back(vectScalesValues[msa.noiseLevel(1)]);
   }
   return vectResults;
 }
