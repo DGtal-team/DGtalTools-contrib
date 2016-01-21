@@ -11,3 +11,5 @@ FOREACH(FILE ${DGTAL_TOOLS_DEVEL_SRC})
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib)
 ENDFOREACH(FILE)
+
+add_subdirectory(distanceTransform)
