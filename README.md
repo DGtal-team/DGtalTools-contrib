@@ -24,19 +24,11 @@ This section can contains various utilities related to 2d geometry (2d estimator
       Proceedings of the 1st International Conference on Pattern Recognition Applications and Methods
        2012 pp. 372--379)]
 
-<center>
-<table>
-<tr>
-<td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/12368518/6026fd32-bbec-11e5-8fa3-d1c9b51ba389.png"> </td>
 
-</tr>
-<tr>
-<td>meaningFullThickness</td>
-</tr>
+| ![](https://cloud.githubusercontent.com/assets/772865/12481234/048994c0-c048-11e5-8c64-0e6baea4c62c.png)  |
+| :-: |
+| meaningFullThickness |
 
-</table>
-
-</center>
 
 
 
@@ -49,19 +41,13 @@ As the previous section but in 3d, it contains actually these tools:
    - computeMeshDistances: computes for each face of a mesh A the minimal distance to another mesh B.
    - volLocalMax: extract the local maximas of a vol image within a spherical kernel.
 
-<center>
-<table>
-<tr>
-<td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/12368559/cdb1da0c-bbec-11e5-8076-0a39d962f759.png"> </td>
 
-</tr>
-<tr>
-<td>computeMeshDistances</td>
-</tr>
+| ![](https://cloud.githubusercontent.com/assets/772865/12481207/d20d246c-c047-11e5-8986-ae17a582c977.png)  |
+| :-: |
+| computeMeshDistances |
 
-</table>
 
-</center>
+
 Visualisation
 -------------
 
