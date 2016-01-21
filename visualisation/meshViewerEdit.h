@@ -35,9 +35,10 @@
 #include "DGtal/images/ConstImageAdapter.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
 #include "DGtal/io/colormaps/HueShadeColorMap.h"
+#include "compClass/ViewerMesh.cpp"
 #endif 
 
-#include "compClass/ViewerMesh.cpp"
+
 
 
 
