@@ -39,7 +39,7 @@ mechanism. If you want to contribute, you would have to:
 * clone and install the last version of the
   [DGtal](https://github.com/DGtal-team/DGtal) main repository;
 
-* clone [DGtalTools](https://github.com/DGtal-team/DGtalTools-contrib) ;
+* clone [DGtalTools-contrib](https://github.com/DGtal-team/DGtalTools-contrib) ;
 
 * create a branch for your contribution and push it to your DGtalTools-contrib
   clone;
