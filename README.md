@@ -63,6 +63,6 @@ This section, can contain all tools related to visualisation:
    - meshViewerEdit: tool to visualize a mesh and to apply simple edits (face removal, color edits...).
 
 
-| ![](https://cloud.githubusercontent.com/assets/772865/12523276/22205f46-c156-11e5-827d-ec788baf7029.png) |
-| :-: |
-|meshViewerEdit|
+|![](https://cloud.githubusercontent.com/assets/772865/12538777/cd8c2d28-c2e2-11e5-93ab-cb4a6cfadc8e.png)|  ![](https://cloud.githubusercontent.com/assets/772865/12523276/22205f46-c156-11e5-827d-ec788baf7029.png) |
+|:-:| :-: |
+|displayTgtCoverAlphaTS|meshViewerEdit|
