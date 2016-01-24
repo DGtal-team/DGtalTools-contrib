@@ -46,7 +46,7 @@ As the previous section but in 3d, it contains actually these tools:
    - basicEditMesh: to apply basic mesh edition (scale change, mesh face contraction, face filtering).
    - computeMeshDistances: computes for each face of a mesh A the minimal distance to another mesh B.
    - volLocalMax: extract the local maximas of a vol image within a spherical kernel.
-
+   - basicMorphoFilter: apply basic morpho filter from a ball structural element.
 
 | ![](https://cloud.githubusercontent.com/assets/772865/12481207/d20d246c-c047-11e5-8986-ae17a582c977.png)  |
 | :-: |
@@ -60,7 +60,9 @@ Visualisation
 This section, can contain all tools related to visualisation:
 
    - displayTgtCoverAlphaTS: to display alpha-thick segment given on a simple contour.
+   - meshViewerEdit: tool to visualize a mesh and to apply simple edits (face removal, color edits...).
 
 
-
-
+| ![](https://cloud.githubusercontent.com/assets/772865/12523276/22205f46-c156-11e5-827d-ec788baf7029.png) |
+| :-: |
+|meshViewerEdit|
