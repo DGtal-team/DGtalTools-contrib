@@ -7,7 +7,6 @@ Various tools from the community built using DGtal. Contrary to the DGtalTools p
 
 More Information
 ----------------
-* Related DGtalTools: https://github.com/DGtal-team/DGtalTools
 * Release 0.9.1 DOI [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.xxxxx.svg)](http://dx.doi.org/10.5281/zenodo.xxxxx)
 * [![Build Status](https://api.travis-ci.org/DGtal-team/DGtalTools-contrib.svg?branch=master)](https://travis-ci.org/DGtal-team/DGtalTools-contrib)
 
