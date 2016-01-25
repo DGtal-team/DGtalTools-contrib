@@ -1,7 +1,19 @@
-# DGtalTools-contrib
+DGtalTools-contrib
+==================
+
 
 Various tools from the community built using DGtal. Contrary to the DGtalTools project, these tools are not necessary final but can be considered as development tools or prototypes used to share recent research in progress.
 
+
+More Information
+----------------
+* Related DGtalTools: https://github.com/DGtal-team/DGtalTools
+* Release 0.9.1 DOI [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.xxxxx.svg)](http://dx.doi.org/10.5281/zenodo.xxxxx)
+* [![Build Status](https://api.travis-ci.org/DGtal-team/DGtalTools-contrib.svg?branch=master)](https://travis-ci.org/DGtal-team/DGtalTools-contrib)
+
+
+Organisation
+============
 
 This project is actually organized as follows:
 
@@ -66,3 +78,6 @@ This section, can contain all tools related to visualisation:
 | ![](https://cloud.githubusercontent.com/assets/772865/12523276/22205f46-c156-11e5-827d-ec788baf7029.png) |
 | :-: |
 |meshViewerEdit|
+
+
+
