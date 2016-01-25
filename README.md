@@ -1,7 +1,18 @@
-# DGtalTools-contrib
+DGtalTools-contrib
+==================
+
 
 Various tools from the community built using DGtal. Contrary to the DGtalTools project, these tools are not necessary final but can be considered as development tools or prototypes used to share recent research in progress.
 
+
+More Information
+----------------
+* Release 0.9.1 DOI [![DOI](https://zenodo.org/badge/4888/DGtal-team/DGtalTools-contrib.svg)](https://zenodo.org/badge/latestdoi/4888/DGtal-team/DGtalTools-contrib)
+* [![Build Status](https://api.travis-ci.org/DGtal-team/DGtalTools-contrib.svg?branch=master)](https://travis-ci.org/DGtal-team/DGtalTools-contrib)
+
+
+Organisation
+============
 
 This project is actually organized as follows:
 
