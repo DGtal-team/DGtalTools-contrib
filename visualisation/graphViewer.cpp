@@ -112,7 +112,7 @@ int main( int argc, char** argv )
   // Add vertex to viewer as lines
   viewer << CustomColors3D( Color::Blue,  Color::Blue );
   Mesh<Z3i::RealPoint> aMesh;
-  for ( auto v: vectVertex )
+  for ( const auto& v: vectVertex )
   {
     const Z3i::RealPoint& e1 = vectEdges[v[0]];
     const Z3i::RealPoint& e2 = vectEdges[v[1]];
