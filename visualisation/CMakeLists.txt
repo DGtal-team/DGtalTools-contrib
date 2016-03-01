@@ -1,6 +1,5 @@
 SET(DGTAL_TOOLS_CONTRIB
    displayTgtCoverAlphaTS
-   graphViewer
 )
 
 
@@ -18,6 +17,20 @@ ENDFOREACH(FILE)
 
 
 if (  WITH_VISU3D_QGLVIEWER )
+
+  SET(DGTAL_TOOLS_CONTRIB_WITH_QGLVIEWER
+     graphViewer
+  )
+
+  FOREACH(FILE ${DGTAL_TOOLS_CONTRIB_WITH_QGLVIEWER})
+    add_executable(${FILE} ${FILE})
+    target_link_libraries (${FILE} ${DGTAL_LIBRARIES} ${DGtalToolsContribLibDependencies})
+    install(TARGETS ${FILE} 
+          RUNTIME DESTINATION bin
+          LIBRARY DESTINATION lib
+          ARCHIVE DESTINATION lib)
+  ENDFOREACH(FILE)
+
   include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
   if (WITH_QT4)
