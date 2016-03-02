@@ -58,6 +58,7 @@ As the previous section but in 3d, it contains actually these tools:
    - computeMeshDistances: computes for each face of a mesh A the minimal distance to another mesh B.
    - volLocalMax: extract the local maximas of a vol image within a spherical kernel.
    - basicMorphoFilter: apply basic morpho filter from a ball structural element.
+   - xyzScale: a basic tool to adjust the scale of an xyz file.
 
 | ![](https://cloud.githubusercontent.com/assets/772865/12481207/d20d246c-c047-11e5-8986-ae17a582c977.png)  |
 | :-: |
