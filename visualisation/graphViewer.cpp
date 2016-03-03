@@ -33,6 +33,7 @@
 #include <DGtal/helpers/StdDefs.h>
 #include <DGtal/io/readers/PointListReader.h>
 #include <DGtal/io/readers/TableReader.h>
+#include <DGtal/io/colormaps/HueShadeColorMap.h>
 
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
@@ -49,10 +50,11 @@ int main( int argc, char** argv )
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")
-    ("inputEdge,e", po::value<std::string>(), "input file containing the edge list.")
     ("inputVertex,v", po::value<std::string>(), "input file containing the vertex list.")
-    ("inputRadii,r", po::value<std::string>(), "input file containing the radius for each edge.")
-    ("ballRadius,b", po::value<double>()->default_value(2.0), "radius of edge balls.");
+    ("inputEdge,e", po::value<std::string>(), "input file containing the edge list.")
+    ("inputRadii,r", po::value<std::string>(), "input file containing the radius for each vertex.")
+    ("ballRadius,b", po::value<double>()->default_value(1.0), "radius of vertex balls.")
+    ("colormap,c", "display vertex colored by order in file.");
 
   bool parseOK = true;
 
@@ -68,7 +70,7 @@ int main( int argc, char** argv )
     parseOK = false;
   }
   po::notify(vm);
-  if( !parseOK || argc<=1 || vm.count("help") || !vm.count("inputEdge")  || !vm.count("inputVertex") )
+  if( !parseOK || argc<=1 || vm.count("help") || !vm.count("inputVertex")  || !vm.count("inputEdge") )
   {
     trace.info() << "Basic display graph" << std::endl
                  << "Options:" << std::endl
@@ -76,24 +78,24 @@ int main( int argc, char** argv )
     return 1;
   }
 
-  std::string nameFileEdge = vm["inputEdge"].as<std::string>();
   std::string nameFileVertex = vm["inputVertex"].as<std::string>();
+  std::string nameFileEdge = vm["inputEdge"].as<std::string>();
   double r = vm["ballRadius"].as<double>();
   bool useRadiiFile = vm.count("inputRadii");
 
-  // Structurex to store edges and vertex read in input files
-  std::vector<Z3i::RealPoint> vectEdges = PointListReader<Z3i::RealPoint>::getPointsFromFile(nameFileEdge);
-  std::vector<Z2i::Point> vectVertex = PointListReader<Z2i::Point>::getPointsFromFile(nameFileVertex);
-  std::vector<double> vectRadii( vectEdges.size(), r );
+  // Structurex to store vertex and edges read in input files
+  std::vector<Z3i::RealPoint> vectVertex = PointListReader<Z3i::RealPoint>::getPointsFromFile(nameFileVertex);
+  std::vector<Z2i::Point> vectEdges = PointListReader<Z2i::Point>::getPointsFromFile(nameFileEdge);
+  std::vector<double> vectRadii( vectVertex.size(), r );
 
   if ( useRadiiFile )
   {
     std::string nameFileRadii = vm["inputRadii"].as<std::string>();
     vectRadii = TableReader<double>::getColumnElementsFromFile(nameFileRadii,0);
-    if ( vectRadii.size() != vectEdges.size() )
+    if ( vectRadii.size() != vectVertex.size() )
     {
-      trace.info() << "Error: number of edges ("
-                   << vectEdges.size() << ") is not equal to the number of radii ("
+      trace.info() << "Error: number of vertex ("
+                   << vectVertex.size() << ") is not equal to the number of radii ("
                    << vectRadii.size() << ")." << std::endl;
       return 1;
     }
@@ -101,22 +103,37 @@ int main( int argc, char** argv )
 
   typedef Viewer3D<> MyViewer;
   MyViewer viewer;
-  viewer << CustomColors3D( Color::Blue, Color::Blue );
 
-  // Add edges to viewer as balls
-  for ( int i=0 ; i<vectEdges.size() ; ++i )
+
+  // Add vertex to viewer as balls
+  if ( vm.count("colormap") )
   {
-    viewer.addBall(vectEdges[i], vectRadii[i]);
+    HueShadeColorMap<int> hueShade(0,vectVertex.size());
+    Color currentColor;
+    for ( int i=0 ; i<vectVertex.size() ; ++i )
+    {
+      currentColor = hueShade(i);
+      viewer << CustomColors3D( currentColor, currentColor );
+      viewer.addBall(vectVertex[i], vectRadii[i]);
+    }
+  }
+  else
+  {
+    viewer << CustomColors3D( Color::Blue, Color::Blue );
+     for ( int i=0 ; i<vectVertex.size() ; ++i )
+    {
+      viewer.addBall(vectVertex[i], vectRadii[i]);
+    }
   }
 
-  // Add vertex to viewer as lines
+  // Add edges to viewer as lines
   Mesh<Z3i::RealPoint> aMesh;
   std::vector<Z3i::RealPoint> vertex;
   std::vector<double> radii;
-  for ( const auto& v: vectVertex )
+  for ( const auto& e: vectEdges )
   {
-    vertex = { vectEdges[v[0]], vectEdges[v[1]] };
-    radii = { vectRadii[v[0]], vectRadii[v[1]] };
+    vertex = { vectVertex[e[0]], vectVertex[e[1]] };
+    radii = { vectRadii[e[0]], vectRadii[e[1]] };
     Mesh<Z3i::RealPoint>::createTubularMesh(aMesh, vertex, radii, 0.1);
   }
 
