@@ -16,8 +16,7 @@
 /**
  * @file graphViewer.cpp
  
- * @author Adrien Krahenbuhl  (\c adrien.krahenbuhl@loria.fr)
- * @author Bertrand Kerautret (\c kerautre@loria.fr)
+ * @author Adrien Krähenbühl  (\c adrien.krahenbuhl@loria.fr)
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
  * @date 2016/02/29
