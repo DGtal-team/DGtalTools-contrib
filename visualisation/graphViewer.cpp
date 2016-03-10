@@ -101,14 +101,12 @@ int main( int argc, char** argv )
     }
   }
 
-  typedef Viewer3D<> MyViewer;
-  MyViewer viewer;
-
+  Viewer3D<> viewer;
+  HueShadeColorMap<int> hueShade(0,vectVertex.size());
 
   // Add vertex to viewer as balls
   if ( vm.count("colormap") )
   {
-    HueShadeColorMap<int> hueShade(0,vectVertex.size());
     Color currentColor;
     for ( int i=0 ; i<vectVertex.size() ; ++i )
     {
@@ -119,7 +117,6 @@ int main( int argc, char** argv )
   }
   else
   {
-    viewer << CustomColors3D( Color::Blue, Color::Blue );
      for ( int i=0 ; i<vectVertex.size() ; ++i )
     {
       viewer.addBall(vectVertex[i], vectRadii[i]);
@@ -127,18 +124,34 @@ int main( int argc, char** argv )
   }
 
   // Add edges to viewer as lines
-  Mesh<Z3i::RealPoint> aMesh;
   std::vector<Z3i::RealPoint> vertex;
   std::vector<double> radii;
-  for ( const auto& e: vectEdges )
+
+  if ( vm.count("colormap") )
   {
-    vertex = { vectVertex[e[0]], vectVertex[e[1]] };
-    radii = { vectRadii[e[0]], vectRadii[e[1]] };
-    Mesh<Z3i::RealPoint>::createTubularMesh(aMesh, vertex, radii, 0.1);
+    for ( const auto& e: vectEdges )
+    {
+      Mesh<Z3i::RealPoint> aMesh;
+      vertex = { vectVertex[e[0]], vectVertex[e[1]] };
+      radii = { vectRadii[e[0]], vectRadii[e[1]] };
+      Mesh<Z3i::RealPoint>::createTubularMesh(aMesh, vertex, radii, 0.1);
+      viewer << CustomColors3D( hueShade(e[0]), hueShade(e[1]) );
+      viewer << aMesh;
+    }
+  }
+  else
+  {
+    Mesh<Z3i::RealPoint> aMesh;
+    for ( const auto& e: vectEdges )
+    {
+      vertex = { vectVertex[e[0]], vectVertex[e[1]] };
+      radii = { vectRadii[e[0]], vectRadii[e[1]] };
+      Mesh<Z3i::RealPoint>::createTubularMesh(aMesh, vertex, radii, 0.1);
+    }
+    viewer << aMesh;
   }
 
-  viewer << aMesh;
-  viewer << MyViewer::updateDisplay;
+  viewer << Viewer3D<>::updateDisplay;
   viewer.show();
 
   return application.exec();
