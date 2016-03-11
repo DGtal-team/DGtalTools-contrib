@@ -4,6 +4,8 @@
   - graphViewer: add a new tool allowing to display graph from edges, vertex and radii.
     (Adrien Krahenbuhl)
 
+- *Geometry3d*
+  - xyzScale: a basic tool to adjust the scale of an xyz file. (Bertrand Kerautret)
 
 
 # DGtalTools-contrib  0.9.1
@@ -18,7 +20,7 @@
  - computeMeshDistances: computes for each face of a mesh A the minimal distance to another mesh B. (Bertrand Kerautret)
  - volLocalMax: extract the local maximas of a vol image within a spherical kernel. (Bertrand Kerautret)
  - basicMorphoFilter: apply basic morpho filter from a ball structural element. (Bertrand Kerautret)
- 
+
 
 - *visualisation*
  - displayTgtCoverAlphaTS: to display alpha-thick segment given on a simple contour. (Bertrand Kerautret)
