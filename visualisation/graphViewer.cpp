@@ -33,6 +33,7 @@
 #include <DGtal/helpers/StdDefs.h>
 #include <DGtal/io/readers/PointListReader.h>
 #include <DGtal/io/readers/TableReader.h>
+#include <DGtal/io/readers/MeshReader.h>
 #include <DGtal/io/colormaps/HueShadeColorMap.h>
 
 #include <boost/program_options/options_description.hpp>
@@ -54,6 +55,9 @@ int main( int argc, char** argv )
     ("inputEdge,e", po::value<std::string>(), "input file containing the edge list.")
     ("inputRadii,r", po::value<std::string>(), "input file containing the radius for each vertex.")
     ("ballRadius,b", po::value<double>()->default_value(1.0), "radius of vertex balls.")
+    ("addMesh,m", po::value<std::string>(), "add mesh in the display.")
+    ("colorMesh", po::value<std::vector<unsigned int> >()->multitoken(), "specify the color mesh.")
+    ("colorEdges", po::value<std::vector<unsigned int> >()->multitoken(), "specify the color of edges.")
     ("colormap,c", "display vertex colored by order in file.");
 
   bool parseOK = true;
@@ -77,6 +81,16 @@ int main( int argc, char** argv )
 		             << general_opt << std::endl;
     return 1;
   }
+  unsigned int  meshColorR = 240;
+  unsigned int  meshColorG = 240;
+  unsigned int  meshColorB = 240;
+  unsigned int  meshColorA = 255;
+
+  unsigned int  edgesColorR = 240;
+  unsigned int  edgesColorG = 240;
+  unsigned int  edgesColorB = 240;
+  unsigned int  edgesColorA = 255;
+  
 
   std::string nameFileVertex = vm["inputVertex"].as<std::string>();
   std::string nameFileEdge = vm["inputEdge"].as<std::string>();
@@ -87,6 +101,29 @@ int main( int argc, char** argv )
   std::vector<Z3i::RealPoint> vectVertex = PointListReader<Z3i::RealPoint>::getPointsFromFile(nameFileVertex);
   std::vector<Z2i::Point> vectEdges = PointListReader<Z2i::Point>::getPointsFromFile(nameFileEdge);
   std::vector<double> vectRadii( vectVertex.size(), r );
+
+  if(vm.count("colorMesh")){
+    std::vector<unsigned int > vectCol = vm["colorMesh"].as<std::vector<unsigned int> >();
+    if(vectCol.size()!=4 && vectCol.size()!=8 ){
+      trace.error() << "colors specification should contain R,G,B and Alpha values"<< std::endl;
+    }
+    meshColorR = vectCol[0];
+    meshColorG = vectCol[1];
+    meshColorB = vectCol[2];
+    meshColorA = vectCol[3];
+  }
+  if(vm.count("colorEdges")){
+    std::vector<unsigned int > vectCol = vm["colorEdges"].as<std::vector<unsigned int> >();
+    if(vectCol.size()!=4 && vectCol.size()!=8 ){
+      trace.error() << "colors specification should contain R,G,B and Alpha values"<< std::endl;
+    }
+    edgesColorR = vectCol[0];
+    edgesColorG = vectCol[1];
+    edgesColorB = vectCol[2];
+    edgesColorA = vectCol[3];
+  }
+  
+
 
   if ( useRadiiFile )
   {
@@ -148,8 +185,19 @@ int main( int argc, char** argv )
       radii = { vectRadii[e[0]], vectRadii[e[1]] };
       Mesh<Z3i::RealPoint>::createTubularMesh(aMesh, vertex, radii, 0.1);
     }
+    viewer << CustomColors3D(DGtal::Color::Black, DGtal::Color(edgesColorR, edgesColorG, edgesColorB, edgesColorA));
     viewer << aMesh;
   }
+
+
+  if(vm.count("addMesh")){
+    std::string meshName = vm["addMesh"].as<std::string>();
+    Mesh<Z3i::RealPoint> mesh;
+    mesh << meshName ;
+    viewer << CustomColors3D(DGtal::Color::Black, DGtal::Color(meshColorR, meshColorG, meshColorB, meshColorA));
+    viewer << mesh;
+  }
+
 
   viewer << Viewer3D<>::updateDisplay;
   viewer.show();
