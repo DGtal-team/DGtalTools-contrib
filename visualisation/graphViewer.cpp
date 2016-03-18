@@ -56,8 +56,8 @@ int main( int argc, char** argv )
     ("inputRadii,r", po::value<std::string>(), "input file containing the radius for each vertex.")
     ("ballRadius,b", po::value<double>()->default_value(1.0), "radius of vertex balls.")
     ("addMesh,m", po::value<std::string>(), "add mesh in the display.")
-    ("colorMesh", po::value<std::vector<unsigned int> >()->multitoken(), "specify the color mesh.")
-    ("colorEdges", po::value<std::vector<unsigned int> >()->multitoken(), "specify the color of edges.")
+    ("meshColor", po::value<std::vector<unsigned int> >()->multitoken(), "specify the color mesh.")
+    ("edgeColors", po::value<std::vector<unsigned int> >()->multitoken(), "specify the color of edges.")
     ("colormap,c", "display vertex colored by order in file.");
 
   bool parseOK = true;
@@ -102,8 +102,8 @@ int main( int argc, char** argv )
   std::vector<Z2i::Point> vectEdges = PointListReader<Z2i::Point>::getPointsFromFile(nameFileEdge);
   std::vector<double> vectRadii( vectVertex.size(), r );
 
-  if(vm.count("colorMesh")){
-    std::vector<unsigned int > vectCol = vm["colorMesh"].as<std::vector<unsigned int> >();
+  if(vm.count("meshColor")){
+    std::vector<unsigned int > vectCol = vm["meshColor"].as<std::vector<unsigned int> >();
     if(vectCol.size()!=4 && vectCol.size()!=8 ){
       trace.error() << "colors specification should contain R,G,B and Alpha values"<< std::endl;
     }
@@ -112,8 +112,8 @@ int main( int argc, char** argv )
     meshColorB = vectCol[2];
     meshColorA = vectCol[3];
   }
-  if(vm.count("colorEdges")){
-    std::vector<unsigned int > vectCol = vm["colorEdges"].as<std::vector<unsigned int> >();
+  if(vm.count("edgeColors")){
+    std::vector<unsigned int > vectCol = vm["edgeColors"].as<std::vector<unsigned int> >();
     if(vectCol.size()!=4 && vectCol.size()!=8 ){
       trace.error() << "colors specification should contain R,G,B and Alpha values"<< std::endl;
     }
