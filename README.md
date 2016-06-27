@@ -9,7 +9,6 @@ More Information
 ----------------
 * Release 0.9.2 DOI [![DOI](https://zenodo.org/badge/4888/DGtal-team/DGtalTools-contrib.svg)](https://zenodo.org/badge/latestdoi/4888/DGtal-team/DGtalTools-contrib)
 * Release 0.9.1 DOI [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.45131.svg)](http://dx.doi.org/10.5281/zenodo.45131)
-* [![Build Status](https://travis-ci.org/DGtal-team/DGtalTools-contrib.svg?branch=master)](https://travis-ci.org/DGtal-team/DGtalTools-contrib)
 * [![Build Status](https://api.travis-ci.org/DGtal-team/DGtalTools-contrib.svg?branch=master)](https://travis-ci.org/DGtal-team/DGtalTools-contrib)
 
 
