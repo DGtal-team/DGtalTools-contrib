@@ -143,8 +143,11 @@ int main( int argc, char** argv )
     ("help,h", "display this message")
     ("input,i", po::value<std::string>(), "the input file containing the segments x1 y1 x2 y2 to be displayed. ")
     ("SDPindex", po::value<std::vector <unsigned int> >()->multitoken(), "specify the sdp index of segment endpoints (by default 0,1,2,3).")
+    ("domain", po::value<std::vector <int> >()->multitoken(), "limit the export to a given domain (xmin ymin xmax ymax).")
     ("lineWidth", po::value<double>()->default_value(1.0), "Define the linewidth of the contour (SDP format)") 
     ("noXFIGHeader", " to exclude xfig header in the resulting output stream (no effect with option -outputFile).")
+    ("customLineColor",po::value<std::vector<unsigned int> >()->multitoken(), "set the R, G, B, A components of the colors of the mesh faces and eventually the color R, G, B, A of the mesh edge lines (set by default to black). " )
+    ("customPointColor",po::value<std::vector<unsigned int> >()->multitoken(), "set the R, G, B, A components of the colors of the mesh faces and eventually the color R, G, B, A of the mesh edge lines (set by default to black). " )
     ("outputFile,o", po::value<std::string>(), " <filename> save output file automatically according the file format extension.")
     ("outputStreamEPS", " specify eps for output stream format.")
     ("outputStreamSVG", " specify svg for output stream format.")
@@ -200,8 +203,16 @@ int main( int argc, char** argv )
   
    Board2D aBoard;
    aBoard.setUnit (0.05*scale, LibBoard::Board::UCentimeter);
-  
-
+   if(vm.count("domain"))
+     {
+       
+       std::vector<int> vectDom = vm["domain"].as<std::vector<int > >();
+       if(vectDom.size()!=4){
+         trace.error() << "you need to specify the four values for the domain." << std::endl;
+         return 0;
+       }
+       aBoard.setClippingRectangle(vectDom[0],vectDom[1],vectDom[2],vectDom[3]);
+     }
 
    double alpha=1.0;
    if(vm.count("alphaBG")){
@@ -242,17 +253,33 @@ int main( int argc, char** argv )
      std::vector<Z2i::RealPoint> vectPt1 = PointListReader<Z2i::RealPoint>::getPointsFromFile(fileName, vectPos);
      std::vector<unsigned int> vectPos2; vectPos2.push_back(vectPos[2]); vectPos2.push_back(vectPos[3]);
      std::vector<Z2i::RealPoint> vectPt2 = PointListReader<Z2i::RealPoint>::getPointsFromFile(fileName, vectPos2);
-     
+
+     DGtal::Color lineColor = DGtal::Color::Red;
+     DGtal::Color pointColor = DGtal::Color::Blue;
+     if(vm.count("customLineColor")){
+       std::vector<unsigned int > vectCol = vm["customLineColor"].as<std::vector<unsigned int> >();
+       if(vectCol.size()!=3 ){
+         trace.error() << "colors specification should contain R,G,B values (using default red)."<< std::endl;
+       }
+       lineColor.setRGBi(vectCol[0], vectCol[1], vectCol[2], 255);
+     }
+     if(vm.count("customPointColor")){
+       std::vector<unsigned int > vectCol = vm["customPointColor"].as<std::vector<unsigned int> >();
+       if(vectCol.size()!=3 ){
+         trace.error() << "colors specification should contain R,G,B values (using default red)."<< std::endl;
+       }
+       pointColor.setRGBi(vectCol[0], vectCol[1], vectCol[2], 255);
+     }
+
    
      
      for(unsigned int i=0; i<vectPt1.size(); i++){
        Z2i::Point pt1 (vectPt1[i][0], invertYaxis? height - vectPt1[i][1]: vectPt1[i][1] );
        Z2i::Point pt2 (vectPt2[i][0], invertYaxis? height - vectPt2[i][1]: vectPt2[i][1] );
-       aBoard << CustomStyle(vectPt1[i].className(), new CustomColors(DGtal::Color::Blue, DGtal::Color::Blue));
+       aBoard << CustomStyle(vectPt1[i].className(), new CustomColors(pointColor, pointColor));
        aBoard << pt1 ;
- 
        aBoard <<  pt2;
-       aBoard.setPenColor(DGtal::Color::Red);
+       aBoard.setPenColor(lineColor);
        
     
        aBoard.drawLine(pt1[0], pt1[1], pt2[0], pt2[1]);
