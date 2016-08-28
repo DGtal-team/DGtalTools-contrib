@@ -27,7 +27,9 @@ LINK_DIRECTORIES(${DGTAL_LIBRARY_DIRS})
   endif (CMAKE_CXX_FLAGS MATCHES "-ftemplate-depth-[0-9]*")
 
 
-
+if(USE_OPENCV)
+   find_package( OpenCV REQUIRED )
+endif()
 
 # -----------------------------------------------------------------------------
 # Define variables and cmake parameters, and display some information
