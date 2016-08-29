@@ -53,25 +53,43 @@ namespace po = boost::program_options;
 /**
  @page houghLineDetect houghLineDetect
  
- @brief  Apply the hough transform from the OpenCV implementation.
+ @brief  Apply the hough transform from the OpenCV implementation (see http://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/hough_lines/hough_lines.html).
 
  @b Usage:   houghLineDetect [input]
 
  @b Allowed @b options @b are :
  
  @code
-  -h [ --help ]           display this message
-  -i [ --input ] arg      an input file... 
-  -p [ --parameter] arg   a double parameter...
+  -h [ --help ]                         display this message
+  -i [ --input ] arg                    the input image file.
+  -o [ --output ] arg                   the output file containing the 
+                                        resulting lines segments (one segment 
+                                        per lines).
+  -r [ --rho ] arg (=1)                 The resolution of the parameter r in 
+                                        pixels. We use 1 pixel.
+  -t [ --theta ] arg (=0.017453292519943295)
+                                        The resolution of the parameter heta in
+                                                                        radians
+                                                                        .
+  -T [ --threshold ] arg (=100)         The minimum number of intersections to 
+                                        “detect” a line.
+  -m [ --minLinLength ] arg (=10)        The minimum number of points that can 
+                                        form a line. Lines with less than this 
+                                        number of points are disregarded (use 
+                                        only with --useProbabilist option).
+  -g [ --maxLineGap ] arg (=3)          The maximum gap between two points to 
+                                        be considered in the same line (use 
+                                        only with --useProbabilist option) 
+  -P [ --useProbabilist ]               use improved probabilist algorithm
+
  @endcode
 
  @b Example: 
 
  @code
-   	houghLineDetect -i  $DGtal/examples/samples/....
+   houghLineDetect -i  $DGtal/examples/samples/church.pgm -T 100 -P
  @endcode
 
- @image html reshoughLineDetect.png "Example of result. "
 
  @see
  @ref houghLineDetect.cpp
@@ -112,9 +130,9 @@ int main( int argc, char** argv )
   if( !parseOK || vm.count("help")||argc<=1)
     {
       std::cout << "Usage: " << argv[0] << " [input]\n"
-                << "Apply the Hough transform from the OpenCV implementation.\n"
+                << "Apply the Hough transform from the OpenCV implementation (see http://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/hough_lines/hough_lines.html).\n"
                 << general_opt << "\n"
-                << "Typical use example:\n \t houghLineDetect -i ... \n";
+                << "Typical use example:\n \t houghLineDetect -i  $DGtal/examples/samples/church.pgm -T 100 -P \n";
       return 0;
     }  
   if(! vm.count("input"))
