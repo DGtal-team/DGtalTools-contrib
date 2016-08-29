@@ -71,7 +71,7 @@ Visualisation
 -------------
 
 This section, can contain all tools related to visualisation:
-
+   - displayLineSegments: to display lines as vectorial image.
    - displayTgtCoverAlphaTS: to display alpha-thick segment given on a simple contour.
    - meshViewerEdit: tool to visualize a mesh and to apply simple edits (face removal, color edits...).
    - graphViewer: tool to display graphs from a list of edges, a list of vertex and an optionnal list of radius for each edge.
