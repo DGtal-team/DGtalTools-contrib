@@ -15,7 +15,7 @@ ENDFOREACH(FILE)
 if(USE_OPENCV)
     add_executable(houghLineDetect houghLineDetect)
     target_link_libraries (houghLineDetect ${DGTAL_LIBRARIES} ${DGtalToolsContribLibDependencies} ${OpenCV_LIBS}  )
-  install(TARGETS ${FILE} 
+  install(TARGETS houghLineDetect 
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib)
