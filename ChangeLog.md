@@ -1,3 +1,9 @@
+# DGtalTools-contrib  0.9.3
+
+- *visualisation*
+  - displayLineSegments: add a new tool allowing to display line segment in an output image.
+
+
 # DGtalTools-contrib  0.9.2
 
 - *visualisation*
