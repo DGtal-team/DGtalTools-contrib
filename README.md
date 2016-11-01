@@ -29,7 +29,7 @@ Geometry2d
 ----------
 
 This section can contains various utilities related to 2d geometry (2d estimators, 2d contour tools, ...):
-   - houghLineDetect: line detection from the hough transform (from OpenCV implementation, use cmake option:-DUSE_OPENCV=true).
+   - houghLineDetect: line detection from the hough transform (from OpenCV implementation, use cmake option:-DWITH_OPENCV=true).
    - meaningFullThickness: to display the meaningful thickness of digital contour.
      [Bertrand Kerautret, Jacques-Olivier Lachaud and  Mouhammad Said;
       ~Meaningful Thickness Detection on Polygonal Curve~ ;

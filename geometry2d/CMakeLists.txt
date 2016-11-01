@@ -12,7 +12,7 @@ FOREACH(FILE ${DGTAL_TOOLS_DEVEL_SRC})
         ARCHIVE DESTINATION lib)
 ENDFOREACH(FILE)
 
-if(USE_OPENCV)
+if(WITH_OPENCV)
     add_executable(houghLineDetect houghLineDetect)
     target_link_libraries (houghLineDetect ${DGTAL_LIBRARIES} ${DGtalToolsContribLibDependencies} ${OpenCV_LIBS}  )
   install(TARGETS houghLineDetect 
