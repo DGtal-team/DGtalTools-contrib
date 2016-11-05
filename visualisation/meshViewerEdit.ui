@@ -86,6 +86,13 @@
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="invButton">
+          <property name="text">
+           <string>Inv select</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QPushButton" name="colorButton">
           <property name="maximumSize">
            <size>
@@ -95,13 +102,6 @@
           </property>
           <property name="text">
            <string>color mode</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="invButton">
-          <property name="text">
-           <string>Inv select</string>
           </property>
          </widget>
         </item>
