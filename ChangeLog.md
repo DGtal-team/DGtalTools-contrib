@@ -1,8 +1,11 @@
 # DGtalTools-contrib  0.9.3
 
 - *visualisation*
-  - displayLineSegments: add a new tool allowing to display line segment in an output image.
-
+  - displayLineSegments: add a new tool allowing to display line segment in an output image. (Bertrand Kerautret)
+  
+- *Geometry2d*
+  - houghLineDetect: to detect line segment from Hough transform (using OpenCV). 
+  
 
 # DGtalTools-contrib  0.9.2
 
