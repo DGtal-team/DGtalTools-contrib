@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>990</width>
+    <height>567</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -64,7 +64,7 @@
         <rect>
          <x>20</x>
          <y>30</y>
-         <width>864</width>
+         <width>945</width>
          <height>41</height>
         </rect>
        </property>
@@ -95,6 +95,13 @@
           </property>
           <property name="text">
            <string>color mode</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="invButton">
+          <property name="text">
+           <string>Inv select</string>
           </property>
          </widget>
         </item>
@@ -210,7 +217,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>990</width>
      <height>22</height>
     </rect>
    </property>
