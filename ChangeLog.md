@@ -2,7 +2,7 @@
 
 - *visualisation*
   - displayLineSegments: add a new tool allowing to display line segment in an output image. (Bertrand Kerautret)
-  - AddMeshViewerEdit: add a button to invert the current selection (Bertrand Kerautret)
+  - meshViewerEdit: add a button to invert the current selection (Bertrand Kerautret)
   
 - *Geometry2d*
   - houghLineDetect: to detect line segment from Hough transform (using OpenCV). 
