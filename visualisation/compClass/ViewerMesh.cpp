@@ -176,6 +176,33 @@ ViewerMesh<Space, KSpace>::deleteCurrents()
 
 template< typename Space, typename KSpace>
 void
+ViewerMesh<Space, KSpace>::invertSelection()
+{
+  myUndoQueueSelected.push_front(myVectFaceSelected);
+  std::vector<bool> selected(myMesh.nbFaces());
+  for(unsigned int i = 0; i <selected.size(); i++)
+    {
+      selected[i]=false;
+    }
+  
+  for (unsigned int i = 0; i < myVectFaceSelected.size(); i++)
+    {
+      selected[myVectFaceSelected[i]]=true;
+    }
+  myVectFaceSelected.clear();
+  for (unsigned int i = 0; i < myMesh.nbFaces(); i++)
+    {
+      if(!selected[i])
+        {
+          myVectFaceSelected.push_back(i);
+        }
+    }
+  displaySelectionOnMesh();
+}
+
+
+template< typename Space, typename KSpace>
+void
 ViewerMesh<Space, KSpace>::addToSelected(DGtal::Z3i::RealPoint p)
 {
   myUndoQueueSelected.push_front(myVectFaceSelected);

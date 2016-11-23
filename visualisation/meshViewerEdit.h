@@ -60,7 +60,7 @@ public:
   ~MainWindow();
   
 public slots:
-
+  void invertSelection();
   void updatePenSize();
   void setSelectMode();
   void setColorMode();
