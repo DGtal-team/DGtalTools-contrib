@@ -29,7 +29,7 @@ void
 ViewerMesh< Space, KSpace>::init()
 {
    DGtal::Viewer3D<>::init();
-   (*this).setForegroundColor(QColor::QColor(255,55,55,255));
+   (*this).setForegroundColor(QColor(255,55,55,255));
    QGLViewer::setKeyDescription ( Qt::Key_D|Qt::MetaModifier, "Delete the current selected faces (highlighted in red)" );
    QGLViewer::setKeyDescription ( Qt::Key_D, "Change the current mode to Delete mode" );
    QGLViewer::setKeyDescription ( Qt::Key_C, "Change the current mode to Color mode" );
