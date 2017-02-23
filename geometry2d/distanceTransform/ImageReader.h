@@ -30,9 +30,7 @@
 
 #include "LUTBasedNSDistanceTransformConfig.h"
 
-#ifdef WITH_NETPBM
-#   include "PBMImageReader.h"
-#endif
+#include "PBMImageReader.h"
 #ifdef WITH_PNG
 #   include "PNGImageReader.h"
 #endif

@@ -28,10 +28,6 @@
  * This file is part of the DGtal library.
  */
 
-extern "C" {
-#include <pam.h>
-}
-
 #include "ImageFilter.h"
 
 /**
@@ -49,5 +45,4 @@ protected:
     int _cols;
     int _plainFormat;
     FILE* _output;
-    gray * _outputRow;
 };

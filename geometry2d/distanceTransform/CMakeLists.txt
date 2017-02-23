@@ -9,7 +9,7 @@ add_executable(RationalBeattySequenceTest RationalBeattySequenceTest.cpp)
 add_executable(CumulativeSequenceTest CumulativeSequence.cpp CumulativeSequenceTest.cpp)
 #target_link_libraries(CumulativeSequenceTest sequence)
 
-add_executable(LUTBasedNSDistanceTransform LUTBasedNSDistanceTransform.cpp ImageFilter.cpp ImageWriter.cpp NeighborhoodSequenceDistance.cpp D4DistanceDT.cpp D8DistanceDT.cpp RatioNSDistanceDT.cpp PeriodicNSDistanceDT.cpp CumulativeSequence.cpp)
+add_executable(LUTBasedNSDistanceTransform LUTBasedNSDistanceTransform.cpp ImageFilter.cpp ImageWriter.cpp NeighborhoodSequenceDistance.cpp D4DistanceDT.cpp D8DistanceDT.cpp RatioNSDistanceDT.cpp PeriodicNSDistanceDT.cpp CumulativeSequence.cpp PBMImageReader.cpp PGMImageWriter.cpp)
 
 target_link_libraries (LUTBasedNSDistanceTransform ${DGTAL_LIBRARIES} ${DGtalToolsContribLibDependencies})
 
@@ -24,21 +24,6 @@ if (WITH_PNG)
   message(STATUS "      PNG_FOUND       true")
     endif (PNG_FOUND)
 endif (WITH_PNG)
-
-if (WITH_NETPBM)
-    find_package(NetPBM REQUIRED)
-    if (NETPBM_FOUND)
-  add_definitions(-DWITH_NETPBM)
-  include_directories(${NETPBM_INCLUDE_DIR})
-  add_library(pbmio PBMImageReader.cpp PGMImageWriter.cpp)
-  target_link_libraries(pbmio ${NETPBM_LIBRARIES})
-  target_link_libraries(LUTBasedNSDistanceTransform pbmio)
-
-#	add_executable(imageFeeder imageFeeder.cpp)
-#	target_link_libraries(imageFeeder ${NETPBM_LIBRARIES})
-  message(STATUS "      NETPBM_FOUND       true")
-    endif (NETPBM_FOUND)
-endif (WITH_NETPBM)
 
 install(TARGETS LUTBasedNSDistanceTransform
         RUNTIME DESTINATION bin

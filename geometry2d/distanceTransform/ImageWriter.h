@@ -31,9 +31,7 @@
 #include "LUTBasedNSDistanceTransformConfig.h"
 
 #include "ImageFilter.h"
-#ifdef WITH_NETPBM
-#   include "PGMImageWriter.h"
-#endif
+#include "PGMImageWriter.h"
 #ifdef WITH_PNG
 #   include "PNGImageWriter.h"
 #endif

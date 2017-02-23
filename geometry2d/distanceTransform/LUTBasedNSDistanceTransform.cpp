@@ -31,11 +31,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-#if !defined(WITH_NETPBM) && !defined(WITH_PNG)
-#pragma message ( "Neither libpng nor libnetpbm is available, image i/o is disabled," )
-#pragma message ( "use cmake with option -DWITH_PNG or -DWITH_NETPBM" )
-#endif
-
 #include <iostream>
 
 #include "DGtal/base/Common.h"
@@ -239,7 +234,6 @@ int main( int argc, char** argv )
     }
     int inputFormat = 0;
 
-#ifdef WITH_NETPBM
     if (inputFormat == 0) {
 	char c = fgetc(input);
 	ungetc(c, input);
@@ -257,12 +251,15 @@ int main( int argc, char** argv )
 	    producer.produceAllRows();
 
 	    int c;
-	    while ((c = fgetc(input)) == '\n');
-	    if (c != EOF)
+	    do {
+		c = fgetc(input);
+	    }
+	    while (c == '\r' || c == '\n');
+	    if (!feof(input)) {
 		ungetc(c, input);
+	    }
 	}
     }
-#endif
 
 #ifdef WITH_PNG
     unsigned char signature[8];

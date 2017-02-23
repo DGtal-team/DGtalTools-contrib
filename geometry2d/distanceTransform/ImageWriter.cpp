@@ -74,30 +74,15 @@ ImageConsumer<GrayscalePixelType> *createImageWriter(std::string filename, std::
 	    return NULL;
     }
 
-#ifdef WITH_NETPBM
     if (boost::iequals(format, "pgm")) {
 	return new PGMImageWriter(output, lineBuffered);
     }
-#endif
 #ifdef WITH_PNG
     if (boost::iequals(format, "png")) {
 	return new PNGImageWriter(output, lineBuffered);
     }
 #endif
 
-    if (format != "") {
-	// We can't obey the specified format, give up
-	return NULL;
-    }
-
     // No format specified, use default
-#ifdef WITH_NETPBM
     return new PGMImageWriter(output);
-#else
-#   ifdef WITH_PNG
-    return new PNGImageWriter(output);
-#   endif
-#endif
-
-    return NULL;
 }
