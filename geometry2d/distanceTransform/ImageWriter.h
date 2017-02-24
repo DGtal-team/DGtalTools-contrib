@@ -31,9 +31,5 @@
 #include "LUTBasedNSDistanceTransformConfig.h"
 
 #include "ImageFilter.h"
-#include "PGMImageWriter.h"
-#ifdef WITH_PNG
-#   include "PNGImageWriter.h"
-#endif
 
 ImageConsumer<GrayscalePixelType>* createImageWriter(std::string filename = std::string("-"), std::string format = std::string(""), bool lineBuffered=false);

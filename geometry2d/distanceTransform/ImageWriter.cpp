@@ -31,6 +31,10 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <stdio.h>
 #include "ImageWriter.h"
+#include "PGMImageWriter.h"
+#ifdef WITH_PNG
+#   include "PNGImageWriter.h"
+#endif
 
 /**
  * Creates an ImageWriter.
