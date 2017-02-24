@@ -196,7 +196,6 @@ int main( int argc, char** argv )
 	}
 	else {
 	    input = fopen(inputFile.c_str(), "r");
-	    // FIXME: where is fclose?
 	    if (input == NULL)
 		std::cerr << "Unable to open input stream";
 	}
