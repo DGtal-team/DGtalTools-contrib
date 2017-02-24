@@ -55,8 +55,7 @@ using namespace DGtal;
 std::vector<int> parseSequence(std::string string) {
     std::vector<int> args;
     boost::tokenizer<> tok(string);
-    for (boost::tokenizer<>::iterator beg = tok.begin(); beg != tok.end(); ++beg){
-	//args.push_back(boost::lexical_cast<short>(*beg));
+    for (boost::tokenizer<>::iterator beg = tok.begin(); beg != tok.end(); ++beg) {
 	args.push_back(boost::lexical_cast<short>(*beg));
     }
     return args;
@@ -134,12 +133,6 @@ int main( int argc, char** argv )
 	boost::rational<int> ratio;
 	std::istringstream iss(vm["ratio"].as<std::string>());
 	iss >> ratio;
-	//trace.info() << ratio << std::endl;
-/*	if (!parseRate(vm["ratio"].as<string>(), &num, &den)) {
-	    trace.error() << "Unable to parse num/den from \"%s\"\n"
-			  << vm["ratio"].as<string>();
-	    exit(-1);
-	}*/
 	if (ratio < 0 || ratio > 1) {
 	    std::cerr <<
 		"Invalid ratio " << ratio << std::endl <<
@@ -149,7 +142,7 @@ int main( int argc, char** argv )
 	dist = NeighborhoodSequenceDistance::newInstance(ratio);
     }
     else if (vm.count("sequence")) {
-      std::vector<int> sequence = parseSequence(vm["sequence"].as<std::string>());
+	std::vector<int> sequence = parseSequence(vm["sequence"].as<std::string>());
 	dist = NeighborhoodSequenceDistance::newInstance(sequence);
     }
     //------------------------------------------------------------------------//
@@ -162,10 +155,10 @@ int main( int argc, char** argv )
 	bool lineBuffered = false;
 
 	if (vm.count("output")) {
-          outputFile = vm["output"].as<std::string>();
+	    outputFile = vm["output"].as<std::string>();
 	}
 	if (vm.count("outputFormat")) {
-          outputFormat = vm["outputFormat"].as<std::string>();
+	    outputFormat = vm["outputFormat"].as<std::string>();
 	}
 	if (vm.count("lineBuffered")) {
 	    lineBuffered = true;
@@ -189,15 +182,16 @@ int main( int argc, char** argv )
     {
 	std::string inputFile("-");
 	if (vm.count("input")) {
-          inputFile = vm["input"].as<std::string>();
+	    inputFile = vm["input"].as<std::string>();
 	}
 	if (inputFile == "-") {
 	    input = stdin;
 	}
 	else {
 	    input = fopen(inputFile.c_str(), "r");
-	    if (input == NULL)
+	    if (input == NULL) {
 		std::cerr << "Unable to open input stream";
+	    }
 	}
     }
     int inputFormat = 0;
