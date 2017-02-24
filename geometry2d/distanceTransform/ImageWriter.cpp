@@ -84,5 +84,9 @@ ImageConsumer<GrayscalePixelType> *createImageWriter(std::string filename, std::
 #endif
 
     // No format specified, use default
-    return new PGMImageWriter(output);
+    if (boost::iequals(format, "")) {
+	return new PGMImageWriter(output);
+    }
+
+    return NULL;
 }
