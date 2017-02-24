@@ -31,54 +31,23 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-#include <iostream>
-
-#include "DGtal/base/Common.h"
-
-#include "DGtal/helpers/StdDefs.h"
-
-#include "DGtal/shapes/ShapeFactory.h"
-#include "DGtal/shapes/Shapes.h"
-#include "DGtal/topology/helpers/Surfaces.h"
-
-//image
-#include "DGtal/images/imagesSetsUtils/ImageFromSet.h"
-#include "DGtal/images/imagesSetsUtils/SetFromImage.h"
-#include "DGtal/images/ImageContainerBySTLVector.h"
-#include "DGtal/images/ImageSelector.h"
-#include "DGtal/io/readers/PointListReader.h"
-#include "DGtal/io/boards/Board2D.h"
-#include "DGtal/io/Color.h"
-
-#ifdef WITH_MAGICK
-#include "DGtal/io/readers/MagickReader.h"
-#endif
-
-
-//contour
-#include "DGtal/geometry/curves/FreemanChain.h"
-
-//processing
-#include "DGtal/geometry/curves/ArithmeticalDSS.h"
-#include "DGtal/geometry/curves/FP.h"
-
 //boost
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
+#include <boost/tokenizer.hpp>
 
 //STL
+#include <iostream>
 #include <vector>
 #include <string>
 
 //Path-based distances
 #include "ImageReader.h"
-
 #include "NeighborhoodSequenceDistance.h"
-#include <boost/tokenizer.hpp>
-
 #include "ImageWriter.h"
 
+#include "DGtal/base/Common.h"
 using namespace DGtal;
 
 ////////////////////////////////////////////////////////////////////////////////
