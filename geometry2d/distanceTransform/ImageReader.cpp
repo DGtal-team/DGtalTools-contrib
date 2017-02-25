@@ -108,12 +108,12 @@ RowImageProducer<BinaryPixelType>* createImageReader(ImageConsumer<BinaryPixelTy
     unsigned char signature[8];
     int readBytes = 0;
 
-    if (format == 0) {
+    if (format == "") {
 	readBytes = fread(signature, 1, 8, input);
     }
 
     if (format == "png" ||
-	(format == 0 && readBytes == 8 && png_check_sig(signature, 8))) {
+	(format == "" && readBytes == 8 && png_check_sig(signature, 8))) {
 
 	format = "png";
 	PNGImageReader producer(consumer, input);

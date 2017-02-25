@@ -51,7 +51,7 @@ void PNGImageWriter::beginOfImage(int cols, int rows) {
 		 16,
 		 PNG_COLOR_TYPE_GRAY,
 		 PNG_INTERLACE_NONE,
-		 NULL/*PNG_COMPRESSION_TYPE_DEFAULT*/,
+		 PNG_COMPRESSION_TYPE_DEFAULT,
 		 PNG_FILTER_TYPE_DEFAULT);
     //png_set_filter(_png_ptr, 0, PNG_FILTER_NONE);
     //png_set_packing(_png_ptr);
