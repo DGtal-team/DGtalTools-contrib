@@ -65,9 +65,6 @@ std::vector<int> parseSequence(std::string string) {
 
 namespace po = boost::program_options;
 
-#define PBM_FILE_FORMAT	1
-#define PNG_FILE_FORMAT	2
-
 int main( int argc, char** argv )
 {
     // parse command line ----------------------------------------------------//
@@ -88,6 +85,7 @@ int main( int argc, char** argv )
 	("output,o", po::value<std::string>(), "Output file name, optionally "
 	 "prefixed with the file format and ':'")
 	("outputFormat,t", po::value<std::string>(), "Output file format")
+	("inputFormat,f", po::value<std::string>(), "Input file format")
 	("lineBuffered,l", "Flush output after each produced row.")
 	("input,i", po::value<std::string>(), "Read from file \"arg\" instead of "
 	 "stdin.");
@@ -178,83 +176,16 @@ int main( int argc, char** argv )
     //------------------------------------------------------------------------//
 
     // Input -----------------------------------------------------------------//
-    FILE *input;
-    {
-	std::string inputFile("-");
-	if (vm.count("input")) {
-	    inputFile = vm["input"].as<std::string>();
-	}
-	if (inputFile == "-") {
-	    input = stdin;
-	}
-	else {
-	    input = fopen(inputFile.c_str(), "r");
-	    if (input == NULL) {
-		std::cerr << "Unable to open input stream";
-	    }
-	}
+    std::string inputFile("-");
+    std::string inputFormat("");
+    if (vm.count("input")) {
+	inputFile = vm["input"].as<std::string>();
     }
-    int inputFormat = 0;
-
-    if (inputFormat == 0) {
-	char c = fgetc(input);
-	ungetc(c, input);
-
-	if (c == 'P') {
-	    inputFormat = PBM_FILE_FORMAT;
-	}
+    if (vm.count("inputFormat")) {
+	inputFormat = vm["inputFormat"].as<std::string>();
     }
-
-    if (inputFormat == PBM_FILE_FORMAT) {
-	PBMImageReader producer(dt, input);
-	dt = NULL;
-
-	while (!feof(input)) {
-	    producer.produceAllRows();
-
-	    int c;
-	    do {
-		c = fgetc(input);
-	    }
-	    while (c == '\r' || c == '\n');
-	    if (!feof(input)) {
-		ungetc(c, input);
-	    }
-	}
-    }
-
-#ifdef WITH_PNG
-    unsigned char signature[8];
-    int readBytes = 0;
-
-    if (inputFormat == 0) {
-	readBytes = fread(signature, 1, 8, input);
-    }
-
-    if (inputFormat == PNG_FILE_FORMAT ||
-	(inputFormat == 0 && readBytes == 8 && png_check_sig(signature, 8))) {
-
-	inputFormat = PNG_FILE_FORMAT;
-	PNGImageReader producer(dt, input);
-	dt = NULL;
-
-	do {
-	    // Assumes following images, if any, are png
-	    producer.produceAllRows(8);
-	}
-	while (fread(signature, 1, 8, input) == 8);
-    }
-#endif
-
-    if (inputFormat == 0) {
-	std::cerr << "Input image format not recognized" << std::endl;
-    }
+    createImageReader(dt, inputFile, inputFormat);
     //------------------------------------------------------------------------//
 
-    if (dt != NULL) {
-	delete dt;
-    }
-
-    fclose(input);
     return 0;
 }

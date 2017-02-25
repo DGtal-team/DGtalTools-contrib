@@ -29,8 +29,6 @@
  */
 
 #include "LUTBasedNSDistanceTransformConfig.h"
+#include "ImageFilter.h"
 
-#include "PBMImageReader.h"
-#ifdef WITH_PNG
-#   include "PNGImageReader.h"
-#endif
+RowImageProducer<BinaryPixelType>* createImageReader(ImageConsumer<BinaryPixelType> *consumer, std::string filename = std::string("-"), std::string format = std::string(""));
