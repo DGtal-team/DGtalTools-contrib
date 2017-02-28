@@ -32,4 +32,6 @@
 
 #include "ImageFilter.h"
 
-ImageConsumer<GrayscalePixelType>* createImageWriter(std::string filename = std::string("-"), std::string format = std::string(""), bool lineBuffered=false);
+ImageConsumer<GrayscalePixelType> *createImageWriter(
+    std::string filename = std::string("-"),
+    std::string format = std::string(""), bool lineBuffered = false);

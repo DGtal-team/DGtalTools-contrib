@@ -30,26 +30,28 @@
 
 #include "PGMImageWriter.h"
 
-PGMImageWriter::PGMImageWriter(FILE* output, int plainFormat) :
-_cols(0),
-_plainFormat(plainFormat),
-_output(output) {
+PGMImageWriter::PGMImageWriter(FILE *output, int plainFormat)
+    : _cols(0)
+    , _plainFormat(plainFormat)
+    , _output(output)
+{
 }
 
-void
-PGMImageWriter::beginOfImage(int cols, int rows) {
+void PGMImageWriter::beginOfImage(int cols, int rows)
+{
     _cols = cols;
     fprintf(_output, "P2\n%d %d\n255\n", cols, rows);
 }
 
-void
-PGMImageWriter::endOfImage() {
+void PGMImageWriter::endOfImage()
+{
 }
 
-void
-PGMImageWriter::processRow(const GrayscalePixelType* inputRow) {
-    for (int column = 0; column < _cols - 1; column++) {
-	fprintf(_output, "%d ", inputRow[column]);
+void PGMImageWriter::processRow(const GrayscalePixelType *inputRow)
+{
+    for (int column = 0; column < _cols - 1; column++)
+    {
+        fprintf(_output, "%d ", inputRow[column]);
     }
     fprintf(_output, "%d\n", inputRow[_cols - 1]);
 }

@@ -28,44 +28,46 @@
  * This file is part of the DGtal library.
  */
 
-#include <vector>
 #include <ostream>
+#include <vector>
 
 /**
  * \brief This class represents non-decreasing sequences of integers produced
  * by the cumulative sum of periodic sequences.
  */
-class CumulativeOfPeriodicSequence {
-public:
-    CumulativeOfPeriodicSequence(std::vector<int> sequence, int offset = 0) :
-        _sequence(sequence),
-	_offset(offset)
+class CumulativeOfPeriodicSequence
+{
+  public:
+    CumulativeOfPeriodicSequence(std::vector<int> sequence, int offset = 0)
+        : _sequence(sequence)
+        , _offset(offset)
     {
-	int sum = 0;
-	for (std::vector<int>::iterator it = _sequence.begin();
-	     it != _sequence.end();
-	     it++)
-	{
-	    sum += *it;
-	    *it = sum;
-	}
+        int sum = 0;
+        for (std::vector<int>::iterator it = _sequence.begin();
+             it != _sequence.end(); it++)
+        {
+            sum += *it;
+            *it = sum;
+        }
     }
 
     CumulativeOfPeriodicSequence invert() const;
 
     int operator()(int i) const;
 
-    bool operator==(const CumulativeOfPeriodicSequence& seq) const;
+    bool operator==(const CumulativeOfPeriodicSequence &seq) const;
 
-    friend std::ostream &operator<<(std::ostream &out, const CumulativeOfPeriodicSequence &seq);
+    friend std::ostream &operator<<(
+        std::ostream &out, const CumulativeOfPeriodicSequence &seq);
 
-protected:
-    CumulativeOfPeriodicSequence(int length, int offset = 0) :
-    _sequence(length),
-    _offset(offset) {
+  protected:
+    CumulativeOfPeriodicSequence(int length, int offset = 0)
+        : _sequence(length)
+        , _offset(offset)
+    {
     }
 
-private:
+  private:
     std::vector<int> _sequence;
     int _offset;
 };

@@ -33,13 +33,14 @@
 /**
  *
  */
-class PBMImageReader: public RowImageProducer<BinaryPixelType> {
-public:
-    PBMImageReader(ImageConsumer<BinaryPixelType>* consumer, FILE *input);
+class PBMImageReader : public RowImageProducer<BinaryPixelType>
+{
+  public:
+    PBMImageReader(ImageConsumer<BinaryPixelType> *consumer, FILE *input);
 
     void produceAllRows();
 
-private:
+  private:
     typedef RowImageProducer<BinaryPixelType> super;
     FILE *_input;
 };

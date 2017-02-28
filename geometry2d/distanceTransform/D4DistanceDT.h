@@ -35,22 +35,27 @@
  * factory methods to create translated distance transform filters and
  * distance transform untranslator filters.
  */
-class D4Distance: public NeighborhoodSequenceDistance {
-public:
-    NeighborhoodSequenceDistanceTransform* newTranslatedDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer) const;
-    DistanceTransformUntranslator<GrayscalePixelType, GrayscalePixelType>* newDistanceTransformUntranslator(ImageConsumer<GrayscalePixelType>* consumer) const;
+class D4Distance : public NeighborhoodSequenceDistance
+{
+  public:
+    NeighborhoodSequenceDistanceTransform *newTranslatedDistanceTransform(
+        ImageConsumer<GrayscalePixelType> *consumer) const;
+    DistanceTransformUntranslator<GrayscalePixelType, GrayscalePixelType> *
+    newDistanceTransformUntranslator(
+        ImageConsumer<GrayscalePixelType> *consumer) const;
 };
 
 /**
  * \brief Implements a single scan translated city-block distance transform.
  */
-class D4DistanceTransform: public NeighborhoodSequenceDistanceTransform {
-public:
-    D4DistanceTransform(ImageConsumer<GrayscalePixelType>* consumer);
+class D4DistanceTransform : public NeighborhoodSequenceDistanceTransform
+{
+  public:
+    D4DistanceTransform(ImageConsumer<GrayscalePixelType> *consumer);
 
     void processRow(const BinaryPixelType *imageRow);
 
-private:
+  private:
     typedef NeighborhoodSequenceDistanceTransform super;
 };
 
@@ -58,18 +63,25 @@ private:
  * \brief Implements a recentering algorithm for the translated city-block
  * distance transform.
  */
-class D4DistanceTransformUntranslator: public DistanceTransformUntranslator<GrayscalePixelType, GrayscalePixelType> {
-private:
-    typedef DistanceTransformUntranslator<GrayscalePixelType, GrayscalePixelType> super;
-public:
-    D4DistanceTransformUntranslator(ImageConsumer<GrayscalePixelType>* consumer, int dMax);
+class D4DistanceTransformUntranslator
+    : public DistanceTransformUntranslator<GrayscalePixelType,
+          GrayscalePixelType>
+{
+  private:
+    typedef DistanceTransformUntranslator<GrayscalePixelType,
+        GrayscalePixelType>
+        super;
+
+  public:
+    D4DistanceTransformUntranslator(
+        ImageConsumer<GrayscalePixelType> *consumer, int dMax);
     ~D4DistanceTransformUntranslator();
 
     void beginOfImage(int cols, int rows);
-    void processRow(const GrayscalePixelType* inputRow);
+    void processRow(const GrayscalePixelType *inputRow);
     void endOfImage();
 
-protected:
+  protected:
     int _dMax;
     int _imageDMax;
 };

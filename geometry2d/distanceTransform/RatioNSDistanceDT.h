@@ -36,8 +36,9 @@
  * a ratio of neighborhoods. It provides factory methods to create translated
  * distance transform filters and distance transform untranslator filters.
  */
-class RatioNSDistance: public NeighborhoodSequenceDistance {
-public:
+class RatioNSDistance : public NeighborhoodSequenceDistance
+{
+  public:
     /**
      * Constructor.  Creates a neighborhood sequence distance defined by a
      * a ratio of neighborhoods.
@@ -55,14 +56,17 @@ public:
      */
     RatioNSDistance(boost::rational<int> ratio);
 
-    NeighborhoodSequenceDistanceTransform* newTranslatedDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer) const;
+    NeighborhoodSequenceDistanceTransform *newTranslatedDistanceTransform(
+        ImageConsumer<GrayscalePixelType> *consumer) const;
 
-    DistanceTransformUntranslator<GrayscalePixelType, GrayscalePixelType>* newDistanceTransformUntranslator(ImageConsumer<GrayscalePixelType>* consumer) const;
+    DistanceTransformUntranslator<GrayscalePixelType, GrayscalePixelType> *
+    newDistanceTransformUntranslator(
+        ImageConsumer<GrayscalePixelType> *consumer) const;
 
     friend class RatioNSDistanceTransform;
     friend class RatioNSDistanceTransformUntranslator;
 
-protected:
+  protected:
     /**
      * ratio of appearance of the 2-neighborhood in the sequence.
      */
@@ -87,12 +91,14 @@ protected:
  * \brief Implements a single scan translated distance transform for distances
  * defined by a ratio of neighborhoods.
  */
-class RatioNSDistanceTransform : public NeighborhoodSequenceDistanceTransform {
-protected:
+class RatioNSDistanceTransform : public NeighborhoodSequenceDistanceTransform
+{
+  protected:
     const RatioNSDistance d;
 
-public:
-    RatioNSDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer, boost::rational<int> ratio);
+  public:
+    RatioNSDistanceTransform(ImageConsumer<GrayscalePixelType> *consumer,
+        boost::rational<int> ratio);
 
     void processRow(const BinaryPixelType *imageRow);
 };
@@ -101,17 +107,24 @@ public:
  * \brief Implements a recentering algorithm for the translated distance
  * transforms defined by a ratio of neighborhoods.
  */
-class RatioNSDistanceTransformUntranslator: public DistanceTransformUntranslator<GrayscalePixelType, GrayscalePixelType> {
-public:
-    RatioNSDistanceTransformUntranslator(ImageConsumer<GrayscalePixelType>* consumer, int dMax, boost::rational<int> ratio);
+class RatioNSDistanceTransformUntranslator
+    : public DistanceTransformUntranslator<GrayscalePixelType,
+          GrayscalePixelType>
+{
+  public:
+    RatioNSDistanceTransformUntranslator(
+        ImageConsumer<GrayscalePixelType> *consumer, int dMax,
+        boost::rational<int> ratio);
     ~RatioNSDistanceTransformUntranslator();
 
     void beginOfImage(int cols, int rows);
-    void processRow(const GrayscalePixelType* inputRow);
+    void processRow(const GrayscalePixelType *inputRow);
     void endOfImage();
 
-protected:
-    typedef DistanceTransformUntranslator<GrayscalePixelType, GrayscalePixelType> super;
+  protected:
+    typedef DistanceTransformUntranslator<GrayscalePixelType,
+        GrayscalePixelType>
+        super;
     void rotate();
 
     static const int marginRight = 1;

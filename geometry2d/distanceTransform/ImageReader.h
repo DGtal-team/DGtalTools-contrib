@@ -28,7 +28,10 @@
  * This file is part of the DGtal library.
  */
 
-#include "LUTBasedNSDistanceTransformConfig.h"
 #include "ImageFilter.h"
+#include "LUTBasedNSDistanceTransformConfig.h"
 
-RowImageProducer<BinaryPixelType>* createImageReader(ImageConsumer<BinaryPixelType> *consumer, std::string filename = std::string("-"), std::string format = std::string(""));
+RowImageProducer<BinaryPixelType> *createImageReader(
+    ImageConsumer<BinaryPixelType> *consumer,
+    std::string filename = std::string("-"),
+    std::string format = std::string(""));

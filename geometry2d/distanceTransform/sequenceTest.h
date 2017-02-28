@@ -41,20 +41,23 @@
  * Practically, the test is performed from **n=1** to a finite limit **N**
  * (defaults to 10000).
  */
-template<typename sequence>
-bool testLambekMoserInverseSequences(sequence &s1, sequence &s2, unsigned int N = 10000) {
+template <typename sequence>
+bool testLambekMoserInverseSequences(
+    sequence &s1, sequence &s2, unsigned int N = 10000)
+{
     unsigned int i1 = 1;
     unsigned int i2 = 1;
-    for (unsigned int n = 1; n <= N; n++) {
-	// Each positive integer n is expected to be equal to a sequence term
-	// plus its rank.
-	if (s1(i1) + i1 == n)
-	    i1++;
-	else if (s2(i2) + i2 == n)
-	    i2++;
-	else
-	    // ... otherwise the test fails
-	    return false;
+    for (unsigned int n = 1; n <= N; n++)
+    {
+        // Each positive integer n is expected to be equal to a sequence term
+        // plus its rank.
+        if (s1(i1) + i1 == n)
+            i1++;
+        else if (s2(i2) + i2 == n)
+            i2++;
+        else
+            // ... otherwise the test fails
+            return false;
     }
     // The test succeded (so far...)
     return true;
@@ -69,19 +72,22 @@ bool testLambekMoserInverseSequences(sequence &s1, sequence &s2, unsigned int N 
  * Practically, the test is performed from **n=1** to a finite limit **N**
  * (defaults to 10000).
  */
-template<typename sequence>
-bool testComplementarySequences(sequence &s1, sequence &s2, unsigned int N = 10000) {
+template <typename sequence>
+bool testComplementarySequences(
+    sequence &s1, sequence &s2, unsigned int N = 10000)
+{
     int i1 = 1;
     int i2 = 1;
-    for (int n = 1; n <= N; n++) {
-	// Each positive integer n is expected to be found in one sequence.
-      if (s1(i1) == n)
-	    i1++;
-	else if (s2(i2) == n)
-	    i2++;
-	else
-	    // ... otherwise the test fails
-	    return false;
+    for (int n = 1; n <= N; n++)
+    {
+        // Each positive integer n is expected to be found in one sequence.
+        if (s1(i1) == n)
+            i1++;
+        else if (s2(i2) == n)
+            i2++;
+        else
+            // ... otherwise the test fails
+            return false;
     }
     // The test succeded (so far...)
     return true;

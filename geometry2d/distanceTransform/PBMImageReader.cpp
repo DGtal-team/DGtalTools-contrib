@@ -30,45 +30,52 @@
 
 #include "PBMImageReader.h"
 
-void skipCommentLines(FILE *file) {
+void skipCommentLines(FILE *file)
+{
     int ch;
     int isComment;
 
-    do {
-	isComment = 0;
-	ch = fgetc(file);
-	if (ch == '#') {
-	    isComment = 1;
-	    int eolFound = 0;
-	    do {
-		ch = fgetc(file);
-		if (ch == '\n' || ch == '\r')
-		    eolFound = 1;
-	    } while (ch != '\n' && ch != '\r' && !eolFound);
-	}
-	ungetc(ch, file);
-    }
-    while (isComment || ch == EOF);
+    do
+    {
+        isComment = 0;
+        ch = fgetc(file);
+        if (ch == '#')
+        {
+            isComment = 1;
+            int eolFound = 0;
+            do
+            {
+                ch = fgetc(file);
+                if (ch == '\n' || ch == '\r')
+                    eolFound = 1;
+            } while (ch != '\n' && ch != '\r' && !eolFound);
+        }
+        ungetc(ch, file);
+    } while (isComment || ch == EOF);
 }
 
-void readpbminit(FILE *pbmFile, int * cols, int * rows, int * format) {
+void readpbminit(FILE *pbmFile, int *cols, int *rows, int *format)
+{
     skipCommentLines(pbmFile);
     fscanf(pbmFile, "P%d ", format);
-    if (*format != 1 && *format != 4) {
-	*cols = *rows = 0;
-	return;
+    if (*format != 1 && *format != 4)
+    {
+        *cols = *rows = 0;
+        return;
     }
     skipCommentLines(pbmFile);
     fscanf(pbmFile, "%d %d ", cols, rows);
 }
 
-PBMImageReader::PBMImageReader(ImageConsumer<BinaryPixelType>* consumer, FILE *input) :
-    super(consumer),
-    _input(input)
+PBMImageReader::PBMImageReader(
+    ImageConsumer<BinaryPixelType> *consumer, FILE *input)
+    : super(consumer)
+    , _input(input)
 {
 }
 
-void PBMImageReader::produceAllRows() {
+void PBMImageReader::produceAllRows()
+{
     BinaryPixelType *inputRow;
     int cols, rows;
     int col, row;
@@ -77,41 +84,48 @@ void PBMImageReader::produceAllRows() {
     readpbminit(_input, &cols, &rows, &format);
     assert(cols > 0);
     assert(rows > 0);
-    inputRow = (BinaryPixelType *) malloc(sizeof(BinaryPixelType) * cols);
+    inputRow = (BinaryPixelType *)malloc(sizeof(BinaryPixelType) * cols);
     _consumer->beginOfImage(cols, rows);
-    switch (format) {
-	case 1:
-	    for (int row = 0; row < rows; row++) {
-		for (col = 0; col < cols; col++) {
-		    int value;
-		    fscanf(_input, "%1d", &value);
-		    inputRow[col] = value != 0;
-		}
-		_consumer->processRow(inputRow);
-	    }
-	    break;
-	case 4:
-	    unsigned int bytesPerRow = (cols + 7) / 8;
-	    unsigned char* bits = (unsigned char*) malloc(bytesPerRow);
-	    int byte;
-	    unsigned char m;
+    switch (format)
+    {
+    case 1:
+        for (int row = 0; row < rows; row++)
+        {
+            for (col = 0; col < cols; col++)
+            {
+                int value;
+                fscanf(_input, "%1d", &value);
+                inputRow[col] = value != 0;
+            }
+            _consumer->processRow(inputRow);
+        }
+        break;
+    case 4:
+        unsigned int bytesPerRow = (cols + 7) / 8;
+        unsigned char *bits = (unsigned char *)malloc(bytesPerRow);
+        int byte;
+        unsigned char m;
 
-	    for (int row = 0; row < rows; row++) {
-		fread(bits, 1, bytesPerRow, _input);
-		for (col = 0, byte = 0, m = 1 << 7; col < cols; col++) {
-		    inputRow[col] = (bits[byte] & m) != 0;
-		    if (m > 1) {
-			m >>= 1;
-		    }
-		    else {
-			m = 1 << 7;
-			byte++;
-		    }
-		}
-		_consumer->processRow(inputRow);
-	    }
-	    free(bits);
-	    break;
+        for (int row = 0; row < rows; row++)
+        {
+            fread(bits, 1, bytesPerRow, _input);
+            for (col = 0, byte = 0, m = 1 << 7; col < cols; col++)
+            {
+                inputRow[col] = (bits[byte] & m) != 0;
+                if (m > 1)
+                {
+                    m >>= 1;
+                }
+                else
+                {
+                    m = 1 << 7;
+                    byte++;
+                }
+            }
+            _consumer->processRow(inputRow);
+        }
+        free(bits);
+        break;
     }
     _consumer->endOfImage();
     free(inputRow);

@@ -33,8 +33,8 @@
 
 #include <sys/types.h>
 
-#include <assert.h>
 #include <algorithm>
+#include <assert.h>
 #include <iostream>
 
 #include "LUTBasedNSDistanceTransformConfig.h"
@@ -49,12 +49,14 @@ void freerow(void *);
  * followed by as many calls to processRow() as the number of rows in the image
  * and a final call to endOfImage().
  */
-template <typename inputPixelType>
-class ImageConsumer {
-public:
-    virtual ~ImageConsumer() { }
+template <typename inputPixelType> class ImageConsumer
+{
+  public:
+    virtual ~ImageConsumer()
+    {
+    }
 
-    virtual void processRow(const inputPixelType* inputRow) = 0;
+    virtual void processRow(const inputPixelType *inputRow) = 0;
     virtual void beginOfImage(int cols, int rows) = 0;
     virtual void endOfImage() = 0;
 };
@@ -65,20 +67,27 @@ public:
  *
  * The data is pushed to the ImageConsumer attached to it.
  */
-template <typename outputPixelType>
-class RowImageProducer {
-public:
-    RowImageProducer(ImageConsumer<outputPixelType>* consumer) : _consumer(consumer) {
-	if (_consumer == NULL) {
-	    exit(1);
-	}
+template <typename outputPixelType> class RowImageProducer
+{
+  public:
+    RowImageProducer(ImageConsumer<outputPixelType> *consumer)
+        : _consumer(consumer)
+    {
+        if (_consumer == NULL)
+        {
+            exit(1);
+        }
     }
     bool hasMoreRows();
     void produceRow();
     void produceAllRows();
-    virtual ~RowImageProducer() { delete _consumer; }
-protected:
-    ImageConsumer<outputPixelType>* _consumer;
+    virtual ~RowImageProducer()
+    {
+        delete _consumer;
+    }
+
+  protected:
+    ImageConsumer<outputPixelType> *_consumer;
 };
 
 /**
@@ -89,18 +98,32 @@ protected:
  * next ImageConsumer (optionally modifying the size and content of the image).
  */
 template <typename inputPixelType, typename outputPixelType>
-class ImageFilter: public ImageConsumer<inputPixelType> {
-public:
-    ImageFilter(ImageConsumer<outputPixelType>* consumer) : _consumer(consumer) {
-	if (_consumer == NULL) {
-	    exit(1);
-	}
+class ImageFilter : public ImageConsumer<inputPixelType>
+{
+  public:
+    ImageFilter(ImageConsumer<outputPixelType> *consumer)
+        : _consumer(consumer)
+    {
+        if (_consumer == NULL)
+        {
+            exit(1);
+        }
     }
-    virtual ~ImageFilter() { delete _consumer; }
-    void beginOfImage(int cols, int rows) {_consumer->beginOfImage(cols, rows);}
-    void endOfImage() {_consumer->endOfImage();}
-protected:
-    ImageConsumer<outputPixelType>* _consumer;
+    virtual ~ImageFilter()
+    {
+        delete _consumer;
+    }
+    void beginOfImage(int cols, int rows)
+    {
+        _consumer->beginOfImage(cols, rows);
+    }
+    void endOfImage()
+    {
+        _consumer->endOfImage();
+    }
+
+  protected:
+    ImageConsumer<outputPixelType> *_consumer;
 };
 
 /**
@@ -108,42 +131,54 @@ protected:
  * instead of one.
  */
 template <typename inputPixelType, typename outputPixelType>
-class TeeImageFilter: public ImageFilter<inputPixelType, outputPixelType> {
-public:
+class TeeImageFilter : public ImageFilter<inputPixelType, outputPixelType>
+{
+  public:
     typedef ImageFilter<inputPixelType, outputPixelType> super;
 
-    TeeImageFilter(ImageConsumer<inputPixelType>* consumer, ImageConsumer<inputPixelType>* consumer2) :
-	ImageFilter<inputPixelType, outputPixelType>(consumer),
-	_consumer2(consumer2) {}
-    ~TeeImageFilter() { delete _consumer2; }
-
-    void beginOfImage(int cols, int rows) {
-	super::beginOfImage(cols, rows);
-
-	if (_consumer2) {
-	    _consumer2->beginOfImage(cols, rows);
-	}
+    TeeImageFilter(ImageConsumer<inputPixelType> *consumer,
+        ImageConsumer<inputPixelType> *consumer2)
+        : ImageFilter<inputPixelType, outputPixelType>(consumer)
+        , _consumer2(consumer2)
+    {
+    }
+    ~TeeImageFilter()
+    {
+        delete _consumer2;
     }
 
-    void processRow(const outputPixelType* inputRow);
+    void beginOfImage(int cols, int rows)
+    {
+        super::beginOfImage(cols, rows);
+
+        if (_consumer2)
+        {
+            _consumer2->beginOfImage(cols, rows);
+        }
+    }
+
+    void processRow(const outputPixelType *inputRow);
     /*
     void processRow(const outputPixelType* inputRow) {
-	_consumer->processRow(inputRow);
+        _consumer->processRow(inputRow);
 
-	if (_consumer2) {
-	    _consumer2->processRow(inputRow);
-	}
+        if (_consumer2) {
+            _consumer2->processRow(inputRow);
+        }
     }*/
 
-    void endOfImage() {
-	super::endOfImage();
+    void endOfImage()
+    {
+        super::endOfImage();
 
-	if (_consumer2) {
-	    _consumer2->endOfImage();
-	}
+        if (_consumer2)
+        {
+            _consumer2->endOfImage();
+        }
     }
-protected:
-    ImageConsumer<outputPixelType>* _consumer2;
+
+  protected:
+    ImageConsumer<outputPixelType> *_consumer2;
 };
 
 #endif

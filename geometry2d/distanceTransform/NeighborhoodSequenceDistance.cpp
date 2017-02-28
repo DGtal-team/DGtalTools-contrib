@@ -29,27 +29,28 @@
  */
 
 #include <assert.h>
-#include <string.h>
-#include <limits.h>
 #include <assert.h>
-
+#include <limits.h>
+#include <string.h>
 
 #include <algorithm>
 
+#include "D4DistanceDT.h"
+#include "D8DistanceDT.h"
 #include "NeighborhoodSequenceDistance.h"
 #include "PeriodicNSDistanceDT.h"
 #include "RatioNSDistanceDT.h"
-#include "D4DistanceDT.h"
-#include "D8DistanceDT.h"
 
-void NeighborhoodSequenceDistanceTransform::rotate() {
+void NeighborhoodSequenceDistanceTransform::rotate()
+{
     GrayscalePixelType *t = dtLines[2];
     dtLines[2] = dtLines[1];
     dtLines[1] = dtLines[0];
     dtLines[0] = t;
 }
 
-void NeighborhoodSequenceDistanceTransform::beginOfImage(int cols, int rows) {
+void NeighborhoodSequenceDistanceTransform::beginOfImage(int cols, int rows)
+{
     assert(!_inited);
     assert(_cols == 0);
     assert(dtLines[0] == NULL);
@@ -57,11 +58,14 @@ void NeighborhoodSequenceDistanceTransform::beginOfImage(int cols, int rows) {
     assert(dtLines[2] == NULL);
 
     _cols = cols;
-    dtLines[0] = (GrayscalePixelType *) malloc((2 + cols + 1) * sizeof(GrayscalePixelType));
+    dtLines[0] = (GrayscalePixelType *)malloc(
+        (2 + cols + 1) * sizeof(GrayscalePixelType));
     memset(dtLines[0], 0, (2 + cols + 1) * sizeof(GrayscalePixelType));
-    dtLines[1] = (GrayscalePixelType *) malloc((2 + cols + 1) * sizeof(GrayscalePixelType));
+    dtLines[1] = (GrayscalePixelType *)malloc(
+        (2 + cols + 1) * sizeof(GrayscalePixelType));
     memset(dtLines[1], 0, (2 + cols + 1) * sizeof(GrayscalePixelType));
-    dtLines[2] =  (GrayscalePixelType *) malloc((2 + cols + 1) * sizeof(GrayscalePixelType));
+    dtLines[2] = (GrayscalePixelType *)malloc(
+        (2 + cols + 1) * sizeof(GrayscalePixelType));
     memset(dtLines[2], 0, (2 + cols + 1) * sizeof(GrayscalePixelType));
 
     _consumer->beginOfImage(cols, rows);
@@ -69,7 +73,8 @@ void NeighborhoodSequenceDistanceTransform::beginOfImage(int cols, int rows) {
     _inited = true;
 }
 
-void NeighborhoodSequenceDistanceTransform::endOfImage() {
+void NeighborhoodSequenceDistanceTransform::endOfImage()
+{
     _consumer->endOfImage();
 
     free(dtLines[0]);
@@ -83,54 +88,70 @@ void NeighborhoodSequenceDistanceTransform::endOfImage() {
     _inited = false;
 }
 
-NeighborhoodSequenceDistanceTransform::NeighborhoodSequenceDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer) :
-super(consumer),
-_inited(false),
-_cols(0) {
-
+NeighborhoodSequenceDistanceTransform::NeighborhoodSequenceDistanceTransform(
+    ImageConsumer<GrayscalePixelType> *consumer)
+    : super(consumer)
+    , _inited(false)
+    , _cols(0)
+{
     dtLines[0] = NULL;
     dtLines[1] = NULL;
     dtLines[2] = NULL;
 }
 
-NeighborhoodSequenceDistanceTransform::~NeighborhoodSequenceDistanceTransform() {
+NeighborhoodSequenceDistanceTransform::~NeighborhoodSequenceDistanceTransform()
+{
 }
 
-NeighborhoodSequenceDistance* NeighborhoodSequenceDistance::newD4Instance() {
+NeighborhoodSequenceDistance *NeighborhoodSequenceDistance::newD4Instance()
+{
     return new D4Distance();
 }
 
-NeighborhoodSequenceDistance* NeighborhoodSequenceDistance::newD8Instance() {
+NeighborhoodSequenceDistance *NeighborhoodSequenceDistance::newD8Instance()
+{
     return new D8Distance();
 }
 
-NeighborhoodSequenceDistance* NeighborhoodSequenceDistance::newInstance(std::vector<int> sequence) {
+NeighborhoodSequenceDistance *NeighborhoodSequenceDistance::newInstance(
+    std::vector<int> sequence)
+{
     int countOfNeighbors[2] = {0, 0};
-    for (std::vector<int>::iterator it = sequence.begin(); it != sequence.end(); it++) {
-	BOOST_VERIFY(*it == 1 || *it == 2);
-	countOfNeighbors[*it - 1]++;
+    for (std::vector<int>::iterator it = sequence.begin(); it != sequence.end();
+         it++)
+    {
+        BOOST_VERIFY(*it == 1 || *it == 2);
+        countOfNeighbors[*it - 1]++;
     }
-    if (countOfNeighbors[0] == 0) {
-	// d8
-	return new D8Distance();
+    if (countOfNeighbors[0] == 0)
+    {
+        // d8
+        return new D8Distance();
     }
-    else if (countOfNeighbors[1] == 0) {
-	// d4
-	return new D4Distance();
+    else if (countOfNeighbors[1] == 0)
+    {
+        // d4
+        return new D4Distance();
     }
-    else {
-	return new PeriodicNSDistance(sequence);
-    }		
+    else
+    {
+        return new PeriodicNSDistance(sequence);
+    }
 }
 
-NeighborhoodSequenceDistance* NeighborhoodSequenceDistance::newInstance(boost::rational<int> ratio) {
-    if (ratio == 0) {
-	return new D4Distance();
+NeighborhoodSequenceDistance *NeighborhoodSequenceDistance::newInstance(
+    boost::rational<int> ratio)
+{
+    if (ratio == 0)
+    {
+        return new D4Distance();
     }
-    else if (ratio == 1) {
-	return new D8Distance();
+    else if (ratio == 1)
+    {
+        return new D8Distance();
     }
-    else {
-	return new RatioNSDistance(ratio);
-    }	
+    else
+    {
+        return new RatioNSDistance(ratio);
+    }
 }

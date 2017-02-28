@@ -28,12 +28,12 @@
  * This file is part of the DGtal library.
  */
 
-#include <boost/algorithm/string/predicate.hpp>
-#include <stdio.h>
 #include "ImageWriter.h"
 #include "PGMImageWriter.h"
+#include <boost/algorithm/string/predicate.hpp>
+#include <stdio.h>
 #ifdef WITH_PNG
-#   include "PNGImageWriter.h"
+#include "PNGImageWriter.h"
 #endif
 
 /**
@@ -48,48 +48,58 @@
  * Il no format is speficied at all, the default format is used in the last
  * resort.
  */
-ImageConsumer<GrayscalePixelType> *createImageWriter(std::string filename, std::string format, bool lineBuffered) {
+ImageConsumer<GrayscalePixelType> *createImageWriter(
+    std::string filename, std::string format, bool lineBuffered)
+{
     FILE *output = NULL;
 
     // Format wasn't specified in arguments, check if there is a prefix for it.
-    if (format == "") {
-	size_t n = filename.find(':');
-	if (n != std::string::npos) {
-	    format = filename.substr(0, n);
-	    filename = filename.substr(n+1);
-	}
+    if (format == "")
+    {
+        size_t n = filename.find(':');
+        if (n != std::string::npos)
+        {
+            format = filename.substr(0, n);
+            filename = filename.substr(n + 1);
+        }
     }
 
     // Format wasn't specified in arguments nor in the filename prefix, check if
     // there the file has an extension
-    if (format == "") {
-	size_t n = filename.rfind('.');
-	if (n != std::string::npos)
-	    format = filename.substr(n+1);
+    if (format == "")
+    {
+        size_t n = filename.rfind('.');
+        if (n != std::string::npos)
+            format = filename.substr(n + 1);
     }
 
-    if (filename == "-") {
-	output = stdout;
+    if (filename == "-")
+    {
+        output = stdout;
     }
-    else {
-	output = fopen(filename.c_str(), "w");
-	// FIXME: where is fclose?
-	if (output == NULL)
-	    return NULL;
+    else
+    {
+        output = fopen(filename.c_str(), "w");
+        // FIXME: where is fclose?
+        if (output == NULL)
+            return NULL;
     }
 
-    if (boost::iequals(format, "pgm")) {
-	return new PGMImageWriter(output, lineBuffered);
+    if (boost::iequals(format, "pgm"))
+    {
+        return new PGMImageWriter(output, lineBuffered);
     }
 #ifdef WITH_PNG
-    if (boost::iequals(format, "png")) {
-	return new PNGImageWriter(output, lineBuffered);
+    if (boost::iequals(format, "png"))
+    {
+        return new PNGImageWriter(output, lineBuffered);
     }
 #endif
 
     // No format specified, use default
-    if (boost::iequals(format, "")) {
-	return new PGMImageWriter(output);
+    if (boost::iequals(format, ""))
+    {
+        return new PGMImageWriter(output);
     }
 
     return NULL;

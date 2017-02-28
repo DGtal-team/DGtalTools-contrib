@@ -27,4 +27,3 @@
  *
  * This file is part of the DGtal library.
  */
-

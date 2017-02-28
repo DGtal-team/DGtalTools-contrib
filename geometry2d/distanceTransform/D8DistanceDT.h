@@ -35,18 +35,23 @@
  * factory methods to create translated distance transform filters and
  * distance transform untranslator filters.
  */
-class D8Distance: public NeighborhoodSequenceDistance {
-public:
-    NeighborhoodSequenceDistanceTransform* newTranslatedDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer) const;
-    DistanceTransformUntranslator<GrayscalePixelType, GrayscalePixelType>* newDistanceTransformUntranslator(ImageConsumer<GrayscalePixelType>* consumer) const;
+class D8Distance : public NeighborhoodSequenceDistance
+{
+  public:
+    NeighborhoodSequenceDistanceTransform *newTranslatedDistanceTransform(
+        ImageConsumer<GrayscalePixelType> *consumer) const;
+    DistanceTransformUntranslator<GrayscalePixelType, GrayscalePixelType> *
+    newDistanceTransformUntranslator(
+        ImageConsumer<GrayscalePixelType> *consumer) const;
 };
 
 /**
  * \brief Implements a single scan translated chessboard distance transform.
  */
-class D8DistanceTransform: public NeighborhoodSequenceDistanceTransform {
-public:
-    D8DistanceTransform(ImageConsumer<GrayscalePixelType>* consumer);
+class D8DistanceTransform : public NeighborhoodSequenceDistanceTransform
+{
+  public:
+    D8DistanceTransform(ImageConsumer<GrayscalePixelType> *consumer);
 
     void processRow(const BinaryPixelType *imageRow);
 };
@@ -55,18 +60,25 @@ public:
  * \brief Implements a recentering algorithm for the translated chessboard
  * distance transform.
  */
-class D8DistanceTransformUntranslator: public DistanceTransformUntranslator<GrayscalePixelType, GrayscalePixelType> {
-private:
-    typedef DistanceTransformUntranslator<GrayscalePixelType, GrayscalePixelType> super;
-public:
-    D8DistanceTransformUntranslator(ImageConsumer<GrayscalePixelType>* consumer, int dMax);
+class D8DistanceTransformUntranslator
+    : public DistanceTransformUntranslator<GrayscalePixelType,
+          GrayscalePixelType>
+{
+  private:
+    typedef DistanceTransformUntranslator<GrayscalePixelType,
+        GrayscalePixelType>
+        super;
+
+  public:
+    D8DistanceTransformUntranslator(
+        ImageConsumer<GrayscalePixelType> *consumer, int dMax);
     ~D8DistanceTransformUntranslator();
 
     void beginOfImage(int cols, int rows);
-    void processRow(const GrayscalePixelType* inputRow);
+    void processRow(const GrayscalePixelType *inputRow);
     void endOfImage();
 
-protected:
+  protected:
     int _dMax;
     int _imageDMax;
 };

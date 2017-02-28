@@ -33,16 +33,17 @@
 /**
  * \brief A PGMImageWriter is an ImageConsumer that writes PGM images to a file.
  */
-class PGMImageWriter : public ImageConsumer<GrayscalePixelType> {
-public:
-    PGMImageWriter(FILE* output, int plainFormat = 1);
+class PGMImageWriter : public ImageConsumer<GrayscalePixelType>
+{
+  public:
+    PGMImageWriter(FILE *output, int plainFormat = 1);
 
     void beginOfImage(int cols, int rows);
-    void processRow(const GrayscalePixelType* inputRow);
+    void processRow(const GrayscalePixelType *inputRow);
     void endOfImage();
 
-protected:
+  protected:
     int _cols;
     int _plainFormat;
-    FILE* _output;
+    FILE *_output;
 };

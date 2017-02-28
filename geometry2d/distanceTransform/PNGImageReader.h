@@ -35,13 +35,14 @@
  * \brief A PNGImageWriter is an ImageProducer that pushes PNG images read from
  * a file.
  */
-class PNGImageReader: public RowImageProducer<BinaryPixelType> {
-public:
-    PNGImageReader(ImageConsumer<BinaryPixelType>* consumer, FILE *input);
+class PNGImageReader : public RowImageProducer<BinaryPixelType>
+{
+  public:
+    PNGImageReader(ImageConsumer<BinaryPixelType> *consumer, FILE *input);
 
     void produceAllRows(size_t readBytes);
 
-private:
+  private:
     void startImage(size_t readBytes = 0);
 
     png_structp _png_ptr;
