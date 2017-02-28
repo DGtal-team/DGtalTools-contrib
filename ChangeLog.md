@@ -1,7 +1,8 @@
 # DGtalTools-contrib  0.9.4
 
 - *Geometry2d*
-  - LUTBasedNSDistanceTransform: Removed the dependency to libNetPBM. (Nicolas Normand)
+  - LUTBasedNSDistanceTransform: Removed the dependency to libNetPBM. (Nicolas Normand,
+  [#32](https://github.com/DGtal-team/DGtalTools-contrib/pull/32))
 
 # DGtalTools-contrib  0.9.3
 
