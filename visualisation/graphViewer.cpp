@@ -41,6 +41,26 @@
 #include <boost/program_options/variables_map.hpp>
 
 
+template < typename Space = DGtal::Z3i::Space, typename KSpace = DGtal::Z3i::KSpace>
+struct ViewerSnap: DGtal::Viewer3D <Space, KSpace>
+{
+
+  ViewerSnap(bool saveSnap): DGtal::Viewer3D<Space, KSpace>(), mySaveSnap(saveSnap){
+  };
+
+  virtual  void
+  init(){
+    DGtal::Viewer3D<>::init();
+    if(mySaveSnap){
+      QObject::connect(this, SIGNAL(drawFinished(bool)), this, SLOT(saveSnapshot(bool)));
+    }
+  };
+  bool mySaveSnap;
+};
+
+
+
+
 using namespace DGtal;
 namespace po = boost::program_options;
 
@@ -48,6 +68,7 @@ int main( int argc, char** argv )
 { 
   QApplication application(argc,argv);
 
+  typedef ViewerSnap<> Viewer;
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")
@@ -58,7 +79,8 @@ int main( int argc, char** argv )
     ("addMesh,m", po::value<std::string>(), "add mesh in the display.")
     ("meshColor", po::value<std::vector<unsigned int> >()->multitoken(), "specify the color mesh.")
     ("edgeColor", po::value<std::vector<unsigned int> >()->multitoken(), "specify the color of edges.")
-    ("colormap,c", "display vertex colored by order in vertex file or by radius scale if the radius file is specidfied (-r).");
+    ("colormap,c", "display vertex colored by order in vertex file or by radius scale if the radius file is specidfied (-r).")
+    ("doSnapShotAndExit,d", po::value<std::string>(), "save display snapshot into file. Notes that the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D). If the camera setting was not saved it will use the default camera setting." );
 
   bool parseOK = true;
 
@@ -80,6 +102,11 @@ int main( int argc, char** argv )
                  << "Options:" << std::endl
 		             << general_opt << std::endl;
     return 1;
+  }
+
+  Viewer viewer(vm.count("doSnapShotAndExit"));
+  if(vm.count("doSnapShotAndExit")){
+    viewer.setSnapshotFileName(QString(vm["doSnapShotAndExit"].as<std::string>().c_str()));
   }
 
   DGtal::Color meshColor(240,240,240);
@@ -127,7 +154,6 @@ int main( int argc, char** argv )
     hueShade = HueShadeColorMap<int>((*(std::min_element(vectRadii.begin(),vectRadii.end())))*10000,(*(std::max_element(vectRadii.begin(),vectRadii.end())))*10000);
   }
 
-  Viewer3D<> viewer;
 
   // Add vertex to viewer as balls
   if ( vm.count("colormap") )
@@ -189,6 +215,32 @@ int main( int argc, char** argv )
 
   viewer << Viewer3D<>::updateDisplay;
   viewer.show();
+  if(vm.count("doSnapShotAndExit")){
+    // Appy cleaning just save the last snap
+    DGtal::trace.info() << "sorting surfel according camera position....";
+    viewer.sortSurfelFromCamera();
+    viewer.sortQuadFromCamera();
+    viewer.sortTriangleFromCamera();
+    viewer.updateList(false);    
+    if(!viewer.restoreStateFromFile())
+      {
+        viewer.updateGL();
+      }    
+    std::string name = vm["doSnapShotAndExit"].as<std::string>();
+    std::string extension = name.substr(name.find_last_of(".") + 1);
+    std::string basename = name.substr(0, name.find_last_of("."));
+    for(int i=0; i< viewer.snapshotCounter()-1; i++){
+      std::stringstream s;
+      s << basename << "-"<< setfill('0') << setw(4)<<  i << "." << extension;
+      trace.info() << "erase temp file: " << s.str() << std::endl;
+      remove(s.str().c_str());
+    }
+    std::stringstream s;
+    s << basename << "-"<< setfill('0') << setw(4)<<  viewer.snapshotCounter()-1 << "." << extension;
+    rename(s.str().c_str(), name.c_str());
+    return 0;
+  }
+
 
   return application.exec();
 }

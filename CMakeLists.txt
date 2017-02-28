@@ -9,7 +9,7 @@ cmake_minimum_required (VERSION 2.6)
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 
-FIND_PACKAGE(DGtal 0.9.1 REQUIRED)
+FIND_PACKAGE(DGtal 0.9.3 REQUIRED)
 INCLUDE_DIRECTORIES(${DGTAL_INCLUDE_DIRS})
 LINK_DIRECTORIES(${DGTAL_LIBRARY_DIRS})
 
@@ -27,7 +27,9 @@ LINK_DIRECTORIES(${DGTAL_LIBRARY_DIRS})
   endif (CMAKE_CXX_FLAGS MATCHES "-ftemplate-depth-[0-9]*")
 
 
-
+if(USE_OPENCV)
+   find_package( OpenCV REQUIRED )
+endif()
 
 # -----------------------------------------------------------------------------
 # Define variables and cmake parameters, and display some information
@@ -35,7 +37,7 @@ LINK_DIRECTORIES(${DGTAL_LIBRARY_DIRS})
 # SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 SET(DGtalToolsContrib_VERSION_MAJOR 0)
 SET(DGtalToolsContrib_VERSION_MINOR 9)
-SET(DGtalToolsContrib_VERSION_PATCH 2beta)
+SET(DGtalToolsContrib_VERSION_PATCH 3)
 SET(DGTALTOOLSContrib_VERSION "${DGtalToolsContrib_VERSION_MAJOR}.${DGtalToolsContrib_VERSION_MINOR}.${DGtalToolsContrib_VERSION_PATCH}")
 SET(PROJECT_VERSION "${DGtalToolsContrib_VERSION_MAJOR}.${DGtalToolsContrib_VERSION_MINOR}.${DGtalToolsContrib_VERSION_PATCH}")
 SET(VERSION ${DGtalToolsContrib_VERSION_MAJOR}.${DGtalToolsContrib_VERSION_MINOR}.${DGtalToolsContrib_VERSION_PATCH})
@@ -46,6 +48,7 @@ SET(Boost_USE_STATIC_RUNTIME OFF)
 SET(Boost_FOUND FALSE)
 FIND_PACKAGE(Boost 1.46.0 REQUIRED COMPONENTS program_options)
 if ( Boost_FOUND )
+  ADD_DEFINITIONS(${BOOST_DEFINITIONS} -DBOOST_ALL_NO_LIB)
   message(STATUS "Boost and boost_program_options found.")
   include_directories( ${Boost_INCLUDE_DIRS} )
   SET(DGtalToolsContribLibDependencies ${DGtalToolsContribLibDependencies} 

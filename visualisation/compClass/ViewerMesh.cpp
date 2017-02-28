@@ -29,7 +29,7 @@ void
 ViewerMesh< Space, KSpace>::init()
 {
    DGtal::Viewer3D<>::init();
-   (*this).setForegroundColor(QColor::QColor(255,55,55,255));
+   (*this).setForegroundColor(QColor(255,55,55,255));
    QGLViewer::setKeyDescription ( Qt::Key_D|Qt::MetaModifier, "Delete the current selected faces (highlighted in red)" );
    QGLViewer::setKeyDescription ( Qt::Key_D, "Change the current mode to Delete mode" );
    QGLViewer::setKeyDescription ( Qt::Key_C, "Change the current mode to Color mode" );
@@ -172,6 +172,33 @@ ViewerMesh<Space, KSpace>::deleteCurrents()
   myUndoQueueSelected.clear();
 }
 
+
+
+template< typename Space, typename KSpace>
+void
+ViewerMesh<Space, KSpace>::invertSelection()
+{
+  myUndoQueueSelected.push_front(myVectFaceSelected);
+  std::vector<bool> selected(myMesh.nbFaces());
+  for(unsigned int i = 0; i <selected.size(); i++)
+    {
+      selected[i]=false;
+    }
+  
+  for (unsigned int i = 0; i < myVectFaceSelected.size(); i++)
+    {
+      selected[myVectFaceSelected[i]]=true;
+    }
+  myVectFaceSelected.clear();
+  for (unsigned int i = 0; i < myMesh.nbFaces(); i++)
+    {
+      if(!selected[i])
+        {
+          myVectFaceSelected.push_back(i);
+        }
+    }
+  displaySelectionOnMesh();
+}
 
 
 template< typename Space, typename KSpace>

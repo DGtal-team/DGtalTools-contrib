@@ -72,6 +72,7 @@ MainWindow::MainWindow(ViewerMesh<> *aViewer,
   ui->verticalLayout->addWidget(aViewer);  
   QObject::connect(ui->scaleSlider, SIGNAL(valueChanged(int)), this, SLOT(updatePenSize()));
   QObject::connect(ui->selectButton, SIGNAL(clicked()), this, SLOT(setSelectMode()));
+  QObject::connect(ui->invButton, SIGNAL(clicked()), this, SLOT(invertSelection()));
   QObject::connect(ui->colorButton, SIGNAL(clicked()), this, SLOT(setColorMode()));
   QObject::connect(ui->saveButton, SIGNAL(clicked()), this, SLOT(save()));
   QObject::connect(ui->undoButton, SIGNAL(clicked()), this, SLOT(undo()));
@@ -79,7 +80,10 @@ MainWindow::MainWindow(ViewerMesh<> *aViewer,
   updatePenSize();
 }
 
-
+void
+MainWindow::invertSelection(){
+  myViewer->invertSelection();
+}
 void 
 MainWindow::setSelectMode(){
   myViewer->setSelectMode();

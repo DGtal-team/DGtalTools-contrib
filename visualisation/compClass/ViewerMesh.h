@@ -63,7 +63,7 @@ public:
                                                         myMode(COLOR_MODE)
   {
   }
-  
+  void invertSelection();  
   void postSelection(const QPoint& point);
   void deleteFacesFromDist(DGtal::Z3i::RealPoint p);
   void addToSelected(DGtal::Z3i::RealPoint p);

@@ -28,9 +28,9 @@
  * This file is part of the DGtal library.
  */
 
-#include "DGtal/io/Color.h"
-
 #include <boost/rational.hpp>
+
+#include <DGtal/base/Exceptions.h>
 
 /**
  * \brief this class represents rational Beatty sequences.

@@ -7,9 +7,11 @@ Various tools from the community built using DGtal. Contrary to the DGtalTools p
 
 More Information
 ----------------
-* Release 0.9.1 DOI [![DOI](https://zenodo.org/badge/4888/DGtal-team/DGtalTools-contrib.svg)](https://zenodo.org/badge/latestdoi/4888/DGtal-team/DGtalTools-contrib)
-* [![Build Status](https://api.travis-ci.org/DGtal-team/DGtalTools-contrib.svg?branch=master)](https://travis-ci.org/DGtal-team/DGtalTools-contrib)
-
+* Release 0.9.3 DOI [![DOI](https://zenodo.org/badge/43562168.svg)](https://zenodo.org/badge/latestdoi/43562168)
+* Release 0.9.2 DOI [![DOI](https://zenodo.org/badge/4888/DGtal-team/DGtalTools-contrib.svg)](https://zenodo.org/badge/latestdoi/4888/DGtal-team/DGtalTools-contrib)
+* Release 0.9.1 DOI [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.45131.svg)](http://dx.doi.org/10.5281/zenodo.45131)
+* Linux/MacOS build: [![Build Status](https://api.travis-ci.org/DGtal-team/DGtalTools-contrib.svg?branch=master)](https://travis-ci.org/DGtal-team/DGtalTools-contrib)
+* Windows build: [![Build status](https://ci.appveyor.com/api/projects/status/sq9w7r1xs8078g7j?svg=true)](https://ci.appveyor.com/project/kerautret/dgtaltools-contrib)
 
 Organisation
 ============
@@ -28,7 +30,7 @@ Geometry2d
 ----------
 
 This section can contains various utilities related to 2d geometry (2d estimators, 2d contour tools, ...):
-
+   - houghLineDetect: line detection from the hough transform (from OpenCV implementation, use cmake option:-DWITH_OPENCV=true).
    - meaningFullThickness: to display the meaningful thickness of digital contour.
      [Bertrand Kerautret, Jacques-Olivier Lachaud and  Mouhammad Said;
       ~Meaningful Thickness Detection on Polygonal Curve~ ;
@@ -70,7 +72,7 @@ Visualisation
 -------------
 
 This section, can contain all tools related to visualisation:
-
+   - displayLineSegments: to display lines as vectorial image.
    - displayTgtCoverAlphaTS: to display alpha-thick segment given on a simple contour.
    - meshViewerEdit: tool to visualize a mesh and to apply simple edits (face removal, color edits...).
    - graphViewer: tool to display graphs from a list of edges, a list of vertex and an optionnal list of radius for each edge.
