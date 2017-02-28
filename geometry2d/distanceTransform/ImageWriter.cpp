@@ -17,7 +17,8 @@
  * @file ImageWriter.cpp
  * @ingroup Tools
  * @author Nicolas Normand (\c Nicolas.Normand@polytech.univ-nantes.fr)
- * LUNAM Université, Université de Nantes, IRCCyN UMR CNRS 6597
+ * Université Bretagne Loire, Université de Nantes,
+ * Laboratoire des Sciences du Numérique de Nantes (LS2N) UMR CNRS 6004
  *
  * @date 2012/09/28
  *
