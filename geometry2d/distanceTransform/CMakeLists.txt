@@ -6,7 +6,7 @@ add_executable(CumulativeSequenceTest CumulativeSequence.cpp CumulativeSequenceT
 set(LUTBasedNSDistanceTransform_LIBRARIES)
 set(LUTBasedNSDistanceTransform_SOURCES LUTBasedNSDistanceTransform.cpp ImageFilter.cpp ImageWriter.cpp ImageReader.cpp NeighborhoodSequenceDistance.cpp D4DistanceDT.cpp D8DistanceDT.cpp RatioNSDistanceDT.cpp PeriodicNSDistanceDT.cpp CumulativeSequence.cpp PBMImageReader.cpp PGMImageWriter.cpp)
 
-#if (WITH_PNG)
+if (WITH_PNG)
     find_package(PNG REQUIRED)
     if (PNG_FOUND)
       add_definitions(-DWITH_PNG)
@@ -15,7 +15,7 @@ set(LUTBasedNSDistanceTransform_SOURCES LUTBasedNSDistanceTransform.cpp ImageFil
       list(APPEND LUTBasedNSDistanceTransform_LIBRARIES ${PNG_LIBRARIES})
       message(STATUS "      PNG_FOUND       true")
     endif (PNG_FOUND)
-#endif (WITH_PNG)
+endif (WITH_PNG)
 
 add_executable(LUTBasedNSDistanceTransform ${LUTBasedNSDistanceTransform_SOURCES})
 
