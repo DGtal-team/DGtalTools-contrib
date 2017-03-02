@@ -17,7 +17,8 @@
  * @file ImageWriter.h
  * @ingroup Tools
  * @author Nicolas Normand (\c Nicolas.Normand@polytech.univ-nantes.fr)
- * LUNAM Université, Université de Nantes, IRCCyN UMR CNRS 6597
+ * Université Bretagne Loire, Université de Nantes,
+ * Laboratoire des Sciences du Numérique de Nantes (LS2N) UMR CNRS 6004
  *
  * @date 2012/09/28
  *
@@ -31,11 +32,7 @@
 #include "LUTBasedNSDistanceTransformConfig.h"
 
 #include "ImageFilter.h"
-#ifdef WITH_NETPBM
-#   include "PGMImageWriter.h"
-#endif
-#ifdef WITH_PNG
-#   include "PNGImageWriter.h"
-#endif
 
-ImageConsumer<GrayscalePixelType>* createImageWriter(std::string filename = std::string("-"), std::string format = std::string(""), bool lineBuffered=false);
+ImageConsumer<GrayscalePixelType> *createImageWriter(
+    std::string filename = std::string("-"),
+    std::string format = std::string(""), bool lineBuffered = false);

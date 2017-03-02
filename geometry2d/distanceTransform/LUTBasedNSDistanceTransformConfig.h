@@ -4,7 +4,7 @@
 
 #include <limits>
 
-typedef unsigned char  BinaryPixelType;
+typedef unsigned char BinaryPixelType;
 typedef unsigned short GrayscalePixelType;
 
 const static int GRAYSCALE_MAX = std::numeric_limits<GrayscalePixelType>::max();

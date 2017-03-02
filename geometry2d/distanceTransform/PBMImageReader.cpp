@@ -17,7 +17,8 @@
  * @file PBMImageReader.cpp
  * @ingroup Tools
  * @author Nicolas Normand (\c Nicolas.Normand@polytech.univ-nantes.fr)
- * LUNAM Université, Université de Nantes, IRCCyN UMR CNRS 6597
+ * Université Bretagne Loire, Université de Nantes,
+ * Laboratoire des Sciences du Numérique de Nantes (LS2N) UMR CNRS 6004
  *
  * @date 2012/09/28
  *
@@ -29,28 +30,104 @@
  */
 
 #include "PBMImageReader.h"
-extern "C" {
-#include "pbm.h"
+
+void skipCommentLines(FILE *file)
+{
+    int ch;
+    int isComment;
+
+    do
+    {
+        isComment = 0;
+        ch = fgetc(file);
+        if (ch == '#')
+        {
+            isComment = 1;
+            int eolFound = 0;
+            do
+            {
+                ch = fgetc(file);
+                if (ch == '\n' || ch == '\r')
+                    eolFound = 1;
+            } while (ch != '\n' && ch != '\r' && !eolFound);
+        }
+        ungetc(ch, file);
+    } while (isComment || ch == EOF);
 }
 
-PBMImageReader::PBMImageReader(ImageConsumer<BinaryPixelType>* consumer, FILE *input) :
-    super(consumer),
-    _input(input)
+void readpbminit(FILE *pbmFile, int *cols, int *rows, int *format)
+{
+    skipCommentLines(pbmFile);
+    fscanf(pbmFile, "P%d ", format);
+    if (*format != 1 && *format != 4)
+    {
+        *cols = *rows = 0;
+        return;
+    }
+    skipCommentLines(pbmFile);
+    fscanf(pbmFile, "%d %d ", cols, rows);
+}
+
+PBMImageReader::PBMImageReader(
+    ImageConsumer<BinaryPixelType> *consumer, FILE *input)
+    : super(consumer)
+    , _input(input)
 {
 }
 
-void PBMImageReader::produceAllRows() {
+void PBMImageReader::produceAllRows()
+{
     BinaryPixelType *inputRow;
     int cols, rows;
+    int col, row;
     int format;
 
-    pbm_readpbminit(_input, &cols, &rows, &format);
-    inputRow = pbm_allocrow(cols);
+    readpbminit(_input, &cols, &rows, &format);
+    assert(cols > 0);
+    assert(rows > 0);
+    inputRow = (BinaryPixelType *)malloc(sizeof(BinaryPixelType) * cols);
     _consumer->beginOfImage(cols, rows);
-    for (int row = 0; row < rows; row++) {
-	pbm_readpbmrow(_input, inputRow, cols, format);
-	_consumer->processRow(inputRow);
+    switch (format)
+    {
+    case 1:
+        for (int row = 0; row < rows; row++)
+        {
+            for (col = 0; col < cols; col++)
+            {
+                int value;
+                fscanf(_input, "%1d", &value);
+                inputRow[col] = value != 0;
+            }
+            _consumer->processRow(inputRow);
+        }
+        break;
+    case 4:
+        unsigned int bytesPerRow = (cols + 7) / 8;
+        unsigned char *bits = (unsigned char *)malloc(bytesPerRow);
+        int byte;
+        unsigned char m;
+
+        for (int row = 0; row < rows; row++)
+        {
+            fread(bits, 1, bytesPerRow, _input);
+            for (col = 0, byte = 0, m = 1 << 7; col < cols; col++)
+            {
+                inputRow[col] = (bits[byte] & m) != 0;
+                if (m > 1)
+                {
+                    m >>= 1;
+                }
+                else
+                {
+                    m = 1 << 7;
+                    byte++;
+                }
+            }
+            _consumer->processRow(inputRow);
+        }
+        free(bits);
+        break;
     }
     _consumer->endOfImage();
-    pbm_freerow(inputRow);
+    free(inputRow);
 }

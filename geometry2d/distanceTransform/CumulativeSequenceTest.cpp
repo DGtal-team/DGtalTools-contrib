@@ -17,7 +17,8 @@
  * @file CumulativeSequenceTest.cpp
  * @ingroup Tools
  * @author Nicolas Normand (\c Nicolas.Normand@polytech.univ-nantes.fr)
- * LUNAM Université, Université de Nantes, IRCCyN UMR CNRS 6597
+ * Université Bretagne Loire, Université de Nantes,
+ * Laboratoire des Sciences du Numérique de Nantes (LS2N) UMR CNRS 6004
  *
  * @date 2012/09/28
  *
@@ -30,43 +31,48 @@
 
 #include <iostream>
 
-#include "sequenceTest.h"
 #include "CumulativeSequence.h"
+#include "sequenceTest.h"
 
 using namespace std;
 
-void testSequence(vector<int> sequence, int offset) {
+void testSequence(vector<int> sequence, int offset)
+{
     int i;
 
     cout << "Sequence: ";
     CumulativeOfPeriodicSequence cs(sequence, offset);
-    for (i = 1; i < 15; i++) {
-	cout << cs(i) << ' ';
+    for (i = 1; i < 15; i++)
+    {
+        cout << cs(i) << ' ';
     }
     cout << cs << endl;
 
     cout << "Inverse of sequence: ";
     CumulativeOfPeriodicSequence csi(cs.invert());
     BOOST_VERIFY(testLambekMoserInverseSequences(cs, csi));
-    for (i = 1; i < 15; i++) {
-	cout << csi(i) << ' ';
+    for (i = 1; i < 15; i++)
+    {
+        cout << csi(i) << ' ';
     }
     cout << csi << endl;
 
     cout << "Inverse of inverse of sequence: ";
     CumulativeOfPeriodicSequence csii(csi.invert());
     BOOST_VERIFY(testLambekMoserInverseSequences(csi, csii));
-    for (i = 1; i < 15; i++) {
-	cout << csii(i) << ' ';
+    for (i = 1; i < 15; i++)
+    {
+        cout << csii(i) << ' ';
     }
     cout << csii << endl;
 
     BOOST_VERIFY(csii == cs);
 }
 
-int main(int argc, char** argv) {
-    //int period;
-    //int seq2[4] = {2, 0, 0, 1};
+int main(int argc, char **argv)
+{
+    // int period;
+    // int seq2[4] = {2, 0, 0, 1};
     vector<int> seq2;
     seq2.push_back(2);
     seq2.push_back(0);
@@ -76,20 +82,20 @@ int main(int argc, char** argv) {
     testSequence(seq2, -4);
 
     testSequence(seq2, -1);
-    testSequence(seq2,  0);
-    testSequence(seq2,  1);
-    testSequence(seq2,  10);
-    testSequence(seq2,  100);
+    testSequence(seq2, 0);
+    testSequence(seq2, 1);
+    testSequence(seq2, 10);
+    testSequence(seq2, 100);
     testSequence(seq2, -10);
     testSequence(seq2, -100);
 
-    //int sequence[4] = {1, 2, 0, 3};	// cf. Table 1
+    // int sequence[4] = {1, 2, 0, 3};	// cf. Table 1
     vector<int> sequence;
     sequence.push_back(1);
     sequence.push_back(2);
     sequence.push_back(0);
     sequence.push_back(3);
-    
+
     testSequence(sequence, 0);
 
     return 0;

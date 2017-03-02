@@ -17,7 +17,8 @@
  * @file PNGImageWriter.h
  * @ingroup Tools
  * @author Nicolas Normand (\c Nicolas.Normand@polytech.univ-nantes.fr)
- * LUNAM Université, Université de Nantes, IRCCyN UMR CNRS 6597
+ * Université Bretagne Loire, Université de Nantes,
+ * Laboratoire des Sciences du Numérique de Nantes (LS2N) UMR CNRS 6004
  *
  * @date 2012/09/28
  *
@@ -34,20 +35,21 @@
 /**
  * \brief A PNGImageWriter is an ImageConsumer that writes PNG images to a file.
  */
-class PNGImageWriter : public ImageConsumer<GrayscalePixelType> {
-public:
-    PNGImageWriter(FILE* output, bool lineBuffered = false);
+class PNGImageWriter : public ImageConsumer<GrayscalePixelType>
+{
+  public:
+    PNGImageWriter(FILE *output, bool lineBuffered = false);
 
     void beginOfImage(int cols, int rows);
 
     void endOfImage();
 
-    void processRow(const GrayscalePixelType* inputRow);
+    void processRow(const GrayscalePixelType *inputRow);
 
-protected:
+  protected:
     png_structp _png_ptr;
     png_infop _info_ptr;
 
-    FILE* _output;
+    FILE *_output;
     bool _lineBuffered;
 };

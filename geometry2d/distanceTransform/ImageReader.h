@@ -17,7 +17,8 @@
  * @file ImageReader.h
  * @ingroup Tools
  * @author Nicolas Normand (\c Nicolas.Normand@polytech.univ-nantes.fr)
- * LUNAM Université, Université de Nantes, IRCCyN UMR CNRS 6597
+ * Université Bretagne Loire, Université de Nantes,
+ * Laboratoire des Sciences du Numérique de Nantes (LS2N) UMR CNRS 6004
  *
  * @date 2012/09/28
  *
@@ -28,11 +29,10 @@
  * This file is part of the DGtal library.
  */
 
+#include "ImageFilter.h"
 #include "LUTBasedNSDistanceTransformConfig.h"
 
-#ifdef WITH_NETPBM
-#   include "PBMImageReader.h"
-#endif
-#ifdef WITH_PNG
-#   include "PNGImageReader.h"
-#endif
+RowImageProducer<BinaryPixelType> *createImageReader(
+    ImageConsumer<BinaryPixelType> *consumer,
+    std::string filename = std::string("-"),
+    std::string format = std::string(""));

@@ -14,7 +14,7 @@
  *
  **/
 /**
- * @file ImageWriter.cpp
+ * @file ImageReader.cpp
  * @ingroup Tools
  * @author Nicolas Normand (\c Nicolas.Normand@polytech.univ-nantes.fr)
  * Université Bretagne Loire, Université de Nantes,
@@ -29,30 +29,31 @@
  * This file is part of the DGtal library.
  */
 
-#include "ImageWriter.h"
-#include "PGMImageWriter.h"
+#include "PBMImageReader.h"
 #include <boost/algorithm/string/predicate.hpp>
-#include <stdio.h>
 #ifdef WITH_PNG
-#include "PNGImageWriter.h"
+#include "PNGImageReader.h"
 #endif
 
 /**
- * Creates an ImageWriter.
+ * Creates an ImageReader.
  *
- * The output image format is determined, in that order, by:
+ * The input image format is determined, in that order, by:
  * - the **format** parameter if not NULL,
  * - a prefix ended by ':' in the file format (*e.g.* 'png:filename'),
  * - the file extension,
+ * - the file content.
  * If one of these methods specifies a format that is not available, no
- * ImageWriter is created and the function return NULL.
+ * ImageReader is created and the function return NULL.
  * Il no format is speficied at all, the default format is used in the last
  * resort.
  */
-ImageConsumer<GrayscalePixelType> *createImageWriter(
-    std::string filename, std::string format, bool lineBuffered)
+RowImageProducer<BinaryPixelType> *createImageReader(
+    ImageConsumer<BinaryPixelType> *consumer,
+    std::string filename = std::string("-"),
+    std::string format = std::string(""))
 {
-    FILE *output = NULL;
+    FILE *input = NULL;
 
     // Format wasn't specified in arguments, check if there is a prefix for it.
     if (format == "")
@@ -76,31 +77,87 @@ ImageConsumer<GrayscalePixelType> *createImageWriter(
 
     if (filename == "-")
     {
-        output = stdout;
+        input = stdin;
     }
     else
     {
-        output = fopen(filename.c_str(), "w");
-        // FIXME: where is fclose?
-        if (output == NULL)
-            return NULL;
+        input = fopen(filename.c_str(), "r");
+        if (input == NULL)
+        {
+            std::cerr << "Unable to open input stream";
+        }
     }
 
-    if (boost::iequals(format, "pgm"))
+    if (format == "")
     {
-        return new PGMImageWriter(output, lineBuffered);
+        char c = fgetc(input);
+        ungetc(c, input);
+
+        if (c == 'P')
+        {
+            format = "pbm";
+        }
     }
-#ifdef WITH_PNG
-    if (boost::iequals(format, "png"))
+
+    if (format == "pbm")
     {
-        return new PNGImageWriter(output, lineBuffered);
+        PBMImageReader producer(consumer, input);
+        // consumer = NULL;
+
+        while (!feof(input))
+        {
+            producer.produceAllRows();
+
+            int c;
+            do
+            {
+                c = fgetc(input);
+            } while (c == '\r' || c == '\n');
+            if (!feof(input))
+            {
+                ungetc(c, input);
+            }
+        }
+    }
+
+#ifdef WITH_PNG
+    unsigned char signature[8];
+    int readBytes = 0;
+
+    if (format == "")
+    {
+        readBytes = fread(signature, 1, 8, input);
+    }
+
+    if (format == "png" ||
+        (format == "" && readBytes == 8 && png_check_sig(signature, 8)))
+    {
+        format = "png";
+        PNGImageReader producer(consumer, input);
+        // consumer = NULL;
+
+        do
+        {
+            // Assumes following images, if any, are png
+            producer.produceAllRows(8);
+        } while (fread(signature, 1, 8, input) == 8);
     }
 #endif
 
-    // No format specified, use default
-    if (boost::iequals(format, ""))
+    if (format == "")
     {
-        return new PGMImageWriter(output);
+        std::cerr << "Input image format not recognized" << std::endl;
+    }
+    if (filename == "-")
+    {
+        input = stdin;
+    }
+    else
+    {
+        input = fopen(filename.c_str(), "r");
+        // FIXME: where is fclose?
+        if (input == NULL)
+            return NULL;
     }
 
     return NULL;

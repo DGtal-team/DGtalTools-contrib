@@ -17,7 +17,8 @@
  * @file PeriodicNSDistanceDT.h
  * @ingroup Tools
  * @author Nicolas Normand (\c Nicolas.Normand@polytech.univ-nantes.fr)
- * LUNAM Université, Université de Nantes, IRCCyN UMR CNRS 6597
+ * Université Bretagne Loire, Université de Nantes,
+ * Laboratoire des Sciences du Numérique de Nantes (LS2N) UMR CNRS 6004
  *
  * @date 2012/09/28
  *
@@ -37,8 +38,9 @@
  * periodic sequence. It provides factory methods to create translated distance
  * transform filters and distance transform untranslator filters.
  */
-class PeriodicNSDistance: public NeighborhoodSequenceDistance {
-public:
+class PeriodicNSDistance : public NeighborhoodSequenceDistance
+{
+  public:
     /**
      * Constructor.  Creates a neighborhood sequence distance with a periodic
      * sequence.
@@ -52,14 +54,17 @@ public:
      */
     ~PeriodicNSDistance();
 
-    NeighborhoodSequenceDistanceTransform* newTranslatedDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer) const;
+    NeighborhoodSequenceDistanceTransform *newTranslatedDistanceTransform(
+        ImageConsumer<GrayscalePixelType> *consumer) const;
 
-    DistanceTransformUntranslator<GrayscalePixelType, GrayscalePixelType>* newDistanceTransformUntranslator(ImageConsumer<GrayscalePixelType>* consumer) const;
+    DistanceTransformUntranslator<GrayscalePixelType, GrayscalePixelType> *
+    newDistanceTransformUntranslator(
+        ImageConsumer<GrayscalePixelType> *consumer) const;
 
     friend class PeriodicNSDistanceTransform;
     friend class PeriodicNSDistanceTransformUntranslator;
 
-protected:
+  protected:
     int mathbf2(int r) const;
 
     GrayscalePixelType C1(int r) const;
@@ -77,14 +82,17 @@ protected:
  * \brief Implements a single scan translated distance transform for distances
  * defined by a periodic sequence of neighborhoods.
  */
-class PeriodicNSDistanceTransform : public NeighborhoodSequenceDistanceTransform {
-public:
-    PeriodicNSDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer, const PeriodicNSDistance *d);
+class PeriodicNSDistanceTransform : public NeighborhoodSequenceDistanceTransform
+{
+  public:
+    PeriodicNSDistanceTransform(ImageConsumer<GrayscalePixelType> *consumer,
+        const PeriodicNSDistance *d);
     ~PeriodicNSDistanceTransform();
 
     void processRow(const BinaryPixelType *imageRow);
     void untranslate(int cols);
-protected:
+
+  protected:
     const PeriodicNSDistance *_d;
 };
 
@@ -92,17 +100,24 @@ protected:
  * \brief Implements a recentering algorithm for the translated distance
  * transforms defined by a periodic sequences of neighborhoods.
  */
-class PeriodicNSDistanceTransformUntranslator: public DistanceTransformUntranslator<GrayscalePixelType, GrayscalePixelType> {
-public:
-    PeriodicNSDistanceTransformUntranslator(ImageConsumer<GrayscalePixelType>* consumer, int dMax, const PeriodicNSDistance *d);
+class PeriodicNSDistanceTransformUntranslator
+    : public DistanceTransformUntranslator<GrayscalePixelType,
+          GrayscalePixelType>
+{
+  public:
+    PeriodicNSDistanceTransformUntranslator(
+        ImageConsumer<GrayscalePixelType> *consumer, int dMax,
+        const PeriodicNSDistance *d);
     ~PeriodicNSDistanceTransformUntranslator();
 
     void beginOfImage(int cols, int rows);
-    void processRow(const GrayscalePixelType* inputRow);
+    void processRow(const GrayscalePixelType *inputRow);
     void endOfImage();
 
-protected:
-    typedef DistanceTransformUntranslator<GrayscalePixelType, GrayscalePixelType> super;
+  protected:
+    typedef DistanceTransformUntranslator<GrayscalePixelType,
+        GrayscalePixelType>
+        super;
     void rotate();
 
     static const int marginRight = 1;

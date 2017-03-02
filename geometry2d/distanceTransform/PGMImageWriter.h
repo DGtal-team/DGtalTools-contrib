@@ -17,7 +17,8 @@
  * @file PGMImageWriter.h
  * @ingroup Tools
  * @author Nicolas Normand (\c Nicolas.Normand@polytech.univ-nantes.fr)
- * LUNAM Université, Université de Nantes, IRCCyN UMR CNRS 6597
+ * Université Bretagne Loire, Université de Nantes,
+ * Laboratoire des Sciences du Numérique de Nantes (LS2N) UMR CNRS 6004
  *
  * @date 2012/09/28
  *
@@ -28,26 +29,22 @@
  * This file is part of the DGtal library.
  */
 
-extern "C" {
-#include <pam.h>
-}
-
 #include "ImageFilter.h"
 
 /**
  * \brief A PGMImageWriter is an ImageConsumer that writes PGM images to a file.
  */
-class PGMImageWriter : public ImageConsumer<GrayscalePixelType> {
-public:
-    PGMImageWriter(FILE* output, int plainFormat = 1);
+class PGMImageWriter : public ImageConsumer<GrayscalePixelType>
+{
+  public:
+    PGMImageWriter(FILE *output, int plainFormat = 1);
 
     void beginOfImage(int cols, int rows);
-    void processRow(const GrayscalePixelType* inputRow);
+    void processRow(const GrayscalePixelType *inputRow);
     void endOfImage();
 
-protected:
+  protected:
     int _cols;
     int _plainFormat;
-    FILE* _output;
-    gray * _outputRow;
+    FILE *_output;
 };

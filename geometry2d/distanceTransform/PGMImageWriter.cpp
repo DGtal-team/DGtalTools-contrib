@@ -17,7 +17,8 @@
  * @file PGMImageWriter.cpp
  * @ingroup Tools
  * @author Nicolas Normand (\c Nicolas.Normand@polytech.univ-nantes.fr)
- * LUNAM Université, Université de Nantes, IRCCyN UMR CNRS 6597
+ * Université Bretagne Loire, Université de Nantes,
+ * Laboratoire des Sciences du Numérique de Nantes (LS2N) UMR CNRS 6004
  *
  * @date 2012/09/28
  *
@@ -29,31 +30,29 @@
  */
 
 #include "PGMImageWriter.h"
-#include <boost/assert.hpp>
 
-PGMImageWriter::PGMImageWriter(FILE* output, int plainFormat) :
-_cols(0),
-_plainFormat(plainFormat),
-_output(output) {
+PGMImageWriter::PGMImageWriter(FILE *output, int plainFormat)
+    : _cols(0)
+    , _plainFormat(plainFormat)
+    , _output(output)
+{
 }
 
-void
-PGMImageWriter::beginOfImage(int cols, int rows) {
+void PGMImageWriter::beginOfImage(int cols, int rows)
+{
     _cols = cols;
-    _outputRow = pgm_allocrow(cols);
-    BOOST_VERIFY(_outputRow != NULL);
-    pgm_writepgminit(_output, cols, rows, 255, 1);
+    fprintf(_output, "P2\n%d %d\n255\n", cols, rows);
 }
 
-void
-PGMImageWriter::endOfImage() {
-    pgm_freerow(_outputRow);
+void PGMImageWriter::endOfImage()
+{
 }
 
-void
-PGMImageWriter::processRow(const GrayscalePixelType* inputRow) {
-    for (int column = 0; column < _cols; ++column) {
-	_outputRow[column] = inputRow[column];
+void PGMImageWriter::processRow(const GrayscalePixelType *inputRow)
+{
+    for (int column = 0; column < _cols - 1; column++)
+    {
+        fprintf(_output, "%d ", inputRow[column]);
     }
-    pgm_writepgmrow(_output, _outputRow, _cols, 255, 1);
+    fprintf(_output, "%d\n", inputRow[_cols - 1]);
 }

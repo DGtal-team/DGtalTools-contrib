@@ -34,7 +34,7 @@ endif()
 # -----------------------------------------------------------------------------
 # Define variables and cmake parameters, and display some information
 # -----------------------------------------------------------------------------
-SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
+# SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 SET(DGtalToolsContrib_VERSION_MAJOR 0)
 SET(DGtalToolsContrib_VERSION_MINOR 9)
 SET(DGtalToolsContrib_VERSION_PATCH 3)

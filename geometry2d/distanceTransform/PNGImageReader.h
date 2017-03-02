@@ -17,7 +17,8 @@
  * @file PNGImageReader.h
  * @ingroup Tools
  * @author Nicolas Normand (\c Nicolas.Normand@polytech.univ-nantes.fr)
- * LUNAM Université, Université de Nantes, IRCCyN UMR CNRS 6597
+ * Université Bretagne Loire, Université de Nantes,
+ * Laboratoire des Sciences du Numérique de Nantes (LS2N) UMR CNRS 6004
  *
  * @date 2012/09/28
  *
@@ -35,13 +36,14 @@
  * \brief A PNGImageWriter is an ImageProducer that pushes PNG images read from
  * a file.
  */
-class PNGImageReader: public RowImageProducer<BinaryPixelType> {
-public:
-    PNGImageReader(ImageConsumer<BinaryPixelType>* consumer, FILE *input);
+class PNGImageReader : public RowImageProducer<BinaryPixelType>
+{
+  public:
+    PNGImageReader(ImageConsumer<BinaryPixelType> *consumer, FILE *input);
 
     void produceAllRows(size_t readBytes);
 
-private:
+  private:
     void startImage(size_t readBytes = 0);
 
     png_structp _png_ptr;
