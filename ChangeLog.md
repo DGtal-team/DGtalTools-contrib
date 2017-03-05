@@ -8,8 +8,8 @@
   [#32](https://github.com/DGtal-team/DGtalTools-contrib/pull/32))
 
 - *Geometry3d*
-  - off2sdp: a new tool to converts a mesh into a set of points (.sdp). It can
-    extract the mesh vertex (by default) or the center of faces. 
+  - off2sdp: a new tool to convert a mesh into a set of points (.sdp). It can
+    extract the mesh vertices (by default) or the face centers. 
     (Bertrand Kerautret [33](https://github.com/DGtal-team/DGtalTools-contrib/pull/32)) 
   
   
