@@ -85,6 +85,7 @@ int main( int argc, char** argv )
     ("help,h", "display this message")
     ("input,i", po::value<std::string >(), "an input mesh file in .off format. " )
     ("output,o", po::value<std::string >(), "an output file (can generate .obj and .mtl if color option is selected) " )
+    ("invertNormals,n", "invert the normals (face orientation).")
     ("colors,c", "convert by taking into account the mesh colors (from each faces)." );
 
   bool parseOK=true;
@@ -127,8 +128,10 @@ int main( int argc, char** argv )
   std::stringstream outname; outname << basename << ".obj"; 
   // read input mesh
   DGtal::Mesh<DGtal::Z3i::RealPoint> aMesh;
-  aMesh << inputFileName ;
 
+  MeshReader<DGtal::Z3i::RealPoint>::importOFFFile(inputFileName,
+                                                   aMesh, vm.count("invertNormals"));
+  
   ofstream fout;
   fout.open(outname.str().c_str());
   if(!vm.count("colors"))
