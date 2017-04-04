@@ -4,6 +4,10 @@
   - LUTBasedNSDistanceTransform: Removed the dependency to libNetPBM. (Nicolas Normand,
   [#32](https://github.com/DGtal-team/DGtalTools-contrib/pull/32))
 
+- *Geometry3d*
+  - off2obj: tool to convert a mesh represented in off format into obj format.
+  (Bertrand Kerautret, [#35](https://github.com/DGtal-team/DGtalTools-contrib/pull/32))
+
 # DGtalTools-contrib  0.9.3
 
 - *visualisation*
