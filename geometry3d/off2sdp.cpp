@@ -52,7 +52,7 @@ namespace po = boost::program_options;
 /**
  @page off2sdp off2sdp
  
- @brief  Converts a mesh into a set of points (.sdp). It can extract the mesh vertex (by default) or the center of faces.  
+ @brief  Converts a mesh into a set of points (.sdp). It can extract the mesh vertices (by default) or the center of faces.  
 
  @b Usage:   off2sdp [input] [output]
 
@@ -111,7 +111,7 @@ int main( int argc, char** argv )
   if( !parseOK || vm.count("help")||argc<=1 || !canStart)
     {
       trace.info() << "Usage: " << argv[0] << " [input] [output] \n"
-                << "Converts a mesh into a set of points (.sdp). It can extract the mesh vertex (by default) or the center of faces.  \n"
+                << "Converts a mesh into a set of points (.sdp). It can extract the mesh vertices (by default) or the center of faces.  \n"
                 << general_opt << "\n"
                 << "Typical use example:\n \t off2sdp -i $DGtal/examples/samples/tref.off -o test.sdp  \n";
       return 0;
