@@ -1,9 +1,18 @@
+
+
+
 # DGtalTools-contrib  0.9.4
 
 - *Geometry2d*
   - LUTBasedNSDistanceTransform: Removed the dependency to libNetPBM. (Nicolas Normand,
   [#32](https://github.com/DGtal-team/DGtalTools-contrib/pull/32))
 
+- *Geometry3d*
+  - off2sdp: a new tool to convert a mesh into a set of points (.sdp). It can
+    extract the mesh vertices (by default) or the face centers. 
+    (Bertrand Kerautret [33](https://github.com/DGtal-team/DGtalTools-contrib/pull/32)) 
+  
+  
 # DGtalTools-contrib  0.9.3
 
 - *visualisation*

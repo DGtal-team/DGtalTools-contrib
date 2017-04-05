@@ -4,6 +4,7 @@ SET(DGTAL_TOOLS_DEVEL_SRC
     volLocalMax
     basicMorphoFilter
     xyzScale
+    off2sdp
 )
 
 
