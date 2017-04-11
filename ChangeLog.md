@@ -1,3 +1,6 @@
+
+
+
 # DGtalTools-contrib  0.9.4
 
 - *Geometry2d*
@@ -5,8 +8,12 @@
   [#32](https://github.com/DGtal-team/DGtalTools-contrib/pull/32))
 
 - *Geometry3d*
-  - off2obj: tool to convert a mesh represented in off format into obj format.
+ - off2sdp: a new tool to convert a mesh into a set of points (.sdp). It can
+    extract the mesh vertices (by default) or the face centers. 
+    (Bertrand Kerautret [33](https://github.com/DGtal-team/DGtalTools-contrib/pull/33)) 
+ - off2obj: tool to convert a mesh represented in off format into obj format.
   (Bertrand Kerautret, [#35](https://github.com/DGtal-team/DGtalTools-contrib/pull/32))
+  
 
 # DGtalTools-contrib  0.9.3
 
