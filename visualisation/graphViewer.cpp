@@ -74,6 +74,7 @@ int main( int argc, char** argv )
     ("help,h", "display this message")
     ("inputVertex,v", po::value<std::string>(), "input file containing the vertex list.")
     ("inputEdge,e", po::value<std::string>(), "input file containing the edge list.")
+    ("autoEdge,a", "generate edge list from vertex order.")
     ("inputRadii,r", po::value<std::string>(), "input file containing the radius for each vertex.")
     ("ballRadius,b", po::value<double>()->default_value(1.0), "radius of vertex balls.")
     ("addMesh,m", po::value<std::string>(), "add mesh in the display.")
@@ -96,7 +97,7 @@ int main( int argc, char** argv )
     parseOK = false;
   }
   po::notify(vm);
-  if( !parseOK || argc<=1 || vm.count("help") || !vm.count("inputVertex")  || !vm.count("inputEdge") )
+  if( !parseOK || argc<=1 || vm.count("help") || !vm.count("inputVertex")  || (!vm.count("inputEdge")&& !vm.count("autoEdge") ))
   {
     trace.info() << "Basic display graph" << std::endl
                  << "Options:" << std::endl
@@ -113,13 +114,25 @@ int main( int argc, char** argv )
   DGtal::Color edgeColor(240,240,240);
 
   std::string nameFileVertex = vm["inputVertex"].as<std::string>();
-  std::string nameFileEdge = vm["inputEdge"].as<std::string>();
+
   double r = vm["ballRadius"].as<double>();
   bool useRadiiFile = vm.count("inputRadii");
 
   // Structures to store vertex and edges read in input files
   std::vector<Z3i::RealPoint> vectVertex = PointListReader<Z3i::RealPoint>::getPointsFromFile(nameFileVertex);
-  std::vector<Z2i::Point> vectEdges = PointListReader<Z2i::Point>::getPointsFromFile(nameFileEdge);
+  std::vector<Z2i::Point> vectEdges;
+  if(!vm.count("autoEdge"))
+  {
+    std::string nameFileEdge = vm["inputEdge"].as<std::string>();
+    vectEdges =  PointListReader<Z2i::Point>::getPointsFromFile(nameFileEdge);
+  }
+  else
+  {
+    for(unsigned int i=0; i<vectVertex.size()-1; i++)
+    {
+      vectEdges.push_back(Z2i::Point(i,i+1));
+    }
+  }
   std::vector<double> vectRadii( std::max(vectVertex.size(),vectEdges.size()), r );
 
   // read the mesh and ege colors

@@ -3,6 +3,10 @@
 
 # DGtalTools-contrib  0.9.4
 
+- *visualisation*
+  - graphViewer: new option to generate edges from vertex points. (Bertrand
+  Kerautret, [#33](https://github.com/DGtal-team/DGtalTools-contrib/pull/33))
+
 - *Geometry2d*
   - LUTBasedNSDistanceTransform: Removed the dependency to libNetPBM. (Nicolas Normand,
   [#32](https://github.com/DGtal-team/DGtalTools-contrib/pull/32))
