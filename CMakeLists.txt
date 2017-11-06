@@ -4,7 +4,7 @@
 # -----------------------------------------------------------------------------
 PROJECT(DGtalTools-contrib)
 
-cmake_minimum_required (VERSION 2.6) 
+cmake_minimum_required (VERSION 3.1) 
 
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
