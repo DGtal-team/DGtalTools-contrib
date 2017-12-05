@@ -35,6 +35,9 @@ addons:
     - libboost-system-dev
 
 
+before_install:
+  - if [ $CXX == "g++" ]; then export CXX="g++-4.8"  CC="gcc-4.8"  CCOMPILER="gcc-4.8" CXXCOMPILER="g++-4.8"; fi
+  - export SRC_DIR="`pwd`"
 
 
 before_script:
