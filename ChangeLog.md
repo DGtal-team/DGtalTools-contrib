@@ -2,6 +2,8 @@
 
 
 # DGtalTools-contrib  0.9.4
+- *global*
+  - Fix for the last QGLViewer version (2.7). (Bertrand Kerautret, #40)
 
 - *Geometry2d*
   - LUTBasedNSDistanceTransform: Removed the dependency to libNetPBM. (Nicolas Normand,
