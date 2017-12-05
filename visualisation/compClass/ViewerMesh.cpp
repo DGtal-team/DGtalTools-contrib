@@ -167,7 +167,7 @@ ViewerMesh<Space, KSpace>::deleteCurrents()
   DGtal::Viewer3D<Space, KSpace>::clear();
   DGtal::Viewer3D<Space, KSpace>::operator<<(myMesh);
   DGtal::Viewer3D<Space, KSpace>::updateList(false);
-  DGtal::Viewer3D<Space, KSpace>::updateGL();
+  DGtal::Viewer3D<Space, KSpace>::update();
   // the selection history is cleared since it can produce wrong reference from index faces changes.
   myUndoQueueSelected.clear();
 }
@@ -234,7 +234,7 @@ ViewerMesh<Space, KSpace>::deleteFacesFromDist(DGtal::Z3i::RealPoint p)
   DGtal::Viewer3D<Space, KSpace>::clear();
   DGtal::Viewer3D<Space, KSpace>::operator<<(myMesh);
   DGtal::Viewer3D<Space, KSpace>::updateList(false);
-  DGtal::Viewer3D<Space, KSpace>::updateGL();
+  DGtal::Viewer3D<Space, KSpace>::update();
 }
 
 
@@ -263,7 +263,7 @@ ViewerMesh<Space, KSpace>::displaySelectionOnMesh()
   DGtal::Viewer3D<Space, KSpace>::clear();
   DGtal::Viewer3D<Space, KSpace>::operator<<(tmp);
   DGtal::Viewer3D<Space, KSpace>::updateList(false);
-  DGtal::Viewer3D<Space, KSpace>::updateGL();
+  DGtal::Viewer3D<Space, KSpace>::update();
 }
 
 template< typename Space, typename KSpace>
@@ -308,7 +308,7 @@ ViewerMesh<Space, KSpace>::undo()
         DGtal::Viewer3D<Space, KSpace>::clear();
         DGtal::Viewer3D<Space, KSpace>::operator<<(myMesh);
         DGtal::Viewer3D<Space, KSpace>::updateList(false);
-        DGtal::Viewer3D<Space, KSpace>::updateGL();      
+        DGtal::Viewer3D<Space, KSpace>::update();      
       }
   
 }
@@ -354,7 +354,7 @@ ViewerMesh<Space, KSpace>::filterVisibleFaces(const double anAngleMax)
   DGtal::Viewer3D<Space, KSpace>::clear();
   DGtal::Viewer3D<Space, KSpace>::operator<<(myMesh);
   DGtal::Viewer3D<Space, KSpace>::updateList(false);
-  DGtal::Viewer3D<Space, KSpace>::updateGL();
+  DGtal::Viewer3D<Space, KSpace>::update();
   
 }
 
