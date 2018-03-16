@@ -5,6 +5,11 @@
 - *global*
   - Fix for the last QGLViewer version (2.7). (Bertrand Kerautret, #40)
 
+- *visualisation*
+  - graphViewer: new option to generate edges from vertex points and to 
+    customize vertex color (Bertrand Kerautret, 
+    [#33](https://github.com/DGtal-team/DGtalTools-contrib/pull/33))
+
 - *Geometry2d*
   - LUTBasedNSDistanceTransform: Removed the dependency to libNetPBM. (Nicolas Normand,
   [#32](https://github.com/DGtal-team/DGtalTools-contrib/pull/32))

@@ -74,10 +74,12 @@ int main( int argc, char** argv )
     ("help,h", "display this message")
     ("inputVertex,v", po::value<std::string>(), "input file containing the vertex list.")
     ("inputEdge,e", po::value<std::string>(), "input file containing the edge list.")
+    ("autoEdge,a", "generate edge list from vertex order.")
     ("inputRadii,r", po::value<std::string>(), "input file containing the radius for each vertex.")
     ("ballRadius,b", po::value<double>()->default_value(1.0), "radius of vertex balls.")
     ("addMesh,m", po::value<std::string>(), "add mesh in the display.")
     ("meshColor", po::value<std::vector<unsigned int> >()->multitoken(), "specify the color mesh.")
+    ("vertexColor", po::value<std::vector<unsigned int> >()->multitoken(), "specify the color of vertex.")
     ("edgeColor", po::value<std::vector<unsigned int> >()->multitoken(), "specify the color of edges.")
     ("colormap,c", "display vertex colored by order in vertex file or by radius scale if the radius file is specidfied (-r).")
     ("doSnapShotAndExit,d", po::value<std::string>(), "save display snapshot into file. Notes that the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D). If the camera setting was not saved it will use the default camera setting." );
@@ -96,7 +98,7 @@ int main( int argc, char** argv )
     parseOK = false;
   }
   po::notify(vm);
-  if( !parseOK || argc<=1 || vm.count("help") || !vm.count("inputVertex")  || !vm.count("inputEdge") )
+  if( !parseOK || argc<=1 || vm.count("help") || !vm.count("inputVertex")  || (!vm.count("inputEdge")&& !vm.count("autoEdge") ))
   {
     trace.info() << "Basic display graph" << std::endl
                  << "Options:" << std::endl
@@ -111,15 +113,28 @@ int main( int argc, char** argv )
 
   DGtal::Color meshColor(240,240,240);
   DGtal::Color edgeColor(240,240,240);
+  DGtal::Color vertexColor(240,240,240);
 
   std::string nameFileVertex = vm["inputVertex"].as<std::string>();
-  std::string nameFileEdge = vm["inputEdge"].as<std::string>();
+
   double r = vm["ballRadius"].as<double>();
   bool useRadiiFile = vm.count("inputRadii");
 
   // Structures to store vertex and edges read in input files
   std::vector<Z3i::RealPoint> vectVertex = PointListReader<Z3i::RealPoint>::getPointsFromFile(nameFileVertex);
-  std::vector<Z2i::Point> vectEdges = PointListReader<Z2i::Point>::getPointsFromFile(nameFileEdge);
+  std::vector<Z2i::Point> vectEdges;
+  if(!vm.count("autoEdge"))
+  {
+    std::string nameFileEdge = vm["inputEdge"].as<std::string>();
+    vectEdges =  PointListReader<Z2i::Point>::getPointsFromFile(nameFileEdge);
+  }
+  else
+  {
+    for(unsigned int i=0; i<vectVertex.size()-1; i++)
+    {
+      vectEdges.push_back(Z2i::Point(i,i+1));
+    }
+  }
   std::vector<double> vectRadii( std::max(vectVertex.size(),vectEdges.size()), r );
 
   // read the mesh and ege colors
@@ -136,6 +151,15 @@ int main( int argc, char** argv )
       trace.error() << "The color specification should contain R,G,B and Alpha values."<< std::endl;
     }
     edgeColor.setRGBi(vectCol[0],vectCol[1],vectCol[2],vectCol[3]);
+  }
+  if(vm.count("vertexColor"))
+  {
+    std::vector<unsigned int> vectCol = vm["vertexColor"].as<std::vector<unsigned int> >();
+    if( vectCol.size()!=4 )
+    {
+      trace.error() << "The color specification should contain R,G,B and Alpha values."<< std::endl;
+    }
+    vertexColor.setRGBi(vectCol[0],vectCol[1],vectCol[2],vectCol[3]);
   }
   
   // Create the color scale dpending on the specified radius file
@@ -161,6 +185,7 @@ int main( int argc, char** argv )
     Color currentColor;
     for ( int i=0 ; i<vectVertex.size() ; ++i )
     {
+      
       currentColor = (useRadiiFile ? hueShade(vectRadii[i]*10000) : hueShade(i));
       viewer << CustomColors3D( currentColor, currentColor );
       viewer.addBall(vectVertex[i], vectRadii[i]);
@@ -168,6 +193,11 @@ int main( int argc, char** argv )
   }
   else
   {
+    if(vm.count("vertexColor"))
+    {
+        viewer << CustomColors3D( vertexColor, vertexColor );
+    }
+    
      for ( int i=0 ; i<vectVertex.size() ; ++i )
     {
       viewer.addBall(vectVertex[i], vectRadii[i]);
