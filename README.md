@@ -43,7 +43,8 @@ This section can contains various utilities related to 2d geometry (2d estimator
         neighborhood-sequence distance transform of a binary image.
       - CumulativeSequenceTest and RationalBeattySequenceTest: tests from
         LUTBasedNSDistanceTransform.
-
+   - rosinThreshold : applies the Rosin Threshold algorithm on a simple file of data values.
+   
 | ![](https://cloud.githubusercontent.com/assets/772865/12481234/048994c0-c048-11e5-8c64-0e6baea4c62c.png)  |
 | :-: |
 | meaningFullThickness |
