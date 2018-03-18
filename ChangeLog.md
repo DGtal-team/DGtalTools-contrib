@@ -3,7 +3,7 @@
 
 # DGtalTools-contrib  0.9.4
 - *global*
-  - Fix for the last QGLViewer version (2.7). (Bertrand Kerautret, #40)
+  - Fix for the last QGLViewer version (2.7). (Bertrand Kerautret, [#40](https://github.com/DGtal-team/DGtalTools-contrib/pull/40)))
 
 - *visualisation*
   - graphViewer: new option to generate edges from vertex points and to 
