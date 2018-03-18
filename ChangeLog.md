@@ -3,7 +3,7 @@
 
 # DGtalTools-contrib  0.9.4
 - *global*
-  - Fix for the last QGLViewer version (2.7). (Bertrand Kerautret, [#40](https://github.com/DGtal-team/DGtalTools-contrib/pull/40)))
+  - Fix for the last QGLViewer version (2.7). (Bertrand Kerautret, [#40](https://github.com/DGtal-team/DGtalTools-contrib/pull/40))
 
 - *visualisation*
   - graphViewer: new option to generate edges from vertex points and to 
@@ -14,12 +14,12 @@
   - LUTBasedNSDistanceTransform: Removed the dependency to libNetPBM. (Nicolas Normand,
   [#32](https://github.com/DGtal-team/DGtalTools-contrib/pull/32))
   - thresholdRosin: implementation of Rosin's algorithm to compute threshold of an unimodal intensity histogram (Van-Tho
-    Nguyen and Bertrand Kerautret [#36](https://github.com/DGtal-team/DGtalTools-contrib/pull/36))
+    Nguyen and Bertrand Kerautret, [#36](https://github.com/DGtal-team/DGtalTools-contrib/pull/36))
 
 - *Geometry3d*
  - off2sdp: a new tool to convert a mesh into a set of points (.sdp). It can
     extract the mesh vertices (by default) or the face centers. 
-    (Bertrand Kerautret [33](https://github.com/DGtal-team/DGtalTools-contrib/pull/33)) 
+    (Bertrand Kerautret, [33](https://github.com/DGtal-team/DGtalTools-contrib/pull/33)) 
  - off2obj: tool to convert a mesh represented in off format into obj format.
   (Bertrand Kerautret, [#35](https://github.com/DGtal-team/DGtalTools-contrib/pull/32))
   
