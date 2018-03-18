@@ -14,7 +14,7 @@
   - LUTBasedNSDistanceTransform: Removed the dependency to libNetPBM. (Nicolas Normand,
   [#32](https://github.com/DGtal-team/DGtalTools-contrib/pull/32))
   - thresholdRosin: implementation of Rosin's algorithm to compute threshold of an unimodal intensity histogram (Van-Tho
-    Nguyen and Bertrand Kerautret [#36](https://github.com/DGtal-team/DGtalTools-contrib/pull/36)))
+    Nguyen and Bertrand Kerautret [#36](https://github.com/DGtal-team/DGtalTools-contrib/pull/36))
 
 - *Geometry3d*
  - off2sdp: a new tool to convert a mesh into a set of points (.sdp). It can
