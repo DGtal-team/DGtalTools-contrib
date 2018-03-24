@@ -56,9 +56,7 @@ before_install:
 
 
 before_script:
-  - if [ $TRAVIS_OS_NAME == linux ]; then echo "All done."; ccache -V && ccache --show-stats && ccache --zero-stats;   fi
-  - if [ $TRAVIS_OS_NAME == linux ]; 'echo "using gcc : : ccache $CXX : <cflags>-std=c11 <cxxflags>-std=c++11 ;" > ~/user-config.jam'; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; 'echo "using clang : : ccache $CXX : <cflags>-std=c11 <cxxflags>-std=c++11 ;" >> ~/user-config.jam'; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then  source .travis/confCCLinux.sh; fi
   - if [ $TRAVIS_OS_NAME == osx ]; then source .travis/install_deps_macos.sh; fi
   - cd $SRC_DIR
   - git clone git://github.com/DGtal-team/DGtal.git
@@ -68,6 +66,8 @@ before_script:
   - cd ..
 
 script: 
-   - cmake . -DCMAKE_BUILD_TYPE=Debug -DDGtal_DIR=$PWD/DGtal -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER  -DUSE_OPENCV=true
+   - if [ $TRAVIS_OS_NAME == osx ]; then cmake . -DCMAKE_BUILD_TYPE=Debug -DDGtal_DIR=$PWD/DGtal -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER  -DUSE_OPENCV=true; -DWITH_QT5=true; fi
+   - if [ $TRAVIS_OS_NAME == linux ]; then cmake . -DCMAKE_BUILD_TYPE=Debug -DDGtal_DIR=$PWD/DGtal -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER  -DUSE_OPENCV=true; fi
+
    - make
 
