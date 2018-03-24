@@ -4,9 +4,24 @@ compiler:
   - gcc
   - clang
 
+os:
+  - linux
+  - osx
+
 
 sudo: false
 
+matrix:
+  fast_finish: true
+  exclude:
+    - os: osx
+      env: CONFIG="DOCUMENTATION"
+    - compiler: gcc
+      os: linux
+      env: CONFIG="DOCUMENTATION"
+    - os: osx
+      compiler: gcc
+      
 
 env:
   - DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=true -DWITH_ITK=false"
@@ -41,9 +56,10 @@ before_install:
 
 
 before_script:
-  - ccache -V && ccache --show-stats && ccache --zero-stats
-  - 'echo "using gcc : : ccache $CXX : <cflags>-std=c11 <cxxflags>-std=c++11 ;" > ~/user-config.jam'
-  - 'echo "using clang : : ccache $CXX : <cflags>-std=c11 <cxxflags>-std=c++11 ;" >> ~/user-config.jam'
+  - if [ $TRAVIS_OS_NAME == linux ]; then echo "All done."; ccache -V && ccache --show-stats && ccache --zero-stats;   fi
+  - if [ $TRAVIS_OS_NAME == linux ]; 'echo "using gcc : : ccache $CXX : <cflags>-std=c11 <cxxflags>-std=c++11 ;" > ~/user-config.jam'; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; 'echo "using clang : : ccache $CXX : <cflags>-std=c11 <cxxflags>-std=c++11 ;" >> ~/user-config.jam'; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then source .travis/install_deps_macos.sh; fi
   - cd $SRC_DIR
   - git clone git://github.com/DGtal-team/DGtal.git
   - cd DGtal
