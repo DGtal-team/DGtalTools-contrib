@@ -66,7 +66,7 @@ before_script:
   - cd ..
 
 script: 
-   - if [ $TRAVIS_OS_NAME == osx ]; then cmake . -DCMAKE_BUILD_TYPE=Debug -DDGtal_DIR=$PWD/DGtal -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER  -DUSE_OPENCV=true; -DWITH_QT5=true; fi
+   - if [ $TRAVIS_OS_NAME == osx ]; then cmake . -DCMAKE_BUILD_TYPE=Debug -DDGtal_DIR=$PWD/DGtal -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER  -DUSE_OPENCV=false; -DWITH_QT5=true; fi
    - if [ $TRAVIS_OS_NAME == linux ]; then cmake . -DCMAKE_BUILD_TYPE=Debug -DDGtal_DIR=$PWD/DGtal -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER  -DUSE_OPENCV=true; fi
 
    - make

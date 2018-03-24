@@ -9,4 +9,3 @@ brew install qt5 graphicsmagick fftw eigen
 # Explicit install of libqglviewer
 brew install http://liris.cnrs.fr/david.coeurjolly/misc/libqglviewer.rb
 
-brew install opencv3
