@@ -11,6 +11,13 @@ os:
 
 sudo: false
 
+
+env:
+  - CONFIG="Debug,QGLVIEWER"
+  - CONFIG="Debug"
+  - CONFIG="DOCUMENTATION"
+
+
 matrix:
   fast_finish: true
   exclude:
@@ -23,9 +30,7 @@ matrix:
       compiler: gcc
       
 
-env:
-  - DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=true -DWITH_ITK=false"
-  - DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=false -DWITH_ITK=false"
+
 addons:
   apt:
    sources:
@@ -58,16 +63,19 @@ before_install:
 before_script:
   - if [ $TRAVIS_OS_NAME == linux ]; then  source .travis/confCCLinux.sh; fi
   - if [ $TRAVIS_OS_NAME == osx ]; then source .travis/install_deps_macos.sh; fi
+  - DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=false -DWITH_ITK=false"
+  - if [ $CONFIG == "Debug,QGLVIEWER" AND  $TRAVIS_OS_NAME == osx  ]; then export DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=true -DWITH_QT5=true -DWITH_ITK=false "; fi
+  - if [ $CONFIG == "Debug,QGLVIEWER" AND  $TRAVIS_OS_NAME == linux  ]; then export DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=true  -DWITH_ITK=false"; fi
   - cd $SRC_DIR
   - git clone git://github.com/DGtal-team/DGtal.git
-  - cd DGtal
-  - cmake . $DGTALTYPE  -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER  
+  - cd DGtal   
+  - if [ $TRAVIS_OS_NAME == osx ]; then cmake . $DGTALTYPE  -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER  -DWITH_QT5=true ; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then cmake . $DGTALTYPE  -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER ; fi
   - make 
   - cd ..
 
 script: 
-   - if [ $TRAVIS_OS_NAME == osx ]; then cmake . -DCMAKE_BUILD_TYPE=Debug -DDGtal_DIR=$PWD/DGtal -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER  -DUSE_OPENCV=false; -DWITH_QT5=true; fi
-   - if [ $TRAVIS_OS_NAME == linux ]; then cmake . -DCMAKE_BUILD_TYPE=Debug -DDGtal_DIR=$PWD/DGtal -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER  -DUSE_OPENCV=true; fi
-
-   - make
+  - if [ $TRAVIS_OS_NAME == osx ]; then cmake . -DCMAKE_BUILD_TYPE=Debug -DDGtal_DIR=$PWD/DGtal -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER  -DUSE_OPENCV=false ; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then cmake . -DCMAKE_BUILD_TYPE=Debug -DDGtal_DIR=$PWD/DGtal -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER  -DUSE_OPENCV=true; fi    
+  - make
 
