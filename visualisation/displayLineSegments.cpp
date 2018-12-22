@@ -113,6 +113,8 @@ namespace po = boost::program_options;
                            the mesh faces and eventually the color R, G, B,
                            A of the mesh edge lines (set by default to black).
   -e [ --noDisplayEndPoints ]  to not displays segment end points.
+  --noDisplayEndPointsSecSet   to not displays segment end points of the second
+                          set.
   -o [ --outputFile ] arg  <filename> save output file automatically according
                           the file format extension.
   --outputStreamEPS        specify eps for output stream format.
@@ -148,10 +150,11 @@ Typical use example:
 
 void displayLineSet(po::variables_map vm, std::string nameInput,
                     std::string nameArgCol, Board2D &aBoard,
-                    unsigned int height, bool invertYaxis)
+                    unsigned int height, bool invertYaxis, bool displayEndPoint, int lineWidth=2)
 {
     std::string fileName = vm[nameInput].as<std::string>();
     std::vector<unsigned int > vectPos;
+    
     if(vm.count("SDPindex"))
     {
         vectPos = vm["SDPindex"].as<std::vector<unsigned int > >();
@@ -180,7 +183,7 @@ void displayLineSet(po::variables_map vm, std::string nameInput,
     }
     if(vm.count("customPointColor")){
         std::vector<unsigned int > vectCol = vm["customPointColor"].as<std::vector<unsigned int> >();
-        if(vectCol.size()!=3 ){
+        if(vectCol.size()!=3){
             trace.error() << "colors specification should contain R,G,B values (using default red)."<< std::endl;
         }
         pointColor.setRGBi(vectCol[0], vectCol[1], vectCol[2], 255);
@@ -190,13 +193,14 @@ void displayLineSet(po::variables_map vm, std::string nameInput,
     for(unsigned int i=0; i<vectPt1.size(); i++){
         Z2i::Point pt1 (vectPt1[i][0], invertYaxis? height - vectPt1[i][1]: vectPt1[i][1] );
         Z2i::Point pt2 (vectPt2[i][0], invertYaxis? height - vectPt2[i][1]: vectPt2[i][1] );
-        if(!vm.count("noDisplayEndPoints"))
+        if(displayEndPoint)
         {
-            aBoard << CustomStyle(vectPt1[i].className(), new CustomColors(pointColor, pointColor));
-            aBoard << pt1 ;
-            aBoard << pt2;
-            aBoard.setPenColor(lineColor);
+            aBoard.setPenColor(pointColor);
+            aBoard.fillCircle(pt1[0], pt1[1], 2*lineWidth);
+            aBoard.fillCircle(pt2[0], pt2[1], 2*lineWidth);
         }
+        aBoard.setPenColor(lineColor);
+        aBoard.setLineWidth(lineWidth);
         aBoard.drawLine(pt1[0], pt1[1], pt2[0], pt2[1]);
     }
     
@@ -221,6 +225,7 @@ int main( int argc, char** argv )
     ("customLineColorSecSet",po::value<std::vector<unsigned int> >()->multitoken(), "set the R, G, B, A components of the colors of the mesh faces and eventually the color R, G, B, A of the mesh edge lines (set by default to black). " )
     ("customPointColor",po::value<std::vector<unsigned int> >()->multitoken(), "set the R, G, B, A components of the colors of the mesh faces and eventually the color R, G, B, A of the mesh edge lines (set by default to black). " )
     ("noDisplayEndPoints,e", "to not displays segment end points.")
+    ("noDisplayEndPointsSecSet", "to not displays segment end points of second set.")
     ("outputFile,o", po::value<std::string>(), " <filename> save output file automatically according the file format extension.")
     ("outputStreamEPS", " specify eps for output stream format.")
     ("outputStreamSVG", " specify svg for output stream format.")
@@ -269,7 +274,7 @@ int main( int argc, char** argv )
 
 
    double lineWidth =  vm["lineWidth"].as<double>();
-   double lineWidthSetB =  vm["lineWidthSetB"].as<double>();
+   double lineWidthSetB =  vm["lineWidthSecSet"].as<double>();
 
     double scale=1.0;
    if(vm.count("scale")){
@@ -308,12 +313,10 @@ int main( int argc, char** argv )
   bool invertYaxis = vm.count("invertYaxis");
 
   if(vm.count("input")){
-      aBoard.setLineWidth(lineWidth);
-      displayLineSet(vm, "input","customLineColor", aBoard, height, invertYaxis);
+      displayLineSet(vm, "input","customLineColor", aBoard, height, invertYaxis, !vm.count("noDisplayEndPoints"), lineWidth);
    }
    if(vm.count("inputSecSet")){
-      aBoard.setLineWidth(lineWidthSetB);
-      displayLineSet(vm, "inputSecSet","customLineColorSecSet", aBoard, height, invertYaxis);
+      displayLineSet(vm, "inputSecSet","customLineColorSecSet", aBoard, height, invertYaxis,!vm.count("noDisplayEndPointsSecSte"), lineWidthSetB);
    }
 
  
