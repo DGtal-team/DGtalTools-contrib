@@ -32,6 +32,7 @@
 //STL
 #include <vector>
 #include <string>
+#include <cstdlib>
 
 #include "DGtal/base/Common.h"
 #include "DGtal/helpers/StdDefs.h"
@@ -84,7 +85,7 @@ namespace po = boost::program_options;
      background
      --alphaBG arg           alphaBG <value> 0-1.0 to display the background image
      in transparency (default 1.0), (transparency works
-     only if cairo is available)
+    & only if cairo is available)
      --scale arg             scale <value> 1: normal; >1 : larger ; <1 lower
      resolutions  )
  
