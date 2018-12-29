@@ -2,7 +2,10 @@
 - *visualisation*
   - displayLineSegments: new option to display a second set of lines.
     (Bertrand Kerautret, 
-    [#33](https://github.com/DGtal-team/DGtalTools-contrib/pull/43))
+    [#43](https://github.com/DGtal-team/DGtalTools-contrib/pull/43))
+  - displaySet2dPts: new tool to display sets of 2d points.
+    (Bertrand Kerautret, 
+    [#44](https://github.com/DGtal-team/DGtalTools-contrib/pull/44))
 
 
 # DGtalTools-contrib  0.9.4
