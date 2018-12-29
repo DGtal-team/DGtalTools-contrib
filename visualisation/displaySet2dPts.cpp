@@ -172,7 +172,6 @@ int main( int argc, char** argv )
      Z2i::Point ptSup = img.domain().upperBound(); 
      unsigned int width = abs(ptSup[0]-ptInf[0]+1);
      height = abs(ptSup[1]-ptInf[1]+1);
-    
      aBoard.drawImage(imageName, 0-0.5,height-0.5, width, height, -1, alpha );
    }
 
@@ -184,7 +183,7 @@ int main( int argc, char** argv )
        HueShadeColorMap<int> hueMap = HueShadeColorMap<int>(0, setOfPoints.size());
        for(auto s: setOfPoints )
      {
-         aBoard.setPenColor(hueMap(random()%(setOfPoints.size())));
+         aBoard.setPenColor(hueMap(random()%(min<uint>(setOfPoints.size(),512))));
          for(auto p: s)
          {
              aBoard.fillRectangle(p[0], p[1], 1, 1);
