@@ -199,11 +199,11 @@ int main( int argc, char** argv )
       // use max limit of 512 to avoid xfig bug display
       if (extension == "fig")
       {
-        aBoard.setPenColor(hueMap(random()%(min<uint>(setOfPoints.size(),512))));
+        aBoard.setPenColor(hueMap(rand()%(min<uint>(setOfPoints.size(),512))));
       }
       else
       {
-        aBoard.setPenColor(hueMap(random()%setOfPoints.size()));
+        aBoard.setPenColor(hueMap(rand()%setOfPoints.size()));
       }
       for(auto p: s)
       {
