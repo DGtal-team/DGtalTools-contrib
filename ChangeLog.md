@@ -1,4 +1,8 @@
 # DGtalTools-contrib  1.0
+- *visualisation*
+  - displayLineSegments: new option to display a second set of lines.
+    (Bertrand Kerautret, 
+    [#33](https://github.com/DGtal-team/DGtalTools-contrib/pull/43))
 
 
 # DGtalTools-contrib  0.9.4
