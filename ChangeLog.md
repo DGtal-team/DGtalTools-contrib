@@ -3,7 +3,10 @@
   - displayLineSegments: new option to display a second set of lines.
     (Bertrand Kerautret, 
     [#33](https://github.com/DGtal-team/DGtalTools-contrib/pull/43))
-
+- *global*
+  - Fix PointVector implicit conversion (in link to DGtal PR #1345)
+    (Bertrand Kerautret 
+    [#45](https://github.com/DGtal-team/DGtalTools/pull/45))
 
 # DGtalTools-contrib  0.9.4
 - *global*
