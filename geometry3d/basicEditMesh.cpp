@@ -152,7 +152,7 @@ main(int argc,char **argv)
 
     if( vm.count("shrinkArea")){
       Z3i::Domain aDomain(ptLower, ptUpper);
-      TPoint ptCenter = (p0+p1+p2)/3.0;
+      Z3i::Point ptCenter( (p0+p1+p2)/3.0, functors::Round<>());
       if(aDomain.isInside(ptCenter)){
         for(unsigned int i =0; i<3; i++){
           TPoint &aVertex = theNewMesh.getVertex(aFace.at(i));
