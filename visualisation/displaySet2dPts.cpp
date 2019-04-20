@@ -66,11 +66,11 @@ namespace po = boost::program_options;
 
 
 /**
- @page displayLineSegments displayLineSegments
+ @page displaySet2dPts displaySet2dPts
  
  @brief  Description of the tool...
  
- @b Usage:   displayLineSegments [input]
+ @b Usage:   displaySet2dPts [input]
  
  @b Allowed @b options @b are :
  
@@ -97,13 +97,13 @@ namespace po = boost::program_options;
  @b Example:
  
  @code
- displayLineSegments -i  $DGtal/examples/samples/....
+ displaySet2dPts -i  $DGtal/examples/samples/....
  @endcode
  
  @image html resdisplayLineSegments.png "Example of result. "
  
  @see
- @ref displayLineSegments.cpp
+ @ref displaySet2dPts.cpp
  
  */
 
