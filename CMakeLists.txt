@@ -10,7 +10,7 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 
 
-FIND_PACKAGE(DGtal 0.9.4 REQUIRED)
+FIND_PACKAGE(DGtal 1.0.0 REQUIRED)
 INCLUDE_DIRECTORIES(${DGTAL_INCLUDE_DIRS})
 LINK_DIRECTORIES(${DGTAL_LIBRARY_DIRS})
 
@@ -36,9 +36,9 @@ endif()
 # Define variables and cmake parameters, and display some information
 # -----------------------------------------------------------------------------
 # SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
-SET(DGtalToolsContrib_VERSION_MAJOR 0)
-SET(DGtalToolsContrib_VERSION_MINOR 9)
-SET(DGtalToolsContrib_VERSION_PATCH 4)
+SET(DGtalToolsContrib_VERSION_MAJOR 1)
+SET(DGtalToolsContrib_VERSION_MINOR 0)
+SET(DGtalToolsContrib_VERSION_PATCH 0)
 SET(DGTALTOOLSContrib_VERSION "${DGtalToolsContrib_VERSION_MAJOR}.${DGtalToolsContrib_VERSION_MINOR}.${DGtalToolsContrib_VERSION_PATCH}")
 SET(PROJECT_VERSION "${DGtalToolsContrib_VERSION_MAJOR}.${DGtalToolsContrib_VERSION_MINOR}.${DGtalToolsContrib_VERSION_PATCH}")
 SET(VERSION ${DGtalToolsContrib_VERSION_MAJOR}.${DGtalToolsContrib_VERSION_MINOR}.${DGtalToolsContrib_VERSION_PATCH})
