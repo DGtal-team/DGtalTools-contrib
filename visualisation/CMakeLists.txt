@@ -1,6 +1,7 @@
 SET(DGTAL_TOOLS_CONTRIB
    displayTgtCoverAlphaTS
    displayLineSegments
+   displaySet2dPts
 )
 
 
