@@ -107,6 +107,7 @@ int main( int argc, char** argv )
   }
 
   Viewer viewer(vm.count("doSnapShotAndExit"));
+  viewer.show();	
   if(vm.count("doSnapShotAndExit")){
     viewer.setSnapshotFileName(QString(vm["doSnapShotAndExit"].as<std::string>().c_str()));
   }
@@ -244,7 +245,7 @@ int main( int argc, char** argv )
 
 
   viewer << Viewer3D<>::updateDisplay;
-  viewer.show();
+  
   if(vm.count("doSnapShotAndExit")){
     // Appy cleaning just save the last snap
     DGtal::trace.info() << "sorting surfel according camera position....";
