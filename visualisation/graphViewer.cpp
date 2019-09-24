@@ -60,7 +60,7 @@ struct ViewerSnap: DGtal::Viewer3D <Space, KSpace>
 
 
 
-
+using namespace std;
 using namespace DGtal;
 namespace po = boost::program_options;
 
