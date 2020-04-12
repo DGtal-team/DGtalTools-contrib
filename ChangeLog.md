@@ -1,8 +1,12 @@
+# DGtalTools-contrib  1.1
+- *visualisation*
+  - graphViewer: fix compilation issue.
+  (Phuc Ngo  [#47](https://github.com/DGtal-team/DGtalTools-contrib/pull/47))
 # DGtalTools-contrib  1.0
 - *visualisation*
   - displayLineSegments: new option to display a second set of lines.
     (Bertrand Kerautret, 
-    [#33](https://github.com/DGtal-team/DGtalTools-contrib/pull/43))
+    [#43](https://github.com/DGtal-team/DGtalTools-contrib/pull/43))
  - displaySet2dPts: new tool to display sets of 2d points.
     (Bertrand Kerautret, 
     [#44](https://github.com/DGtal-team/DGtalTools-contrib/pull/44))
