@@ -2,6 +2,9 @@
 - *visualisation*
   - graphViewer: fix compilation issue.
   (Phuc Ngo  [#47](https://github.com/DGtal-team/DGtalTools-contrib/pull/47))
+   - graphViewer: fix display issue.
+  (Phuc Ngo  [#46](https://github.com/DGtal-team/DGtalTools-contrib/pull/46))
+  
 # DGtalTools-contrib  1.0
 - *visualisation*
   - displayLineSegments: new option to display a second set of lines.
