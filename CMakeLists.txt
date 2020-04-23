@@ -50,7 +50,7 @@ SET(DGTALTOOLSContrib_VERSION "${DGtalToolsContrib_VERSION_MAJOR}.${DGtalToolsCo
 SET(PROJECT_VERSION "${DGtalToolsContrib_VERSION_MAJOR}.${DGtalToolsContrib_VERSION_MINOR}.${DGtalToolsContrib_VERSION_PATCH}")
 SET(VERSION ${DGtalToolsContrib_VERSION_MAJOR}.${DGtalToolsContrib_VERSION_MINOR}.${DGtalToolsContrib_VERSION_PATCH})
 
-SET(Boost_USE_STATIC_LIBS   ON)
+OPTION(Boost_USE_STATIC_LIBS "Use boost static lib" ON)
 SET(Boost_USE_MULTITHREADED ON)
 SET(Boost_USE_STATIC_RUNTIME OFF)
 SET(Boost_FOUND FALSE)
@@ -61,7 +61,7 @@ if ( Boost_FOUND )
   include_directories( ${Boost_INCLUDE_DIRS} )
   SET(DGtalToolsContribLibDependencies ${DGtalToolsContribLibDependencies} 
      ${Boost_LIBRAIRIES}  
-     ${Boost_PROGRAM_OPTIONS_LIBRARY})
+     ${Boost_PROGRAM_OPTIONS_LIBRARY} Boost::program_options)
    SET(DGtalLibInc ${Boost_INCLUDE_DIRS})
 endif( Boost_FOUND )
 
