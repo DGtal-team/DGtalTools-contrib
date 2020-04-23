@@ -9,6 +9,13 @@ cmake_minimum_required (VERSION 3.1)
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 
+ # -----------------------------------------------------------------------------
+ # CPP11 
+ # -----------------------------------------------------------------------------
+ set (CMAKE_CXX_STANDARD 11)
+ set (CMAKE_CXX_STANDARD_REQUIRED TRUE)
+
+
 
 FIND_PACKAGE(DGtal 1.0.0 REQUIRED)
 INCLUDE_DIRECTORIES(${DGTAL_INCLUDE_DIRS})
@@ -43,7 +50,7 @@ SET(DGTALTOOLSContrib_VERSION "${DGtalToolsContrib_VERSION_MAJOR}.${DGtalToolsCo
 SET(PROJECT_VERSION "${DGtalToolsContrib_VERSION_MAJOR}.${DGtalToolsContrib_VERSION_MINOR}.${DGtalToolsContrib_VERSION_PATCH}")
 SET(VERSION ${DGtalToolsContrib_VERSION_MAJOR}.${DGtalToolsContrib_VERSION_MINOR}.${DGtalToolsContrib_VERSION_PATCH})
 
-SET(Boost_USE_STATIC_LIBS   ON)
+OPTION(Boost_USE_STATIC_LIBS "Use boost static lib" ON)
 SET(Boost_USE_MULTITHREADED ON)
 SET(Boost_USE_STATIC_RUNTIME OFF)
 SET(Boost_FOUND FALSE)
@@ -54,7 +61,7 @@ if ( Boost_FOUND )
   include_directories( ${Boost_INCLUDE_DIRS} )
   SET(DGtalToolsContribLibDependencies ${DGtalToolsContribLibDependencies} 
      ${Boost_LIBRAIRIES}  
-     ${Boost_PROGRAM_OPTIONS_LIBRARY})
+     ${Boost_PROGRAM_OPTIONS_LIBRARY} Boost::program_options)
    SET(DGtalLibInc ${Boost_INCLUDE_DIRS})
 endif( Boost_FOUND )
 
