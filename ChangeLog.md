@@ -1,10 +1,15 @@
 # DGtalTools-contrib  1.1
 - *visualisation*
   - graphViewer: fix compilation issue.
-  (Phuc Ngo  [#47](https://github.com/DGtal-team/DGtalTools-contrib/pull/47))
+    (Phuc Ngo  [#47](https://github.com/DGtal-team/DGtalTools-contrib/pull/47))
    - graphViewer: fix display issue.
-  (Phuc Ngo  [#46](https://github.com/DGtal-team/DGtalTools-contrib/pull/46))
-  
+    (Phuc Ngo  [#46](https://github.com/DGtal-team/DGtalTools-contrib/pull/46))
+    
+- *global*
+  - fix Cmake and CPP11 check
+  (Bertrand Kerautret [#48](https://github.com/DGtal-team/DGtalTools-contrib/pull/48))
+
+
 # DGtalTools-contrib  1.0
 - *visualisation*
   - displayLineSegments: new option to display a second set of lines.
