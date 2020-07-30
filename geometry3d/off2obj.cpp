@@ -127,7 +127,7 @@ int main( int argc, char** argv )
   std::string basename = outputFileName.substr(0, outputFileName.find_last_of("."));
   std::stringstream outname; outname << basename << ".obj"; 
   // read input mesh
-  DGtal::Mesh<DGtal::Z3i::RealPoint> aMesh;
+  DGtal::Mesh<DGtal::Z3i::RealPoint> aMesh(vm.count("colors"));
 
   MeshReader<DGtal::Z3i::RealPoint>::importOFFFile(inputFileName,
                                                    aMesh, vm.count("invertNormals"));
