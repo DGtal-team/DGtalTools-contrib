@@ -10,6 +10,11 @@
   (Bertrand Kerautret [#48](https://github.com/DGtal-team/DGtalTools-contrib/pull/48))
 
 
+- *Geometry3d*
+  - fix off2obj: the colors of .off are now well exported in obj.
+   (Bertrand Kerautret [#49](https://github.com/DGtal-team/DGtalTools-contrib/pull/49))   
+
+
 # DGtalTools-contrib  1.0
 - *visualisation*
   - displayLineSegments: new option to display a second set of lines.
