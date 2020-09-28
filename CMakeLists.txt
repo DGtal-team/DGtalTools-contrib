@@ -9,7 +9,7 @@ cmake_minimum_required (VERSION 3.1)
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 
- # -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
  # CPP11 
  # -----------------------------------------------------------------------------
  set (CMAKE_CXX_STANDARD 11)
@@ -38,6 +38,12 @@ LINK_DIRECTORIES(${DGTAL_LIBRARY_DIRS})
 if(USE_OPENCV)
    find_package( OpenCV REQUIRED )
 endif()
+
+
+# CLI11
+include_directories( "${PROJECT_SOURCE_DIR}/ext/" )
+
+
 
 # -----------------------------------------------------------------------------
 # Define variables and cmake parameters, and display some information
