@@ -41,15 +41,13 @@
 
 #include <math.h>
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
+
+
 ///////////////////////////////////////////////////////////////////////////////
 using namespace std;
 using namespace DGtal;
 ///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
-
 
 /**
  @page rosinThreshold rosinThreshold
@@ -61,10 +59,16 @@ namespace po = boost::program_options;
  @b Allowed @b options @b are :
  
  @code
-  -h [ --help ]           display this message
-  -i [ --input ] arg      an input file... 
-  -p [ --parameter] arg   a double parameter...
- @endcode
+ 
+ Positionals:
+   1 TEXT:FILE REQUIRED                  an input file.
+
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED         an input file.
+   -d,--dataIndex UINT=0                 the index to read input data.
+   -b,--binSize FLOAT=1                  binSize for the x axis.
+@endcode
 
  @b Example: 
 
@@ -186,57 +190,32 @@ getThresholdByRosin(const std::vector<double> &data, double binSize){
 
 int main( int argc, char** argv )
 {
-  // parse command line -------------------------------------------------------
-  po::options_description general_opt("Allowed options are");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value<std::string >(), "an input file... " )
-    ("dataIndex,d", po::value<unsigned int >()->default_value(0), "the index to read input data." )
-    ("binSize,b", po::value<double >()->default_value(1.0), "binSize for the x axis." ); 
-
-
-  bool parseOK=true;
-  po::variables_map vm;
-  try
-    {
-      po::store(po::parse_command_line(argc, argv, general_opt), vm);
-    }
-  catch(const std::exception& ex)
-    {
-      parseOK=false;
-      trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-    }
   
+  
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string inputFileName;
+  app.description("Applies the Rosin Treshold on an image.");
+  
+  double binSize {1.0};
+  unsigned int indexData {0};
+  
+  
+  app.add_option("-i,--input,1", inputFileName, "an input file." )
+      ->required()
+      ->check(CLI::ExistingFile);
+  app.add_option("-d,--dataIndex",indexData, "the index to read input data.", true);
+  app.add_option("--binSize,-b", binSize, "binSize for the x axis.", true);
+    
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
 
-  // check if min arguments are given and tools description ------------------
-  po::notify(vm);
-  if( !parseOK || vm.count("help")||argc<=1)
-    {
-      std::cout << "Usage: " << argv[0] << " [input]\n"
-                << "The tools description... \n"
-                << general_opt << "\n"
-                << "Typical use example:\n \t rosinThreshold -i ... \n";
-      return 0;
-    }  
-  if(! vm.count("input"))
-    {
-      trace.error() << " The file name was not defined" << endl;
-      return 1;
-    }
-
-  string inputFileName = vm["input"].as<string>();
-  unsigned int indexData = vm["dataIndex"].as<unsigned int>();
-  double binSize = vm["binSize"].as<double>();
   // Some nice processing  --------------------------------------------------
   
   std::vector<double> vectData = TableReader<double>::getColumnElementsFromFile(inputFileName, indexData);
-  
   double value = getThresholdByRosin(vectData, binSize);  
   DGtal::trace.info() << "Rosin Threshold: " << value << std::endl;
-
-  
-  
-  
 
   return 0;
 }
