@@ -10,7 +10,7 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 
  # -----------------------------------------------------------------------------
- # CPP11 
+z # CPP11 
  # -----------------------------------------------------------------------------
  set (CMAKE_CXX_STANDARD 11)
  set (CMAKE_CXX_STANDARD_REQUIRED TRUE)
@@ -44,7 +44,7 @@ endif()
 # -----------------------------------------------------------------------------
 # SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 SET(DGtalToolsContrib_VERSION_MAJOR 1)
-SET(DGtalToolsContrib_VERSION_MINOR 0)
+SET(DGtalToolsContrib_VERSION_MINOR 1)
 SET(DGtalToolsContrib_VERSION_PATCH 0)
 SET(DGTALTOOLSContrib_VERSION "${DGtalToolsContrib_VERSION_MAJOR}.${DGtalToolsContrib_VERSION_MINOR}.${DGtalToolsContrib_VERSION_PATCH}")
 SET(PROJECT_VERSION "${DGtalToolsContrib_VERSION_MAJOR}.${DGtalToolsContrib_VERSION_MINOR}.${DGtalToolsContrib_VERSION_PATCH}")
