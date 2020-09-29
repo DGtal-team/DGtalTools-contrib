@@ -33,10 +33,7 @@
 #include "DGtal/shapes/Mesh.h"
 #include "DGtal/io/readers/MeshReader.h"
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
-
+#include "CLI11.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -46,7 +43,6 @@
 using namespace std;
 using namespace DGtal;
 ///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
 
 
 /**
@@ -59,16 +55,21 @@ namespace po = boost::program_options;
  @b Allowed @b options @b are :
  
  @code
-  -h [ --help ]         display this message
-  -i [ --input ] arg    the input mesh filename (.off).
-  -o [ --output ] arg   the output filename (.sdp).
-  -f [ --faceCenter ]   export the face centers instead the mesh vertex.
- @endcode
+ 
+ Positionals:
+   1 TEXT:FILE REQUIRED                  the input mesh filename (.off).
+
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED         the input mesh filename (.off).
+   -o,--output TEXT                      the output filename (.sdp).
+   -f,--faceCenter                       export the face centers instead the mesh vertex.
+   @endcode
 
  @b Example: 
 
  @code
- 	 off2sdp -i $DGtal/examples/samples/tref.off -o test.sdp  
+ 	 off2sdp $DGtal/examples/samples/tref.off  test.sdp
  @endcode
 
  
@@ -79,51 +80,28 @@ namespace po = boost::program_options;
 
 int main( int argc, char** argv )
 {
-  // parse command line -------------------------------------------------------
-  po::options_description general_opt("Allowed options are");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value<std::string >(), "the input mesh filename (.off)." )
-    ("output,o", po::value<std::string >(), "the output filename (.sdp)." )
-    ("faceCenter,f", "export the face centers instead the mesh vertex." );
-
-  bool parseOK=true;
-  po::variables_map vm;
-  try
-    {
-      po::store(po::parse_command_line(argc, argv, general_opt), vm);
-    }
-  catch(const std::exception& ex)
-    {
-      parseOK=false;
-      trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-    }
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string inputFileName;
+  std::string outputFileName {"result.sdp"};
+  bool faceCenter {false};
+  app.description("Converts a mesh into a set of points (.sdp)."
+                  "It can extract the mesh vertices (by default) or the center of faces."
+                  "Typical use example:\n \t off2sdp  $DGtal/examples/samples/tref.off  test.sdp  \n");
   
-
-  // check if min arguments are given and tools description ------------------
-  po::notify(vm);
-  bool canStart = true;
-  if(! vm.count("input") || ! vm.count("output"))
-    {
-      trace.error() << " The input or output file name was not defined" << endl;
-      canStart = false;
-    }
-  if( !parseOK || vm.count("help")||argc<=1 || !canStart)
-    {
-      trace.info() << "Usage: " << argv[0] << " [input] [output] \n"
-                << "Converts a mesh into a set of points (.sdp). It can extract the mesh vertices (by default) or the center of faces.  \n"
-                << general_opt << "\n"
-                << "Typical use example:\n \t off2sdp -i $DGtal/examples/samples/tref.off -o test.sdp  \n";
-      return 0;
-    }  
-
-
-
-  //  recover the  args ----------------------------------------------------
-  string inputFileName = vm["input"].as<string>();
-  string outputFileName = vm["output"].as<string>();
-  bool faceCenter =  vm.count("faceCenter")==1;
+  app.add_option("-i,--input,1", inputFileName, "the input mesh filename (.off)." )
+  ->required()
+  ->check(CLI::ExistingFile);
   
+  app.add_option("--output,-o,2",outputFileName, "the output filename (.sdp).", true);
+  app.add_flag("--faceCenter,-f", faceCenter, "export the face centers instead the mesh vertex.");
+  
+  
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
+
   
   
   // read input mesh
