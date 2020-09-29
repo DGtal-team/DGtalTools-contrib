@@ -26,10 +26,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 
-//boost
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
 
 //STL
 #include <vector>
@@ -56,7 +53,30 @@ using namespace DGtal;
 
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
+/**
+
+ @code
+ Display tangentical cover. 
+ Typical use example:    displayTgtCoverAlphaTS [options] --input  <fileName> 
+
+Usage: ./displayTgtCoverAlphaTS [OPTIONS] 1 2
+
+Positionals:
+  1 TEXT:FILE REQUIRED                  the input contour.
+  2 TEXT REQUIRED                       the output eps file name.
+  w FLOAT=1                             width.
+
+Options:
+  -h,--help                             Print this help message and exit
+  -i,--input TEXT:FILE REQUIRED         the input contour.
+  -o,--output TEXT REQUIRED             the output eps file name.
+  -f,--outputFIG TEXT                   the output fig file name.
+  --openContour                         consider the contour as open.
+  --index UINT                          the index of the interest point.
+  --width FLOAT=1                       width.
+  -e,--euclideanThickness               use euclidean thickness instead horizontal/vertical.
+ 
+ */
 
 
 
@@ -91,49 +111,41 @@ int main( int argc, char** argv )
   typedef SaturatedSegmentation<AlphaThickSegmentComputer2DOpen> AlphaSegmentationOpen;
  
   
-  // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "the input contour. ")
-    ("output,o", po::value<std::string>(), "the output eps file name. ")
-    ("outputFIG,f", po::value<std::string>(), "the output fig file name. ")
-    ("openContour", "consider the contour as open.")
-    ("index", po::value<unsigned int>(), "the index of the interest point.")
-    ("euclideanThickness,e", "use euclidean thickness instead horizontal/vertical")
-    ("width,w", po::value<double>()->default_value(1.0), "width.");
+  // parse command line CLI----------------------------------------------
+  CLI::App app;
+  app.description("Display tangentical cover. \n Typical use example: \t displayTgtCoverAlphaTS [options] --input <fileName> \n");
+  std::string fileName;
+  std::string outFileName;
+  std::string outFileNameFIG;
+  double width {1.0};
+  bool openContour {false};
+  unsigned int index;
 
+  app.add_option("-i,--input,1", fileName, "the input contour (FreemanChain).")->required()->check(CLI::ExistingFile);
+  app.add_option("--output,-o,2", outFileName, "the output eps file name.")->required();
+  auto outFileNameFIGOpt = app.add_option("--outputFIG,-f", outFileNameFIG, "the output fig file name.");
+  auto openContourOpt = app.add_flag("--openContour","consider the contour as open.");
+  auto indexOpt = app.add_option("--index", index, "the index of the interest point.");
+  app.add_option("--width,-w", width, "width.", true);
+  auto euclideanThicknessOpt = app.add_flag("--euclideanThickness,-e", "use euclidean thickness instead horizontal/vertical.");
   
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< std::endl;
-  }
-
-  po::notify(vm);    
-  if(!parseOK||vm.count("help")||argc<=1 || (!(vm.count("input")) ))
-    {
-      trace.info()<< "Display Tgt cover . " <<std::endl << "Basic usage: "<<std::endl
-		  << "\t Tgt cover [options] --FreemanChain  <fileName>  "<<std::endl
-		  << general_opt << "\n";
-      return 0;
-    }
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+    
   double scale = 4.0;
   Board2D aBoard;
   aBoard.setUnit (0.5*scale, LibBoard::Board::UCentimeter);
   functions::Hull2D::ThicknessDefinition def = functions::Hull2D::HorizontalVerticalThickness;
-  if(vm.count("euclideanThickness")){
+  if(euclideanThicknessOpt->count()>0){
     def = functions::Hull2D::EuclideanThickness;
   }
+
+  if(openContourOpt->count()>0){
+    openContour=true;
+  }
   
-  std::string fileName = vm["input"].as<std::string>();
-  double width = vm["width"].as<double>();
-  bool openContour = vm.count("openContour");
   std::vector<Point> aContour = PointListReader<Point>::getPointsFromFile(fileName);
-  std::string outFileName = vm["output"].as<std::string>();
    
    // Display the source contour as pixel
    for(unsigned int i =0; i< aContour.size(); i++){
@@ -143,8 +155,7 @@ int main( int argc, char** argv )
    if (!openContour){
      Circulator<RAConstIterator> circu (aContour.begin(), aContour.begin(), aContour.end());
      AlphaThickSegmentComputer2D computer(width, def);
-     if(vm.count("index")){
-       unsigned int index = vm["index"].as<unsigned int>();
+     if(indexOpt->count()>0){
        drawPencil(aBoard, computer, index, circu, circu);
      }else{
          aBoard << SetMode(computer.className(), "BoundingBox");
@@ -159,8 +170,7 @@ int main( int argc, char** argv )
    }else{
      AlphaThickSegmentComputer2DOpen computer(width, def);
      computer.init(aContour.begin());
-     if(vm.count("index")){
-       unsigned int index = vm["index"].as<unsigned int>();
+     if(indexOpt->count()>0){
        drawPencil(aBoard, computer, index, aContour.begin(), aContour.end());
      }else{
          aBoard << SetMode(computer.className(), "BoundingBox");
@@ -177,8 +187,7 @@ int main( int argc, char** argv )
   
   aBoard.saveEPS(outFileName.c_str());
   
-  if(vm.count("outputFIG")){
-    std::string outFileNameFIG = vm["outputFIG"].as<std::string>();  
+  if(outFileNameFIGOpt->count()>0){  
     aBoard.saveFIG(outFileNameFIG.c_str());
   }
   
