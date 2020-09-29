@@ -55,39 +55,39 @@
 #include "DGtal/io/boards/Board2D.h"
 
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
 ///////////////////////////////////////////////////////////////////////////////
 using namespace std;
 using namespace DGtal;
 ///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
-
 
 /**
  @page displaySet2dPts displaySet2dPts
  
  @brief  Description of the tool...
  
- @b Usage:   displaySet2dPts [input]
+ @b Usage:   displaySet2dPts [input] [output]
  
  @b Allowed @b options @b are :
  
  @code
  Usage: ./visualisation/displaySet2dPts [input] [output]
- Display different sets of points from input file where each set is represented in one line.Allowed options are :
-     -h [ --help ]           display this message
-     -i [ --input ] arg      the input file, each line containing one set points.
-     -o [ --outputFile ] arg  <filename> save output file automatically according
-     the file format extension.
-     --backgroundImage arg   backgroundImage <filename> : display image as
-     background
-     --alphaBG arg           alphaBG <value> 0-1.0 to display the background image
-     in transparency (default 1.0), (transparency works
-    & only if cairo is available)
-     --scale arg             scale <value> 1: normal; >1 : larger ; <1 lower
-     resolutions  )
+ Display different sets of points from input file where each set is represented in one line. 
+ Typical use example:    ./visualisation/displaySetOf2dPts -i example.sdp  -o export.eps 
+
+Usage: ./displaySet2dPts [OPTIONS] 1 2
+
+Positionals:
+  1 TEXT:FILE REQUIRED                  the input file, each line containing one set points.
+  2 TEXT REQUIRED                       save output file automatically according the file format extension.
+
+Options:
+  -h,--help                             Print this help message and exit
+  -i,--input TEXT:FILE REQUIRED         the input file, each line containing one set points.
+  -o,--outputFile TEXT REQUIRED         save output file automatically according the file format extension.
+  --backgroundImage TEXT                display image as background.
+  --alphaBG FLOAT=1                     alphaBG <value> 0-1.0 to display the background image in transparency (default 1.0), (transparency works only if cairo is available)
+  --scale FLOAT=1                       scale <value> 1: normal; >1 : larger ; <1 lower resolutions)
  
  Typical use example:
  ./visualisation/displaySetOf2dPts -i example.sdp  -o export.eps
@@ -110,66 +110,32 @@ namespace po = boost::program_options;
 
 int main( int argc, char** argv )
 {
-  // parse command line -------------------------------------------------------
-  // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-  ("help,h", "display this message")
-  ("input,i", po::value<std::string>(), "the input file, each line containing one set points. ")
-  ("outputFile,o", po::value<std::string>(), " <filename> save output file automatically according the file format extension.")
-  ("backgroundImage", po::value<std::string>(), "backgroundImage <filename> : display image as background ")
-  ("alphaBG", po::value<double>(), "alphaBG <value> 0-1.0 to display the background image in transparency (default 1.0), (transparency works only if cairo is available)")
-  ("scale", po::value<double>(), "scale <value> 1: normal; >1 : larger ; <1 lower resolutions  )");
-  
-  
-  bool parseOK=true;
-  po::variables_map vm;
-  try
-  {
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);
-  }
-  catch(const std::exception& ex)
-  {
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }
-  
-  
-  // check if min arguments are given and tools description ------------------
-  po::notify(vm);
-  if( !parseOK || vm.count("help")||argc<=1)
-  {
-    std::cout << "Usage: " << argv[0] << " [input] [output]\n"
-              << "Display different sets of points from input file where each set is represented in one line."
-              << general_opt << "\n"
-              << "Typical use example:\n \t ./visualisation/displaySetOf2dPts -i example.sdp  -o export.eps \n";
-    return 0;
-  }
-  if(! vm.count("input"))
-  {
-    trace.error() << " The file name was not defined" << endl;
-    return 1;
-  }
-  
-  
-  double scale=1.0;
-  if(vm.count("scale"))
-  {
-    scale = vm["scale"].as<double>();
-  }
+  // parse command line CLI-------------------------------------------------------
+  CLI::App app;
+  app.description("Display different sets of points from input file where each set is represented in one line. \n Typical use example: \t ./visualisation/displaySetOf2dPts -i example.sdp  -o export.eps \n");
+  std::string fileName;
+  std::string imageName;
+  std::string outputFileName = "";
+  std::string extension = "";
+  double scale {1.0};
+  double alpha {1.0};
+
+  app.add_option("-i,--input,1", fileName, "the input file, each line containing one set points.")->required()->check(CLI::ExistingFile);
+  app.add_option("--outputFile,-o,2", outputFileName, "save output file automatically according the file format extension.")->required();
+  auto backgroundImageOpt = app.add_option("--backgroundImage", imageName, "display image as background.");
+  app.add_option("--alphaBG", alpha, "alphaBG <value> 0-1.0 to display the background image in transparency (default 1.0), (transparency works only if cairo is available)", true);
+  app.add_option("--scale", scale, "scale <value> 1: normal; >1 : larger ; <1 lower resolutions)", true);
+
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
   
   Board2D aBoard;
   aBoard.setUnit (0.05*scale, LibBoard::Board::UCentimeter);
   
-  double alpha=1.0;
-  if(vm.count("alphaBG"))
-  {
-    alpha = vm["alphaBG"].as<double>();
-  }
   unsigned int height = 0;
-  if(vm.count("backgroundImage"))
+  if(backgroundImageOpt->count() > 0)
   {
-    std::string imageName = vm["backgroundImage"].as<std::string>();
     typedef ImageSelector<Z2i::Domain, unsigned char>::Type Image;
     Image img = DGtal::GenericReader<Image>::import( imageName );
     Z2i::Point ptInf = img.domain().lowerBound();
@@ -180,72 +146,58 @@ int main( int argc, char** argv )
   }
   
   std::vector<std::vector<Z2i::RealPoint>> setOfPoints;
-  std::string outputFileName = "";
-  std::string extension = "";
   
-  if(vm.count("outputFile"))
-  {
-    outputFileName = vm["outputFile"].as<std::string>();
-    extension = outputFileName.substr(outputFileName.find_last_of(".") + 1);
-  }
+  extension = outputFileName.substr(outputFileName.find_last_of(".") + 1);
   
-  if(vm.count("input"))
-  {
-    std::string fileName = vm["input"].as<std::string>();
-    setOfPoints= PointListReader<Z2i::RealPoint>::getPolygonsFromFile(fileName);
-    if (setOfPoints.size() != 0)
-    { 
-      HueShadeColorMap<int> hueMap = HueShadeColorMap<int>(0, setOfPoints.size());
-      for(auto s: setOfPoints )
-      {
-        // use max limit of 512 to avoid xfig bug display
-        if (extension == "fig")
-        {
-          aBoard.setPenColor(hueMap(rand()%(min<uint>(setOfPoints.size(),512))));
-        }
-        else
-        {
-          aBoard.setPenColor(hueMap(rand()%setOfPoints.size()));
-        }
-        for(auto p: s)
-        {
-          aBoard.fillRectangle(p[0], p[1], 1, 1);
-        }
-      }
-    }
-  }
-  
-  
-  
-  if(vm.count("outputFile"))
-  {
-    if(extension=="svg")
+
+  setOfPoints= PointListReader<Z2i::RealPoint>::getPolygonsFromFile(fileName);
+  if (setOfPoints.size() != 0)
+  { 
+    HueShadeColorMap<int> hueMap = HueShadeColorMap<int>(0, setOfPoints.size());
+    for(auto s: setOfPoints )
     {
-      aBoard.saveSVG(outputFileName.c_str());
+      // use max limit of 512 to avoid xfig bug display
+      if (extension == "fig")
+      {
+        aBoard.setPenColor(hueMap(rand()%(min<uint>(setOfPoints.size(),512))));
+      }
+      else
+      {
+        aBoard.setPenColor(hueMap(rand()%setOfPoints.size()));
+      }
+      for(auto p: s)
+      {
+        aBoard.fillRectangle(p[0], p[1], 1, 1);
+      }
     }
-#ifdef WITH_CAIRO
-    else
-      if (extension=="eps")
-      {
-        aBoard.saveCairo(outputFileName.c_str(),Board2D::CairoEPS );
-      }
-      else if (extension=="pdf")
-      {
-        aBoard.saveCairo(outputFileName.c_str(),Board2D::CairoPDF );
-      } else if (extension=="png")
-      {
-        aBoard.saveCairo(outputFileName.c_str(),Board2D::CairoPNG );
-      }
-#endif
-      else if(extension=="eps")
-      {
-        aBoard.saveEPS(outputFileName.c_str());
-      }
-      else if(extension=="fig")
-      {
-        aBoard.saveFIG(outputFileName.c_str(),LibBoard::Board::BoundingBox, 10.0, true );
-      }
   }
+  
+  if(extension=="svg")
+  {
+    aBoard.saveSVG(outputFileName.c_str());
+  }
+#ifdef WITH_CAIRO
+  else
+    if (extension=="eps")
+    {
+      aBoard.saveCairo(outputFileName.c_str(),Board2D::CairoEPS );
+    }
+    else if (extension=="pdf")
+    {
+      aBoard.saveCairo(outputFileName.c_str(),Board2D::CairoPDF );
+    } else if (extension=="png")
+    {
+      aBoard.saveCairo(outputFileName.c_str(),Board2D::CairoPNG );
+    }
+#endif
+    else if(extension=="eps")
+    {
+      aBoard.saveEPS(outputFileName.c_str());
+    }
+    else if(extension=="fig")
+    {
+      aBoard.saveFIG(outputFileName.c_str(),LibBoard::Board::BoundingBox, 10.0, true );
+    }
   
   return 0;
 }
