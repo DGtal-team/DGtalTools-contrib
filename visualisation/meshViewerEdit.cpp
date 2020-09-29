@@ -41,9 +41,7 @@
 #include "DGtal/io/colormaps/GradientColorMap.h"
 #include "DGtal/io/readers/GenericReader.h"
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
 #endif
 
 #include <QInputDialog>
@@ -55,12 +53,22 @@ using namespace std;
 using namespace DGtal;
 using namespace Z3i;
 
+/**
+@code 
+Usage: ./meshViewerEdit [OPTIONS] 1
+
+Positionals:
+  1 TEXT:FILE REQUIRED                  input file: mesh (off,obj).
+
+Options:
+  -h,--help                             Print this help message and exit
+  -i,--input TEXT:FILE REQUIRED         input file: mesh (off,obj).
+  -o,--outputFile TEXT=out.off          save output file automatically according the file format extension.
+  -s,--scalePen FLOAT=1                 change the scale factor of the pen size (by default 1.0, real size: penSize*scale).
+  -c,--penColor UINT ...                change the scale factor of the pen size (by default 1.0)
+*/
+
 ///////////////////////////////////////////////////////////////////////////////
-
-namespace po = boost::program_options;
-
-
-
 
 MainWindow::MainWindow(ViewerMesh<> *aViewer,
                        QWidget *parent, Qt::WindowFlags flags) :
@@ -132,36 +140,21 @@ MainWindow::~MainWindow()
 int main( int argc, char** argv )
 {
 
-  // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-  ("help,h", "display this message")
-  ("input,i", po::value<std::string>(), "input file: mesh (off,obj)" )
-  ("scalePen,s", po::value<double>(), "change the scale factor of the pen size (by default 1.0, real size: penSize*scale)" )
-  ("penColor,c", po::value<std::vector<unsigned int>>()->multitoken(), "change the scale factor of the pen size (by default 1.0)" )
+  // parse command line CLI ----------------------------------------------
+  CLI::App app;
+  string inputFilename;
+  string outputFilename {"out.off"};
+  std::vector<unsigned int> colors;
+  double scalePen {1.0};
 
-  ("output,o", po::value<std::string>()->default_value("out.off"), "output file: mesh (off,obj)" );
-
-  bool parseOK=true;
-  bool cannotStart= false;
+  app.add_option("--input,-i,1", inputFilename, "input file: mesh (off,obj).")->required()->check(CLI::ExistingFile);
+  app.add_option("--outputFile,-o", outputFilename, "save output file automatically according the file format extension.",true);
+  auto scalePenOpt = app.add_option("--scalePen,-s", scalePen, "change the scale factor of the pen size (by default 1.0, real size: penSize*scale).", true);
+  app.add_option("--penColor,-c", colors, "change the scale factor of the pen size (by default 1.0)");
   
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.error()<< "Error checking program options: "<< ex.what()<< endl;
-  }
-  po::notify(vm);
-  if(parseOK && ! vm.count("input"))
-    {
-      trace.error() << " The input file name was not defined" << endl;
-      cannotStart = true;
-    }
-
-  string inputFilename = vm["input"].as<std::string>();
-  string outputFilename = vm["output"].as<std::string>();
-  
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
   
   Mesh<Z3i::RealPoint>  aMesh(true);
   aMesh << inputFilename;
@@ -169,11 +162,10 @@ int main( int argc, char** argv )
   QApplication application(argc,argv);
  
   ViewerMesh<> *viewer = new ViewerMesh<> (aMesh, outputFilename );
-  if (vm.count("scalePen")){
-    viewer->myPenScale = vm["scalePen"].as<double>();
+  if (scalePenOpt->count()>0){
+    viewer->myPenScale = scalePen;
   }
-  if(vm.count("penColor")){
-    std::vector<unsigned int> colors = vm["penColor"].as<std::vector<unsigned int> >();
+  if(scalePenOpt->count()>0){
     if (colors.size()!=4){
       trace.warning() << "you need to precise R,G,B, A values, taking default blue color..." << std::endl;
     }else{

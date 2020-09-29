@@ -5,53 +5,45 @@
 #include <DGtal/helpers/StdDefs.h>
 #include <DGtal/io/readers/PointListReader.h>
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
-
+#include "CLI11.hpp"
 
 using namespace DGtal;
-namespace po = boost::program_options;
 
+/** 
+@code:
+Basic edit mesh.
 
+Usage: ./xyzScale [OPTIONS] 1
 
+Positionals:
+  1 TEXT:FILE REQUIRED                  input file name of the xyz point set.
+
+Options:
+  -h,--help                             Print this help message and exit
+  -i,--input TEXT:FILE REQUIRED         input file name of the xyz point set.
+  -o,--outputFile TEXT=output.xyz       output file name of the resulting xyz point set.
+  --scale FLOAT=1                       change the scale factor
+*/
+  
 int
 main(int argc,char **argv)
 
 {
-  typedef typename Z3i::RealPoint TPoint;
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "input file name of the xyz point set.")
-    ("output,o", po::value<std::string>()->default_value("output.xyz"), "output file name of the resulting xyz point set.")
-    ("scale,s", po::value< double >()->default_value(1.0), "change the scale factor" );
+  // parse command line CLI-------------------------------------------------------
+  CLI::App app;
+  app.description("Basic edit mesh.\n");
+  std::string inputName;
+  std::string outputName {"output.xyz"};
+  double scale {1.0};
+  
+  app.add_option("--input,-i,1", inputName, "input file name of the xyz point set.")->required()->check(CLI::ExistingFile);
+  app.add_option("--output,-o", outputName, "output file name of the resulting xyz point set.", true);
+  app.add_option("--scale", scale, "change the scale factor", true);
 
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
 
-  bool parseOK=true;
-  po::variables_map vm;
-  try
-    {
-      po::store(po::parse_command_line(argc, argv, general_opt), vm);
-    }
-  catch(const std::exception& ex)
-    {
-      trace.info()<< "Error checking program options: "<< ex.what()<< std::endl;
-      parseOK=false;
-    }
-  po::notify(vm);
-  if(vm.count("help")||argc<=1|| !parseOK )
-    {
-      trace.info()<< "Basic edit mesh " <<std::endl << "Options: "<<std::endl
-		  << general_opt << "\n";
-      return 0;
-    }
-  
-  
-  std::string inputName = vm["input"].as<std::string>();
-  std::string outputName = vm["output"].as<std::string>();
-  
-  double scale = vm["scale"].as<double>();
   std::vector<Z3i::RealPoint> vPt = PointListReader<Z3i::RealPoint>::getPointsFromFile(inputName);
   std::ofstream res;
   res.open(outputName);
