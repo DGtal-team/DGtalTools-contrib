@@ -35,17 +35,30 @@
 #include "DGtal/shapes/implicit/ImplicitBall.h"
 #include "DGtal/shapes/GaussDigitizer.h"
 
-
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
 
 using namespace std;
 using namespace DGtal;
 using namespace Z3i;
 
+/**
+@code:
+extraction of (strict) local maxima of a vol image within a spherical kernel of radius '--ballSize'.
+ Usage: ./volLocalMax [input-file] [output-file]
+
+Usage: ./volLocalMax [OPTIONS] 1 2
+
+Positionals:
+  1 TEXT:FILE REQUIRED                  vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm (with 3 dims)) file
+  2 TEXT REQUIRED                       Output SDP filename
+
+Options:
+  -h,--help                             Print this help message and exit
+  -i,--input TEXT:FILE REQUIRED         vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm (with 3 dims)) file
+  -o,--output TEXT REQUIRED             Output SDP filename
+  -b,--ballSize FLOAT=3                 set the ball size
+*/ 
 ///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
 
 typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char> Image3D;
 
@@ -72,56 +85,26 @@ isStrictLocalMax(const TImage &anImage, const Z3i::Point &aPoint, const double a
   return  true;
 }
 
-
-
-
-
 int main( int argc, char** argv )
 {
-  // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-  ("help,h", "display this message")
-  ("input,i", po::value<std::string>(), "vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm (with 3 dims)) file." )
-  ("output,o", po::value<std::string>(), "Output SDP filename" )
-  ("ballSize,b",  po::value<double>()->default_value(3.0), "set the ball size." );
+  // parse command line CLI-------------------------------------------------------
+  CLI::App app;
+  app.description("extraction of (strict) local maxima of a vol image within a spherical kernel of radius '--ballSize'.\n Usage: ./volLocalMax [input-file] [output-file]\n");
+  std::string inputFilename;
+  std::string outputFilename;
+  double ballSize {3.0};
   
-  
-  bool parseOK=true;
-  po::variables_map vm;
-  try
-  {
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);
-  } catch(const std::exception& ex)
-  {
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }
-  po::notify(vm);
-  if( !parseOK || vm.count("help")||argc<=1)
-  {
-    std::cout << "Usage: " << argv[0] << " [input-file]\n" << "extraction of (strict) local maxima of a vol image within a spherical kernel of radius '--ballSize' \n"
-    << general_opt << "\n";
-    return 0;
-  }
-  
-  if(! vm.count("input"))
-  {
-    trace.error() << " The input filename was not defined" << endl;
-    return 0;
-  }
-  if(! vm.count("output"))
-  {
-    trace.error() << " The output filename was not defined" << endl;
-    return 0;
-  }
-  
-  string inputFilename = vm["input"].as<std::string>();
-  string outputFilename = vm["output"].as<std::string>();
+  app.add_option("--input,-i,1", inputFilename, "vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm (with 3 dims)) file")->required()->check(CLI::ExistingFile);
+  app.add_option("--output,-o,2", outputFilename, "Output SDP filename")->required();
+  app.add_option("--ballSize,-b", ballSize, "set the ball size", true);
+
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
   std::ofstream outStream;
   outStream.open(outputFilename.c_str());
   Image3D image = GenericReader<Image3D>::import (inputFilename );
-  double ballSize = vm["ballSize"].as<double>();
   outStream << "# coords of local maximas (from tools volLocalMax) obtained with a ball of radius " << ballSize << std::endl;
   trace.progressBar(0, image.domain().size());
   unsigned int pos = 0;
@@ -134,7 +117,6 @@ int main( int argc, char** argv )
   }
   outStream.close();
  
-  
   return 0;
 }
 
