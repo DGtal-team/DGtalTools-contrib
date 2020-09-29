@@ -58,20 +58,30 @@ SET(DGTALTOOLSContrib_VERSION "${DGtalToolsContrib_VERSION_MAJOR}.${DGtalToolsCo
 SET(PROJECT_VERSION "${DGtalToolsContrib_VERSION_MAJOR}.${DGtalToolsContrib_VERSION_MINOR}.${DGtalToolsContrib_VERSION_PATCH}")
 SET(VERSION ${DGtalToolsContrib_VERSION_MAJOR}.${DGtalToolsContrib_VERSION_MINOR}.${DGtalToolsContrib_VERSION_PATCH})
 
-OPTION(Boost_USE_STATIC_LIBS "Use boost static lib" ON)
-SET(Boost_USE_MULTITHREADED ON)
-SET(Boost_USE_STATIC_RUNTIME OFF)
-SET(Boost_FOUND FALSE)
-FIND_PACKAGE(Boost 1.46.0 REQUIRED COMPONENTS program_options)
+
+
+
+
+
+ # -----------------------------------------------------------------------------
+ # Looking for boost
+ # -----------------------------------------------------------------------------
+set(Boost_USE_STATIC_LIBS   ON)
+set(Boost_USE_MULTITHREADED ON)
+set(Boost_USE_STATIC_RUNTIME OFF)
+set(Boost_FOUND FALSE)
+FIND_PACKAGE(Boost 1.50.0 REQUIRED)
 if ( Boost_FOUND )
   ADD_DEFINITIONS(${BOOST_DEFINITIONS} -DBOOST_ALL_NO_LIB)
-  message(STATUS "Boost and boost_program_options found.")
-  include_directories( ${Boost_INCLUDE_DIRS} )
-  SET(DGtalToolsContribLibDependencies ${DGtalToolsContribLibDependencies} 
-     ${Boost_LIBRAIRIES}  
-     ${Boost_PROGRAM_OPTIONS_LIBRARY} Boost::program_options)
-   SET(DGtalLibInc ${Boost_INCLUDE_DIRS})
+  # SYSTEM to avoid warnings from boost.
+  include_directories(SYSTEM ${Boost_INCLUDE_DIRS} )
+  SET(DGtalToolsContribLibDependencies ${DGtalToolsContribLibDependencies}
+     ${Boost_LIBRAIRIES})
+   SET(DGtalLibInc ${Boost_INCLUDE_DIRS})  
 endif( Boost_FOUND )
+
+
+
 
 #------Tools subdirectories ------
 add_subdirectory(geometry2d)
