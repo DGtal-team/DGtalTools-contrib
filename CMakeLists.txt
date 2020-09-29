@@ -34,9 +34,11 @@ LINK_DIRECTORIES(${DGTAL_LIBRARY_DIRS})
      message ("         CMAKE_CXX_FLAGS=" ${CMAKE_CXX_FLAGS} )
   endif (CMAKE_CXX_FLAGS MATCHES "-ftemplate-depth-[0-9]*")
 
-
-if(USE_OPENCV)
+## or USE_OPENCV
+if(WITH_OPENCV)
    find_package( OpenCV REQUIRED )
+   include_directories(${OpenCV_INCLUDE_DIRS})
+
 endif()
 
 

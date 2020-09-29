@@ -34,20 +34,15 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
+
 
 #include <iostream>
 
 using namespace cv;
-namespace po = boost::program_options;
-
-
 using namespace std;
 using namespace DGtal;
-///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
+
 
 
 /**
@@ -60,28 +55,21 @@ namespace po = boost::program_options;
  @b Allowed @b options @b are :
  
  @code
-  -h [ --help ]                         display this message
-  -i [ --input ] arg                    the input image file.
-  -o [ --output ] arg                   the output file containing the 
-                                        resulting lines segments (one segment 
-                                        per lines).
-  -r [ --rho ] arg (=1)                 The resolution of the parameter r in 
-                                        pixels. We use 1 pixel.
-  -t [ --theta ] arg (=0.017453292519943295)
-                                        The resolution of the parameter heta in
-                                                                        radians
-                                                                        .
-  -T [ --threshold ] arg (=100)         The minimum number of intersections to 
-                                        “detect” a line.
-  -m [ --minLinLength ] arg (=10)        The minimum number of points that can 
-                                        form a line. Lines with less than this 
-                                        number of points are disregarded (use 
-                                        only with --useProbabilist option).
-  -g [ --maxLineGap ] arg (=3)          The maximum gap between two points to 
-                                        be considered in the same line (use 
-                                        only with --useProbabilist option) 
-  -P [ --useProbabilist ]               use improved probabilist algorithm
+ 
+ Positionals:
+   1 TEXT:FILE REQUIRED                  the input image file.
 
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED         the input image file.
+   -o,--output TEXT                      the output file containing the resulting lines segments (one segment per lines).
+   -r,--rho FLOAT=1                      The resolution of the parameter r in pixels. We use 1 pixel.
+   -t,--theta FLOAT=0.0174533            The resolution of the parameter   heta in radians.
+   -T,--threshold FLOAT=100              The minimum number of intersections to “detect” a line.
+   -m,--minLinLength UINT=10              The minimum number of points that can form a line. Lines with less than this number of points are disregarded (use only with --useProbabilist option).
+   -g,--maxLineGap FLOAT=3               The maximum gap between two points to be considered in the same line (use only with --useProbabilist option)
+   -P,--useProbabilist                   use improved probabilist algorithm
+   
  @endcode
 
  @b Example: 
@@ -100,79 +88,59 @@ namespace po = boost::program_options;
 int main( int argc, char** argv )
 {
   // parse command line -------------------------------------------------------
-  po::options_description general_opt("Allowed options are");
-  general_opt.add_options()
-    ("help,h", "display this message")
-     ("input,i", po::value<std::string>(), "the input image file." )
-    ("output,o", po::value<std::string>(), "the output file containing the resulting lines segments (one segment per lines)." )
-    ("rho,r", po::value<double>()->default_value(1.0), "The resolution of the parameter r in pixels. We use 1 pixel." )
-    ("theta,t", po::value<double>()->default_value(CV_PI/180.0), "The resolution of the parameter \theta in radians." )
-    ("threshold,T", po::value<double>()->default_value(100), "The minimum number of intersections to “detect” a line." )
-    ("minLinLength,m", po::value<double>()->default_value(10), " The minimum number of points that can form a line. Lines with less than this number of points are disregarded (use only with --useProbabilist option)." )
-    ("maxLineGap,g", po::value<double>()->default_value(3), "The maximum gap between two points to be considered in the same line (use only with --useProbabilist option) " )
-    ("useProbabilist,P","use improved probabilist algorithm" );
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string inputFileName;
+  std::string outputFileName;
+  double rho {1.0};
+  double theta {CV_PI/180.0};
+  double threshold {100.0};
+  unsigned int minLength {10};
+  double maxLineGap {3.0};
+  bool useProbabilist {false};
   
-  bool parseOK=true;
-  po::variables_map vm;
-  try
-    {
-      po::store(po::parse_command_line(argc, argv, general_opt), vm);
-    }
-  catch(const std::exception& ex)
-    {
-      parseOK=false;
-      DGtal::trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-    }
   
+  app.description("Apply the Hough transform from the OpenCV implementation (see http://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/hough_lines/hough_lines.html).\nTypical use example:\n \t houghLineDetect -i  $DGtal/examples/samples/church.pgm -T 100 -P \n");
+  
+  app.add_option("-i,--input,1", inputFileName, "the input image file." )
+  ->required()
+  ->check(CLI::ExistingFile);
+  app.add_option("--output,-o", outputFileName,  "the output file containing the resulting lines segments (one segment per lines).");
+  app.add_option("--rho,-r", rho,  "The resolution of the parameter r in pixels. We use 1 pixel.", true );
+  app.add_option("--theta,-t", theta,"The resolution of the parameter \theta in radians.", true );
+  app.add_option("--threshold,-T", threshold, "The minimum number of intersections to “detect” a line.", true);
+  app.add_option("--minLinLength,-m", minLength," The minimum number of points that can form a line. Lines with less than this number of points are disregarded (use only with --useProbabilist option).", true );
+  app.add_option("--maxLineGap,-g",maxLineGap, "The maximum gap between two points to be considered in the same line (use only with --useProbabilist option)",true );
+  app.add_flag("--useProbabilist,-P", "use improved probabilist algorithm");
+  
+  
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
 
-  // check if min arguments are given and tools description ------------------
-  po::notify(vm);
-  if( !parseOK || vm.count("help")||argc<=1)
-    {
-      std::cout << "Usage: " << argv[0] << " [input]\n"
-                << "Apply the Hough transform from the OpenCV implementation (see http://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/hough_lines/hough_lines.html).\n"
-                << general_opt << "\n"
-                << "Typical use example:\n \t houghLineDetect -i  $DGtal/examples/samples/church.pgm -T 100 -P \n";
-      return 0;
-    }  
-  if(! vm.count("input"))
-    {
-      DGtal::trace.error() << " The file name was not defined" << endl;
-      return 1;
-    }
-
-  const char* filename;
-  filename = vm["input"].as<std::string>().c_str();
   
-  Mat src = imread(filename, 0);
+  Mat src = imread(inputFileName, 0);
   if(src.empty())
     {
-      cout << "can not open " << filename << endl;
+      cout << "can not open " << inputFileName << endl;
       return -1;
     }
 
 
   //  recover the  args ----------------------------------------------------
-  double rho = vm["rho"].as<double>();
-  double theta = vm["theta"].as<double>();
-  double threshold = vm["threshold"].as<double>();
-  unsigned int minLength = vm["minLinLength"].as<double>();
-  unsigned int maxLineGap = vm["maxLineGap"].as<double>();
-
   
  
   Mat dst, cdst;
   Canny(src, dst, 50, 200, 3);
-  cvtColor(dst, cdst, CV_GRAY2BGR);
-  bool outLines = vm.count("output"); 
+  cvtColor(dst, cdst, cv::COLOR_GRAY2BGR);
+  bool outLines = outputFileName.size()!=0;
   ofstream outStream;
   if(outLines)
     {
-      std::string outputFileName = vm["output"].as<std::string>();
       outStream.open(outputFileName.c_str(), ofstream::binary);
     }
   
-  if(!vm.count("useProbabilist")){
+  if(useProbabilist){
     vector<Vec2f> lines;
     HoughLines(dst, lines, rho, theta, threshold, 0, 0 );
     
@@ -186,7 +154,7 @@ int main( int argc, char** argv )
         pt1.y = cvRound(y0 + 1000*(a));
         pt2.x = cvRound(x0 - 1000*(-b));
         pt2.y = cvRound(y0 - 1000*(a));
-        line( cdst, pt1, pt2, Scalar(0,0,255), 1, CV_AA);
+        line( cdst, pt1, pt2, Scalar(0,0,255), 1, LINE_AA);
         if(outLines){
           outStream << pt1.x << " " << pt1.y << " " << pt2.x << " " << pt2.y << std::endl;
         }
@@ -199,7 +167,7 @@ int main( int argc, char** argv )
       for( size_t i = 0; i < lines.size(); i++ )
         {
           Vec4i l = lines[i];
-          line( cdst, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0,0,255), 1, CV_AA);
+          line( cdst, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0,0,255), 1, LINE_AA);
           if(outLines){
             outStream << l[0] << " " << l[1] << " " << l[2] << " " << l[3] << std::endl;
           }        
