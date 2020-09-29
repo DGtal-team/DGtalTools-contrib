@@ -10,7 +10,7 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 
  # -----------------------------------------------------------------------------
-z # CPP11 
+ # CPP11 
  # -----------------------------------------------------------------------------
  set (CMAKE_CXX_STANDARD 11)
  set (CMAKE_CXX_STANDARD_REQUIRED TRUE)
