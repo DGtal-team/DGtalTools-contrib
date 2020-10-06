@@ -6,64 +6,110 @@
 #include "DGtal/io/readers/MeshReader.h"
 #include "DGtal/io/writers/MeshWriter.h"
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
+
 
 #include "DGtal/shapes/Mesh.h"
 
 using namespace DGtal;
-namespace po = boost::program_options;
 
 
+/**
+ @page basicEditMesh basicEditMesh
+ 
+ @brief  Apply the Rosin Threshold algorithm.
+
+ @b Usage:   basicEditMesh [input]
+
+ @b Allowed @b options @b are :
+ 
+ @code
+ Positionals:
+   1 TEXT:FILE REQUIRED                  input file name of mesh vertex given as OFF format.
+   —-output TEXT                       arg = file.off : export the resulting mesh associated to the fiber extraction.
+
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED         input file name of mesh vertex given as OFF format.
+   -o TEXT                               arg = file.off : export the resulting mesh associated to the fiber extraction.
+   -s,--shrinkArea FLOAT x 7             arg = <dist> <bounding box> apply a mesh shrinking on the defined area.
+   -b,--shrinkBallArea FLOAT x 5         arg = <dist> <x> <y> <z> <radius> apply a mesh shrinking on the  area defined by a ball centered at x y z.
+   --filterVisiblePart FLOAT             arg = angle nx ny nz: filter the mesh visible part (according the mesh part in the direction  nx, ny, nz and a maximal angle).
+   -x,--nx FLOAT=0                       arg = define the nx of the direction of filtering, see --filterVisiblePart.
+   -y,--ny FLOAT=0                       arg = define the ny of the direction of filtering, see --filterVisiblePart.
+   -z,--nz FLOAT=1                       arg = define the nz of the direction of filtering, see --filterVisiblePart.
+   --scale FLOAT                         change the scale factor
+   --filterFirstFaces FLOAT              arg= X : filters the X% of the first faces of the input mesh.
+   --filterNbFaces FLOAT                 arg = X % limits the number of face by keeping only X percent of faces.
+
+
+@endcode
+
+ @b Example:
+
+ @code
+   basicEditMesh ${DGtal}/examples/samples/tref.off --filterVisiblePart 0.3 toto.offbasicEditMesh -i
+ @endcode
+
+
+ @see
+ @ref basicEditMesh.cpp
+
+ */
 int
 main(int argc,char **argv)
 
 {
-
   typedef typename Z3i::RealPoint TPoint;
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "input file name of mesh vertex given as OFF format.")
-    ("output,o", po::value<std::string>(),  "arg = file.off : export the resulting mesh associated to the fiber extraction.")
-    ("shrinkArea,s", po::value<std::vector<double> >() ->multitoken(),  "arg = <dist> <bounding box> apply a mesh shrinking on the defined area.")
-    ("shrinkBallArea,b", po::value<std::vector<double> >() ->multitoken(),  "arg = <dist> <x> <y> <z> <radius> apply a mesh shrinking on the  area defined by a ball centered at x y z.")
-    ("filterVisiblePart", po::value< double >() , "arg = angle nx ny nz: filter the mesh visible part (according the mesh part in the direction  nx, ny, nz and a maximal angle)." )
-    ("nx,x", po::value< double >() , "arg = angle nx ny nz: filter the mesh visible part (according the mesh part in the direction  nx, ny, nz and a maximal angle)." )
-    ("ny,y", po::value< double >() , "arg = angle nx ny nz: filter the mesh visible part (according the mesh part in the direction  nx, ny, nz and a maximal angle)." 
-     )    ("nz,z", po::value< double >() , "arg = angle nx ny nz: filter the mesh visible part (according the mesh part in the direction  nx,k ny, nz and a maximal angle)." )
-    ("scale", po::value< double >() , "change the scale factor" )
 
-    ("filterFirstFaces", po::value<unsigned int >(), "arg= X : filters the X% of the first faces of the input mesh." )
-    ("filterNbFaces", po::value<double >() ->multitoken(), "arg = X % limits the number of face by keeping only X percent of faces." );
+  // parse command line using CLI ----------------------------------------------
+     CLI::App app;
+     std::string inputMeshName;
+     std::string outputMeshName;
+  std::vector<double> vectDistAndBBox;
+  std::vector<double> paramBallArea;
+  double theMaxAngle;
+  double nx {0};
+  double ny {0};
+  double nz {1.0};
+  double scale;
+  double percentFirst;
+  double percent;
+  
+  app.description("Apply basic mesh edition (scale change, mesh face contraction, face filtering).\n"
+                  "Example: ./geometry3d/basicEditMesh ${DGtal}/examples/samples/tref.off --filterVisiblePart 0.3 resultFiltered.off");
 
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);
-  }catch(const std::exception& ex){
-    trace.info()<< "Error checking program options: "<< ex.what()<< std::endl;
-    parseOK=false;
-  }
-  po::notify(vm);
-  if(vm.count("help")||argc<=1|| !parseOK )
-    {
-      trace.info()<< "Basic edit mesh " <<std::endl << "Options: "<<std::endl
-		  << general_opt << "\n";
-      return 0;
-    }
+  app.add_option("-i,--input,1", inputMeshName, "input file name of mesh vertex given as OFF format." )
+      ->required()
+      ->check(CLI::ExistingFile);
+  
+  app.add_option("—-output,-o",outputMeshName,"arg = file.off : export the resulting mesh associated to the fiber extraction." );
+  app.add_option("--shrinkArea,-s",vectDistAndBBox,"arg = <dist> <bounding box> apply a mesh shrinking on the defined area.")
+  ->expected(7);
+  app.add_option("--shrinkBallArea,-b", paramBallArea,  "arg = <dist> <x> <y> <z> <radius> apply a mesh shrinking on the  area defined by a ball centered at x y z.")
+  ->expected(5);
+  auto filterVisOpt = app.add_option("--filterVisiblePart", theMaxAngle , "arg = angle nx ny nz: filter the mesh visible part (according the mesh part in the direction  nx, ny, nz and a maximal angle).");
+  
+  app.add_option("--nx,-x", nx , "arg = define the nx of the direction of filtering, see --filterVisiblePart.", true);
+  app.add_option("--ny,-y", ny, "arg = define the ny of the direction of filtering, see --filterVisiblePart.", true);
+  app.add_option("--nz,-z", nz, "arg = define the nz of the direction of filtering, see --filterVisiblePart.", true);
+  auto scaleOpt = app.add_option("--scale",scale, "change the scale factor" );
+  
+  auto filterFF = app.add_option("--filterFirstFaces",percentFirst,"arg= X : filters the X% of the first faces of the input mesh.");
+  auto filterNBF = app.add_option("--filterNbFaces",percent,  "arg = X % limits the number of face by keeping only X percent of faces." );
   
 
-  std::string inputMeshName = vm["input"].as<std::string>();
-  std::string outputMeshName = vm["output"].as<std::string>();
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
+
+ 
   TPoint aNormal;
-  double theMaxAngle;
   unsigned int moduloLimitFace;
   TPoint ptUpper, ptLower;
   double distanceShrink;
-  if (vm.count("shrinkArea")){
-    std::vector<double> vectDistAndBBox =  vm["shrinkArea"].as<std::vector<double> > ();
+  if (vectDistAndBBox.size()==7){
     distanceShrink = vectDistAndBBox[0];
     ptLower[0] = vectDistAndBBox[1];
     ptLower[1] = vectDistAndBBox[2];
@@ -76,8 +122,7 @@ main(int argc,char **argv)
   
   TPoint ballCenter;
   double  radius;
-  if (vm.count("shrinkBallArea")){
-    std::vector<double> paramBallArea =  vm["shrinkBallArea"].as<std::vector<double> > ();
+  if (paramBallArea.size()==5){
     distanceShrink = paramBallArea[0];
     radius = paramBallArea[4];
     ballCenter[0] = (int) paramBallArea[1];
@@ -86,16 +131,14 @@ main(int argc,char **argv)
   }
 
   
-  if(vm.count("filterVisiblePart")){
+  if(filterVisOpt->count()>0){
     std::vector<double> vectNormalAndAngle;  
-    theMaxAngle =vm["filterVisiblePart"].as<double>();
-    aNormal[0] = vm["nx"].as<double>();
-    aNormal[1] = vm["ny"].as<double>();
-    aNormal[2] = vm["nz"].as<double>();
+    aNormal[0] = nx;
+    aNormal[1] = ny;
+    aNormal[2] = nz;
     aNormal /= aNormal.norm();
   }
-  if(vm.count("filterNbFaces")){
-    double percent = vm["filterNbFaces"].as<double>();
+  if(filterNBF->count()>0){
     moduloLimitFace = (int)(100.0/percent);
   } 
   
@@ -113,9 +156,8 @@ main(int argc,char **argv)
     theNewMesh.addVertex(*it);
   }
   unsigned int numMaxFaces = theMesh.nbFaces();
-  if (vm.count("filterFirstFaces"))
+  if (filterFF-> count() >0 )
     {
-      double percentFirst = vm["filterFirstFaces"].as<unsigned int>();
       numMaxFaces = (numMaxFaces/100.0)*percentFirst;
     }
   unsigned int num =0;
@@ -132,13 +174,13 @@ main(int argc,char **argv)
     TPoint p2 = theMesh.getVertex(aFace.at(2));
     TPoint vectNormal = ((p1-p0).crossProduct(p2 - p0)).getNormalized();    
     vectNormal /= vectNormal.norm();
-    if (vm.count("filterVisiblePart")){
+    if (filterVisOpt->count()>0){
       okOrientation = vectNormal.dot(aNormal) > cos(theMaxAngle);
     }
-    if( okOrientation && (!vm.count("filterNbFaces") || num%moduloLimitFace == 0 )){
+    if( okOrientation && (filterNBF->count()==0 || num%moduloLimitFace == 0 )){
       theNewMesh.addFace(aFace);
     }
-    if( vm.count("shrinkBallArea")){
+    if( paramBallArea.size() == 5){
       TPoint ptCenter = (p0+p1+p2)/3.0;
       if((ptCenter-ballCenter).norm() <= radius){
         for(unsigned int i =0; i<3; i++){
@@ -150,7 +192,7 @@ main(int argc,char **argv)
       } 
     }
 
-    if( vm.count("shrinkArea")){
+    if( vectDistAndBBox.size() == 7 ){
       Z3i::Domain aDomain(ptLower, ptUpper);
       Z3i::Point ptCenter( (p0+p1+p2)/3.0, functors::Round<>());
       if(aDomain.isInside(ptCenter)){
@@ -165,9 +207,8 @@ main(int argc,char **argv)
     
   }  
 
-  if(vm.count("scale"))
+  if( scaleOpt->count()>0 )
     {
-      double scale = vm["scale"].as<double>();
       for(unsigned int i =0; i<theNewMesh.nbVertex(); i++)
         {
           theNewMesh.getVertex(i) *= scale;
@@ -180,5 +221,4 @@ main(int argc,char **argv)
   outMesh.open(outputMeshName.c_str(), std::ofstream::out);
   MeshWriter<Z3i::RealPoint>::export2OFF(outMesh, theNewMesh);
   
-
 }

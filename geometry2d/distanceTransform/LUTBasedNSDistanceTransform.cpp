@@ -30,17 +30,50 @@
  */
 
 ///////////////////////////////////////////////////////////////////////////////
+/**
+ @page LUTBasedNSDistanceTransform
+ 
+ @brief  Apply the Rosin Threshold algorithm.
+
+ @b Usage:   LUTBasedNSDistanceTransform  [input]
+
+ @b Allowed @b options @b are :
+ 
+ @code
+ 
+ Positionals:
+   —-outputFormat TEXT                 Output file format
+   —-inputFormat TEXT                  Input file format
+
+ Options:
+   -h,--help                             Print this help message and exit
+   --input,--i TEXT                      Read from file "arg" instead of stdin.
+   -4,--city-block                       Use the city block distance
+   -8,--chessboard                       Use the chessboard distance
+   -s,--sequence TEXT                    One period of the sequence of neighborhoods given as a list of 1 and 2 separated by " " or ",". Space characters must be escaped from the shell.
+   -r,--ratio TEXT                       Ratio of neighborhood 2 given as the rational number num/den (with den >= num >= 0 and den > 0).
+   -c,--center BOOLEAN                   Center the distance transform (the default is an asymmetric distance transform)
+   -o,--output TEXT                      Output file name, optionally prefixed with the file format and ':'
+   -t TEXT                               Output file format
+   -f TEXT                               Input file format
+   -l,--lineBuffered                     Flush output after each produced row.
+   
+ 
+ @see
+ @ref LUTBasedNSDistanceTransform.cpp
+
+ */
 
 // boost
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
+
 #include <boost/tokenizer.hpp>
 
 // STL
 #include <iostream>
 #include <string>
 #include <vector>
+#include <sstream>
 
 // Path-based distances
 #include "ImageReader.h"
@@ -63,88 +96,78 @@ std::vector<int> parseSequence(std::string string)
     return args;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
-namespace po = boost::program_options;
 
 int main(int argc, char **argv)
 {
-    // parse command line ----------------------------------------------------//
-    po::options_description general_opt("Options and arguments: ");
-    general_opt.add_options()
-        ("help,h", "Display this message")
-        ("city-block,4", "Use the city block distance")
-        ("chessboard,8", "Use the chessboard distance")
-        ("sequence,s", po::value<std::string>(),
-         "One period of the sequence of neighborhoods given as a list of 1 "
-         "and 2 separated by \" \" or \",\". Space characters must be escaped "
-         "from the shell.")
-        ("ratio,r", po::value<std::string>(),
-         "Ratio of neighborhood 2 given as the rational number num/den "
-         "(with den >= num >= 0 and den > 0).")
-        ("center,c", "Center the distance transform (the default is an "
-         "asymmetric distance transform)")
-        ("output,o", po::value<std::string>(), "Output file name, optionally "
-         "prefixed with the file format and ':'")
-        ("outputFormat,t", po::value<std::string>(), "Output file format")
-        ("inputFormat,f", po::value<std::string>(), "Input file format")
-        ("lineBuffered,l", "Flush output after each produced row.")
-        ("input,i", po::value<std::string>(), "Read from file \"arg\" instead "
-         "of stdin.");
-    //------------------------------------------------------------------------//
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::stringstream ssDescr;
+  ssDescr << "Compute the 2D translated neighborhood-sequence distance "
+          "transform of a binary image"
+          << std::endl
+          << "Basic usage: "
+          << std::endl
+          << "\tLUTBasedNSDistanceTransform [-i filename] [-c] (-4|-8|-r "
+          "<num/den>|-s <sequence>) [-t (pgm|png)]"
+          << std::endl;
+    
+  app.description(ssDescr.str());
+  bool city_block {false};
+  bool chessboard {false};
+  bool center {false};
+  bool lineBuffered {false};
+  std::string ratio_s;
+  std::string outputS;
+  std::string outputFormat;
+  std::string inputFormat;
+  std::string input;
+  std::string sequence;
 
-    bool parseOK = true;
-    po::variables_map vm;
-    try
-    {
-        po::store(po::parse_command_line(argc, argv, general_opt), vm);
-    }
-    catch (const std::exception &ex)
-    {
-        parseOK = false;
-        trace.info()
-            << "Error checking program options: "
-            << ex.what()
-            << std::endl;
-    }
+  app.add_option("--input,--i", input, "Read from file \"arg\" instead of stdin.");
+  app.add_flag("--city-block,-4",city_block, "Use the city block distance");
+  app.add_flag("--chessboard,-8",chessboard, "Use the chessboard distance");
+  app.add_option("--sequence,-s", sequence, "One period of the sequence of neighborhoods given as a list of 1 "
+               "and 2 separated by \" \" or \",\". Space characters must be escaped "
+               "from the shell.");
+  auto ratioOpt = app.add_option("--ratio,-r", ratio_s, "Ratio of neighborhood 2 given as the rational number num/den "
+                 "(with den >= num >= 0 and den > 0).");
+  app.add_option("--center,-c", center, "Center the distance transform (the default is an "
+                 "asymmetric distance transform)");
 
-    po::notify(vm);
-    if (!parseOK || vm.count("help") || argc <= 1 ||
-        (vm.count("chessboard") +
-             vm.count("city-block") +
-             vm.count("ratio") +
-             vm.count("sequence") !=
-         1))
-    {
-        trace.info()
-            << "Compute the 2D translated neighborhood-sequence distance "
-               "transform of a binary image"
-            << std::endl
-            << "Basic usage: "
-            << std::endl
-            << "\tLUTBasedNSDistanceTransform [-i filename] [-c] (-4|-8|-r "
-               "<num/den>|-s <sequence>) [-t (pgm|png)]"
-            << std::endl
-            << general_opt << "\n";
-        return 0;
-    }
+  app.add_option("--output,-o",outputS, "Output file name, optionally "
+               "prefixed with the file format and ':'");
+  
+  app.add_option("—-outputFormat,-t", outputFormat,"Output file format");
+  app.add_option("—-inputFormat,-f", outputFormat,"Input file format");
+  app.add_flag("--lineBuffered,-l", lineBuffered, "Flush output after each produced row.");
+
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
+        
+  if ((chessboard + city_block + ratioOpt->count() + sequence.size() !=0 ) != 1){
+    trace.info() << "You need to choose one unique distance, use --help for help.\n";
+    return 1;
+  }
+   
 
     //sourceOfDT source = undefined;
     NeighborhoodSequenceDistance *dist = NULL;
 
     // Distance selection ----------------------------------------------------//
-    if (vm.count("city-block"))
+    if (city_block)
     {
         dist = NeighborhoodSequenceDistance::newD4Instance();
     }
-    else if (vm.count("chessboard"))
+    else if (chessboard)
     {
         dist = NeighborhoodSequenceDistance::newD8Instance();
     }
-    else if (vm.count("ratio"))
+    else if (ratioOpt->count())
     {
         boost::rational<int> ratio;
-        std::istringstream iss(vm["ratio"].as<std::string>());
+        std::istringstream iss(ratio_s);
         iss >> ratio;
         if (ratio < 0 || ratio > 1)
         {
@@ -156,11 +179,10 @@ int main(int argc, char **argv)
         }
         dist = NeighborhoodSequenceDistance::newInstance(ratio);
     }
-    else if (vm.count("sequence"))
+    else if (sequence.size() != 0)
     {
-        std::vector<int> sequence =
-            parseSequence(vm["sequence"].as<std::string>());
-        dist = NeighborhoodSequenceDistance::newInstance(sequence);
+        std::vector<int> sequenceV = parseSequence(sequence);
+        dist = NeighborhoodSequenceDistance::newInstance(sequenceV);
     }
     //------------------------------------------------------------------------//
 
@@ -171,19 +193,12 @@ int main(int argc, char **argv)
         std::string outputFormat("");
         bool lineBuffered = false;
 
-        if (vm.count("output"))
+        if (outputS!="")
         {
-            outputFile = vm["output"].as<std::string>();
+            outputFile = outputS;
         }
-        if (vm.count("outputFormat"))
-        {
-            outputFormat = vm["outputFormat"].as<std::string>();
-        }
-        if (vm.count("lineBuffered"))
-        {
-            lineBuffered = true;
-        }
-
+        
+        
         output = createImageWriter(outputFile, outputFormat, lineBuffered);
 
         if (output == NULL)
@@ -193,7 +208,7 @@ int main(int argc, char **argv)
                 << std::endl;
         }
 
-        if (vm.count("center"))
+        if (center)
         {
             output = dist->newDistanceTransformUntranslator(output);
         }
@@ -203,17 +218,7 @@ int main(int argc, char **argv)
     //------------------------------------------------------------------------//
 
     // Input -----------------------------------------------------------------//
-    std::string inputFile("-");
-    std::string inputFormat("");
-    if (vm.count("input"))
-    {
-        inputFile = vm["input"].as<std::string>();
-    }
-    if (vm.count("inputFormat"))
-    {
-        inputFormat = vm["inputFormat"].as<std::string>();
-    }
-    createImageReader(dt, inputFile, inputFormat);
+    createImageReader(dt, input, inputFormat);
     //------------------------------------------------------------------------//
 
     return 0;

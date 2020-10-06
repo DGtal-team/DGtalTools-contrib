@@ -1,8 +1,14 @@
 # DGtalTools-contrib  1.1
+
+- *global*
+  -  New way to handle command line options of DGtalTools-contrib by using CLI11 instead
+     boost program option. (Phuc Ngo and Bertrand Kerautret 
+     [#51](https://github.com/DGtal-team/DGtalTools-contrib/pull/51))     
+
 - *visualisation*
   - graphViewer: fix compilation issue.
     (Phuc Ngo  [#47](https://github.com/DGtal-team/DGtalTools-contrib/pull/47))
-   - graphViewer: fix display issue.
+  - graphViewer: fix display issue.
     (Phuc Ngo  [#46](https://github.com/DGtal-team/DGtalTools-contrib/pull/46))
     
 - *global*

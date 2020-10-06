@@ -33,6 +33,7 @@
 //STL
 #include <vector>
 #include <string>
+#include <sstream>
 
 #include "DGtal/base/Common.h"
 #include "DGtal/helpers/StdDefs.h"
@@ -66,15 +67,13 @@
 #include "DGtal/io/boards/Board2D.h"
 #include "DGtal/io/boards/CDrawableWithBoard2D.h"
 
+#include "CLI11.hpp"
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 using namespace std;
 using namespace DGtal;
 ///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
 
 
 /**
@@ -87,53 +86,41 @@ namespace po = boost::program_options;
  @b Allowed @b options @b are :
  
  @code
- Usage: ./visualisation/displayLineSegments [input]
- Display line segments from input file where each segment is represented in one line.Allowed options are: :
+ 
+ Positionals:
+   1 TEXT:FILE REQUIRED                  the input file containing the segments x1 y1 x2 y2 to be displayed.
+   2 TEXT                                <filename> save output file automatically according the file format extension.
 
-  -h [ --help ]           display this message
-  -i [ --input ] arg      the input file containing the segments x1 y1 x2 y2 to be displayed.
-  -s [ --inputSec ]       arg the second input set file containing the segments x1 y1 x2 y2 to be displayed.
-  --SDPindex arg          specify the sdp index of segment endpoints (by
-                          default 0,1,2,3).
-  --lineWidth arg (=1)    Define the linewidth of the segments.
-  --lineWidthSec arg (=1) Define the linewidth of the segments (second Set).
-  --noXFIGHeader           to exclude xfig header in the resulting output
-                            stream (no effect with option -outputFile).
- --customLineColor arg   set the R, G, B, A components of the colors of
-                          the mesh faces and eventually the color R, G, B,
-                          A of the mesh edge lines (set by default to black).
-  --customLineColorSec arg  set the R, G, B, A components of the colors of
-                          the mesh faces and eventually the color R, G, B,
-                          A of the mesh edge lines (set by default to black).
-  --customPointColor arg  set the R, G, B, A components of the colors of
-                           the mesh faces and eventually the color R, G, B,
-                           A of the mesh edge lines (set by default to black).
-  -e [ --noDisplayEndPoints ]  to not display segment end points.
-  --noDisplayEndPointsSec   to not display segment end points of the second
-                          set.
-  -o [ --outputFile ] arg  <filename> save output file automatically according
-                          the file format extension.
-  --outputStreamEPS        specify eps for output stream format.
-  --outputStreamSVG        specify svg for output stream format.
-  --outputStreamFIG        specify fig for output stream format.
-  --invertYaxis            invertYaxis invert the Y axis for display contours
-                          (used only with --SDP)
-  --backgroundImage arg   backgroundImage <filename> : display image as
-                          background
-  --alphaBG arg           alphaBG <value> 0-1.0 to display the background image
-                          in transparency (default 1.0), (transparency works
-                          only if cairo is available)
-  --scale arg             scale <value> 1: normal; >1 : larger ; <1 lower
-                          resolutions  )
-
-Typical use example:
- 	 ./visualisation/displayLineSegments -i ../Samples/lines.sdp  --SDPindex 1 2 3 4  -o lines.eps --invertYaxis
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED         the input file containing the segments x1 y1 x2 y2 to be displayed.
+   -s,--inputSec TEXT                    the second input set file containing the segments x1 y1 x2 y2 to be displayed.
+   --SDPindex UINT x 4                   specify the sdp index of segment endpoints (by default 0,1,2,3).
+   --domain UINT x 4                     limit the export to a given domain (xmin ymin xmax ymax).
+   --lineWidth FLOAT                     Define the linewidth of the segments.
+   --lineWidthSec FLOAT                  Define the linewidth of the segments.
+   --noXFIGHeader                         to exclude xfig header in the resulting output stream (no effect with option -outputFile).
+   --customLineColor UINT x 4            set the R, G, B, A components of the colors of the mesh faces and eventually the color R, G, B, A of the mesh edge lines (set by default to black).
+   --customLineColorSec UINT x 4         set the R, G, B, A components of the colors of the mesh faces and eventually the color R, G, B, A of the mesh edge lines (set by default to black).
+   --customPointColor UINT x 4           set the R, G, B, A components of the colors of the mesh faces and eventually the color R, G, B, A of the mesh edge lines (set by default to black).
+   -e,--noDisplayEndPoints BOOLEAN       to not display segment end points.
+   --noDisplayEndPointsSec               to not display segment end points of second set.
+   -o,--outputFile TEXT                  <filename> save output file automatically according the file format extension.
+   --outputStreamEPS                     specify eps for output stream format.
+   --outputStreamSVG                     specify svg for output stream format.
+   --outputStreamFIG                     specify fig for output stream format.
+   --invertYaxis                         invertYaxis invert the Y axis for display contours (used only with --SDP)
+   --backgroundImage TEXT                backgroundImage <filename> : display image as background
+   --alphaBG FLOAT                       alphaBG <value> 0-1.0 to display the background image in transparency (default 1.0), (transparency works only if cairo is available)
+   --scale FLOAT=1                       scale <value> 1: normal; >1 : larger ; <1 lower resolutions  )
+   
+ 
  @endcode
 
  @b Example:
 
  @code
-   	displayLineSegments -i  $DGtal/examples/samples/....
+ ./visualisation/displayLineSegments  ../Samples/lines.sdp  --SDPindex 1 2 3 4 --invertYaxis  lines.eps
  @endcode
 
  @image html resdisplayLineSegments.png "Example of result. "
@@ -144,17 +131,17 @@ Typical use example:
  */
 
 
-void displayLineSet(po::variables_map vm, std::string nameInput,
+
+void displayLineSet(std::string fileName, std::vector<unsigned int > vectPos,
+                    std::vector<unsigned int > vectColPt,
+                    std::vector<unsigned int > vectCol, std::string nameInput,
                     std::string nameArgCol, Board2D &aBoard,
                     unsigned int height, bool invertYaxis,
                     bool displayEndPoint, int lineWidth=2)
 {
-  std::string fileName = vm[nameInput].as<std::string>();
-  std::vector<unsigned int > vectPos;
     
-  if(vm.count("SDPindex"))
+  if(vectPos.size() != 0)
   {
-    vectPos = vm["SDPindex"].as<std::vector<unsigned int > >();
     if(vectPos.size()!=4)
     {
       trace.error() << "you need to specify the four indexes of vertex." << std::endl;
@@ -171,23 +158,21 @@ void displayLineSet(po::variables_map vm, std::string nameInput,
     
   DGtal::Color lineColor = DGtal::Color::Red;
   DGtal::Color pointColor = DGtal::Color::Blue;
-  if(vm.count(nameArgCol))
+  if(vectCol.size() != 0)
   {
-    std::vector<unsigned int > vectCol = vm[nameArgCol].as<std::vector<unsigned int> >();
     if(vectCol.size()!=3 )
     {
       trace.error() << "colors specification should contain R,G,B values (using default red)."<< std::endl;
     }
     lineColor.setRGBi(vectCol[0], vectCol[1], vectCol[2], 255);
   }
-  if(vm.count("customPointColor"))
+  if(vectColPt.size() != 0)
   {
-    std::vector<unsigned int > vectCol = vm["customPointColor"].as<std::vector<unsigned int> >();
-    if(vectCol.size()!=3)
+    if(vectColPt.size()!=3)
     {
       trace.error() << "colors specification should contain R,G,B values (using default red)."<< std::endl;
     }
-    pointColor.setRGBi(vectCol[0], vectCol[1], vectCol[2], 255);
+    pointColor.setRGBi(vectColPt[0], vectColPt[1], vectColPt[2], 255);
   }
     
     
@@ -211,131 +196,129 @@ void displayLineSet(po::variables_map vm, std::string nameInput,
 
 int main( int argc, char** argv )
 {
-  // parse command line -------------------------------------------------------
-// parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "the input file containing the segments x1 y1 x2 y2 to be displayed. ")
-    ("inputSec,s", po::value<std::string>(), "the second input set file containing the segments x1 y1 x2 y2 to be displayed. ")
-    ("SDPindex", po::value<std::vector <unsigned int> >()->multitoken(), "specify the sdp index of segment endpoints (by default 0,1,2,3).")
-    ("domain", po::value<std::vector <int> >()->multitoken(), "limit the export to a given domain (xmin ymin xmax ymax).")
-    ("lineWidth", po::value<double>()->default_value(1.0), "Define the linewidth of the segments.")
-    ("lineWidthSec", po::value<double>()->default_value(1.0), "Define the linewidth of the segments (second set).")
-    ("noXFIGHeader", " to exclude xfig header in the resulting output stream (no effect with option -outputFile).")
-    ("customLineColor",po::value<std::vector<unsigned int> >()->multitoken(), "set the R, G, B, A components of the colors of the mesh faces and eventually the color R, G, B, A of the mesh edge lines (set by default to black). " )
-    ("customLineColorSec",po::value<std::vector<unsigned int> >()->multitoken(), "set the R, G, B, A components of the colors of the mesh faces and eventually the color R, G, B, A of the mesh edge lines (set by default to black). " )
-    ("customPointColor",po::value<std::vector<unsigned int> >()->multitoken(), "set the R, G, B, A components of the colors of the mesh faces and eventually the color R, G, B, A of the mesh edge lines (set by default to black). " )
-    ("noDisplayEndPoints,e", "to not display segment end points.")
-    ("noDisplayEndPointsSec", "to not display segment end points of second set.")
-    ("outputFile,o", po::value<std::string>(), " <filename> save output file automatically according the file format extension.")
-    ("outputStreamEPS", " specify eps for output stream format.")
-    ("outputStreamSVG", " specify svg for output stream format.")
-    ("outputStreamFIG", " specify fig for output stream format.")
-    ("invertYaxis", " invertYaxis invert the Y axis for display contours (used only with --SDP)")
+  
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::stringstream ssDescr;
+  ssDescr << "Display line segments from input file where each segment is represented in one line."
+          << "Typical use example:\n \t  ./visualisation/displayLineSegments  ../Samples/lines.sdp  --SDPindex 1 2 3 4 --invertYaxis  lines.eps \n";
+  
+  app.description(ssDescr.str());
+  std::string inputFileName;
+  std::string inputSec;
+  std::string output;
+  std::string outputPDF;
+  std::string outputEPS;
+  std::string outputSVG;
+  std::string backgroundImage;
+  std::string outputStreamEPS;
+  std::string outputStreamFIG;
+  std::string outputStreamSVG;
+  
+  double lineWidth {1.0};
+  double lineWidthSetB {1.0};
+  double scale=1.0;
+  double alpha=1.0;
+  bool invertYaxis {false};
+  bool noXFIGHeader {false};
+  bool noDisplayEndPoints {false};
+  bool noDisplayEndPointsSec {false};
+  unsigned int height = 0;
+  std::vector<unsigned int> sdpIndexVect;
+  std::vector<unsigned int> vectDomain;
+  std::vector<unsigned int> vectCustomLineColor;
+  std::vector<unsigned int> vectCustomLineColorSec;
+  std::vector<unsigned int> vectCustomPointColor;
+  
+  app.add_option("-i,--input,1", inputFileName, "the input file containing the segments x1 y1 x2 y2 to be displayed. " )
+      ->required()
+      ->check(CLI::ExistingFile);
+  
+  app.add_option("--inputSec,-s", inputSec,
+                 "the second input set file containing the segments x1 y1 x2 y2 to be displayed. ");
+  app.add_option("--SDPindex", sdpIndexVect, "specify the sdp index of segment endpoints (by default 0,1,2,3).")
+  ->expected(4);
+  app.add_option("--domain",vectDomain, "limit the export to a given domain (xmin ymin xmax ymax)." )
+  ->expected(4);
+  app.add_option("--lineWidth", lineWidth, "Define the linewidth of the segments.");
+  app.add_option("--lineWidthSec", lineWidthSetB, "Define the linewidth of the segments.");
+  app.add_flag("--noXFIGHeader",noXFIGHeader, " to exclude xfig header in the resulting output stream (no effect with option -outputFile).");
+  app.add_option("--customLineColor",vectCustomLineColor, "set the R, G, B, A components of the colors of the mesh faces and eventually the color R, G, B, A of the mesh edge lines (set by default to black). ")
+  ->expected(4);
+  app.add_option("--customLineColorSec", vectCustomLineColorSec, "set the R, G, B, A components of the colors of the mesh faces and eventually the color R, G, B, A of the mesh edge lines (set by default to black). ")
+  ->expected(4);
+  app.add_option("--customPointColor", vectCustomPointColor,  "set the R, G, B, A components of the colors of the mesh faces and eventually the color R, G, B, A of the mesh edge lines (set by default to black). " )
+  ->expected(4);
+  app.add_option("--noDisplayEndPoints,-e", noDisplayEndPoints, "to not display segment end points.");
+  app.add_flag("--noDisplayEndPointsSec", noDisplayEndPointsSec, "to not display segment end points of second set.");
+  app.add_option("--outputFile,-o,2",output, "<filename> save output file automatically according the file format extension.");
+  
+  app.add_flag("--outputStreamEPS", outputStreamEPS, "specify eps for output stream format.");
+  app.add_flag("--outputStreamSVG", outputStreamSVG, "specify svg for output stream format.");
+  app.add_flag("--outputStreamFIG", outputStreamFIG, "specify fig for output stream format.");
+  app.add_flag("--invertYaxis", invertYaxis, "invertYaxis invert the Y axis for display contours (used only with --SDP)");
+
 
 #ifdef WITH_CAIRO
-    ("outputPDF", po::value<std::string>(), "outputPDF <filename> specify pdf format. ")
-    ("outputPNG", po::value<std::string>(), "outputPNG <filename> specify png format.")
+  app.add_option("--outputPDF", outputPDF, "outputPDF <filename> specify pdf format.");
+  app.add_option("--outputPNG", outputPNG, "outputPNG <filename> specify pdf format.");
 #endif
 
-    ("backgroundImage", po::value<std::string>(), "backgroundImage <filename> : display image as background ")
-    ("alphaBG", po::value<double>(), "alphaBG <value> 0-1.0 to display the background image in transparency (default 1.0), (transparency works only if cairo is available)")
-    ("scale", po::value<double>(), "scale <value> 1: normal; >1 : larger ; <1 lower resolutions  )");
+  app.add_option("--backgroundImage", backgroundImage, "backgroundImage <filename> : display image as background");
+  app.add_option("--alphaBG", alpha, "alphaBG <value> 0-1.0 to display the background image in transparency (default 1.0), (transparency works only if cairo is available)");
+  
+  app.add_option("--scale",scale, "scale <value> 1: normal; >1 : larger ; <1 lower resolutions  )", true );
   
   
-  bool parseOK=true;
-  po::variables_map vm;
-  try
-  {
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);
-  }
-  catch(const std::exception& ex)
-  {
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }
-  
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
 
-  // check if min arguments are given and tools description ------------------
-  po::notify(vm);
-  if( !parseOK || vm.count("help")||argc<=1)
-  {
-    std::cout << "Usage: " << argv[0] << " [input]\n"
-              << "Display line segments from input file where each segment is represented in one line."
-              << general_opt << "\n"
-              << "Typical use example:\n \t ./visualisation/displayLineSegments -i ../Samples/lines.sdp  --SDPindex 1 2 3 4  -o lines.eps --invertYaxis  \n";
-    return 0;
-  }
-  if(! vm.count("input"))
-  {
-    trace.error() << " The file name was not defined" << endl;
-    return 1;
-  }
-  
-  
-  double lineWidth =  vm["lineWidth"].as<double>();
-  double lineWidthSetB =  vm["lineWidthSec"].as<double>();
-  
-  double scale=1.0;
-  if(vm.count("scale"))
-  {
-    scale = vm["scale"].as<double>();
-  }
   
   Board2D aBoard;
   aBoard.setUnit (0.05*scale, LibBoard::Board::UCentimeter);
-  if(vm.count("domain"))
+  if(vectDomain.size()>0)
   {
-    std::vector<int> vectDom = vm["domain"].as<std::vector<int > >();
-    if(vectDom.size()!=4)
+    if(vectDomain.size()!=4)
     {
       trace.error() << "you need to specify the four values for the domain." << std::endl;
       return 0;
     }
-    aBoard.setClippingRectangle(vectDom[0],vectDom[1],vectDom[2],vectDom[3]);
+    aBoard.setClippingRectangle(vectDomain[0],vectDomain[1],vectDomain[2],vectDomain[3]);
   }
+  
 
-  double alpha=1.0;
-  if(vm.count("alphaBG"))
+  if(backgroundImage != "")
   {
-    alpha = vm["alphaBG"].as<double>();
-  }
-  unsigned int height = 0;
-  if(vm.count("backgroundImage"))
-  {
-    std::string imageName = vm["backgroundImage"].as<std::string>();
     typedef ImageSelector<Z2i::Domain, unsigned char>::Type Image;
-    Image img = DGtal::GenericReader<Image>::import( imageName );
+    Image img = DGtal::GenericReader<Image>::import( backgroundImage );
     Z2i::Point ptInf = img.domain().lowerBound();
     Z2i::Point ptSup = img.domain().upperBound();
     unsigned int width = abs(ptSup[0]-ptInf[0]+1);
     height = abs(ptSup[1]-ptInf[1]+1);
-    aBoard.drawImage(imageName, 0-0.5,height-0.5, width, height, -1, alpha );
+    aBoard.drawImage(backgroundImage, 0-0.5,height-0.5, width, height, -1, alpha );
   }
 
+
+  if(inputFileName != "")
+  {
  
-  bool invertYaxis = vm.count("invertYaxis");
-
-  if(vm.count("input"))
-  {
-    displayLineSet(vm, "input","customLineColor", aBoard, height, invertYaxis, !vm.count("noDisplayEndPoints"), lineWidth);
+    displayLineSet(inputFileName, sdpIndexVect, vectCustomPointColor, vectCustomLineColor, "input","customLineColor",  aBoard, height, invertYaxis, !noDisplayEndPoints, lineWidth);
   }
-  if(vm.count("inputSec"))
+  if(inputSec != "")
   {
-    displayLineSet(vm, "inputSec","customLineColorSec", aBoard, height, invertYaxis,!vm.count("noDisplayEndPointsSec"), lineWidthSetB);
+    displayLineSet(inputSec,sdpIndexVect, vectCustomPointColor, vectCustomLineColorSec , "inputSec","customLineColorSec", aBoard, height, invertYaxis,!noDisplayEndPointsSec, lineWidthSetB);
   }
 
  
   
-  if(vm.count("outputFile"))
+  if(output != "")
   {
-    std::string outputFileName= vm["outputFile"].as<std::string>();
-    std::string extension = outputFileName.substr(outputFileName.find_last_of(".") + 1);
+    std::string extension = output.substr(output.find_last_of(".") + 1);
      
     if(extension=="svg")
     {
-      aBoard.saveSVG(outputFileName.c_str());
+      aBoard.saveSVG(output.c_str());
     }
 #ifdef WITH_CAIRO
     else
@@ -354,27 +337,26 @@ int main( int argc, char** argv )
 #endif
       else if(extension=="eps")
       {
-        aBoard.saveEPS(outputFileName.c_str());
+        aBoard.saveEPS(output.c_str());
       }
       else if(extension=="fig")
       {
-        aBoard.saveFIG(outputFileName.c_str(),LibBoard::Board::BoundingBox, 10.0, !vm.count("noXFIGHeader") );
+        aBoard.saveFIG(output.c_str(),LibBoard::Board::BoundingBox, 10.0, !noXFIGHeader);
       }
   }
     
-  if (vm.count("outputStreamSVG"))
+  if (outputStreamSVG != "")
   {
     aBoard.saveSVG(std::cout);
   }
-  else if (vm.count("outputStreamFIG"))
+  else if (outputStreamFIG != "")
   {
-    aBoard.saveFIG(std::cout, LibBoard::Board::BoundingBox, 10.0,  !vm.count("noXFIGHeader"));
+    aBoard.saveFIG(std::cout, LibBoard::Board::BoundingBox, 10.0,  !noXFIGHeader);
   }
-  else if (vm.count("outputStreamEPS"))
+  else if (outputStreamEPS != "")
   {
     aBoard.saveEPS(std::cout);
   }
-    
   return 0;
 }
 

@@ -23,9 +23,59 @@
  *
  */
 
+/**
+ @page computeMeshDistance
+ 
+ @brief  Apply the Rosin Threshold algorithm.
+
+ @b Usage:   computeMeshDistance  [input]
+
+ @b Allowed @b options @b are :
+ 
+ @code
+ 
+ Positionals:
+   1 TEXT:FILE REQUIRED                  input file name of mesh A (reference shape) given as OFF format.
+   2 TEXT:FILE REQUIRED                  input file name of mesh B (compared shape) given as OFF format.
+   minScaleDistance FLOAT=0              set the default min value use to display the distance
+
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED         input file name of mesh A (reference shape) given as OFF format.
+   -c,--inputComp TEXT:FILE REQUIRED     input file name of mesh B (compared shape) given as OFF format.
+   -o,--output TEXT                      arg = file.dat : output file containing all the distances of each input mesh faces (faces of A)
+   -m,--outputMesh TEXT                  arg = file.off : export the resulting distances represented with a color scale on the faces of the reference mesh A.
+   -f,--faceCenterDistance               approximates the minimal distance by using the euclidean distance of the face centers (instead using the minimal distance given by projection).
+   -s,--squaredDistance                  computes squared distance.
+   -n,--saveNearestPoint                 save the nearest point obtained during the computation of the minimal distance (point of B).
+   --maxScaleDistance FLOAT=0.1          set the default max value use to display the distance
+   --exportDistanceEstimationType        Export as face color the type of distance estimation used for each face (blue for projection, green for edge projection and whitefor euclidean distance.)
+
+
+ 
+@endcode
+
+ @b Example:
+
+ @code
+ computeMeshDistances ../Samples/fandisk.off -c ../Samples/box.off -o distances.dat -m res.off --maxScaleDistance 0.7 -n
+ meshViewer res.off
+
+ @endcode
+
+ @image html rescomputeMeshDistance .png "Example of result. "
+
+ @see
+ @ref computeMeshDistance.cpp
+
+ */
+
+
+
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 #include "DGtal/base/Common.h"
 #include "DGtal/helpers/StdDefs.h"
@@ -34,9 +84,7 @@
 #include "DGtal/io/colormaps/GradientColorMap.h"
 #include "DGtal/io/colormaps/HueShadeColorMap.h"
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
 
 #include "DGtal/shapes/Mesh.h"
 #include "DGtal/math/linalg/SimpleMatrix.h"
@@ -44,7 +92,7 @@
 
 
 using namespace DGtal;
-namespace po = boost::program_options;
+
 
 static const double approxSamePlane = 0.1;
 
@@ -127,46 +175,59 @@ typedef typename Z3i::RealPoint RPoint;
 int
 main(int argc,char **argv)
 {
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-  ("help,h", "display this message")
-  ("input,i", po::value<std::string>(), "input file name of mesh A (reference shape) given as OFF format.")
-  ("inputComp,c", po::value<std::string>(), "input file name of mesh B (compared shape) given as OFF format.")
-   ("output,o", po::value<std::string>(),  "arg = file.dat : output file containing all the distances of each input mesh faces (faces of A)")
-  ("outputMesh,m", po::value<std::string>(),  "arg = file.off : export the resulting distances represented with a color scale on the faces of the reference mesh A.")
-  ("faceCenterDistance,f", "approximates the minimal distance by using the euclidean distance of the face centers (instead using the minimal distance given by projection).")
-  ("squaredDistance,s", "computes squared distance.")
-  ("saveNearestPoint,n", "save the nearest point obtained during the computation of the minimal distance (point of B).")
-  ("maxScaleDistance", po::value<double>()->default_value(0.1), "set the default max value use to display the distance")
-  ("exportDistanceEstimationType", "Export as face color the type of distance estimation used for each face (blue for projection, green for edge projection and white for euclidean distance.)")
-  ("minScaleDistance", po::value<double>()->default_value(0.0), "set the default min value use to display the distance");
   
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);
-  }catch(const std::exception& ex){
-    trace.info()<< "Error checking program options: "<< ex.what()<< std::endl;
-    parseOK=false;
-  }
-  po::notify(vm);
-  if(vm.count("help")||argc<=1 || !vm.count("input") || 
-     !vm.count("inputComp") || !vm.count("output") ||  !parseOK  )
-  {
-    trace.info()<< "Computes for each face of a mesh A the minimal distance to another mesh B. For each face of A, the minimal distance to B is computed by a brut force scan and the result can be exported as a mesh where the distances are represented in color scale. The maximal value of all these distances is also given as std output. " <<std::endl << "Options: "<<std::endl
-                << general_opt << "\n" <<
-      "Example of use (from the DGtalTools-contrib directory:"<< "\n" <<
-      "./build/geometry3d/computeMeshDistances -i Samples/fandisk.off -c Samples/box.off -o distances.dat -m res.off --maxScaleDistance 0.7 -n \n"
-                << "Then you can also check the distance result by using the meshViewer tool from DGtalTools: \n" <<
-      " meshViewer -i res.off \n"
-                << "And you can also check the nearest points used to compute the minimal distance:\n"
-                << "meshViewer -i res.off Samples/box.off -f distances.dat --vectorFieldIndex 0 1 2 4 5 6\n";
-    
-    return 0;
-  }
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string inputMeshName;
+  std::string inputCompMeshName;
+  std::string outputFileName {"result.raw"};
+  std::string outputMeshFileName;
+  DGtal::int64_t rescaleInputMin {0};
+  DGtal::int64_t rescaleInputMax {255};
+  bool useFaceCenterDistance {false};
+  bool squaredDistance {false};
+  bool saveNearestPoint {false};
+  bool exportDistanceEstimationType {false};
+  double maxScaleDistance {0.1};
+  double minScaleDistance {0.0};
   
-  std::string inputMeshName = vm["input"].as<std::string>();
-  std::string inputCompMeshName = vm["inputComp"].as<std::string>();
+  std::stringstream appDescr;
+  appDescr << "Computes for each face of a mesh A the minimal distance to another mesh B. For each face of A, the minimal distance to B is computed by a brut force scan and the result can be exported as a mesh where the distances are represented in color scale. The maximal value of all these distances is also given as std output.";
+  appDescr <<  "Example of use (from the DGtalTools-contrib directory:"<< "\n" <<
+  "./build/geometry3d/computeMeshDistances -i Samples/fandisk.off -c Samples/box.off -o distances.dat -m res.off --maxScaleDistance 0.7 -n \n"
+            << "Then you can also check the distance result by using the meshViewer tool from DGtalTools: \n" <<
+  " meshViewer -i res.off \n"
+            << "And you can also check the nearest points used to compute the minimal distance:\n"
+            << "meshViewer -i res.off Samples/box.off -f distances.dat --vectorFieldIndex 0 1 2 4 5 6\n";
+  
+  
+  app.description(appDescr.str());
+  app.add_option("-i,--input,1", inputMeshName, "input file name of mesh A (reference shape) given as OFF format." )
+      ->required()
+      ->check(CLI::ExistingFile);
+  app.add_option("--inputComp,-c,2", inputCompMeshName, "input file name of mesh B (compared shape) given as OFF format." )
+      ->required()
+      ->check(CLI::ExistingFile);
+
+  app.add_option("--output,-o", outputFileName, "arg = file.dat : output file containing all the distances of each input mesh faces (faces of A)", false);
+  
+  app.add_option("--outputMesh,-m",outputMeshFileName, "arg = file.off : export the resulting distances represented with a color scale on the faces of the reference mesh A.");
+  
+  app.add_flag("--faceCenterDistance,-f",useFaceCenterDistance, "approximates the minimal distance by using the euclidean distance of the face centers (instead using the minimal distance given by projection).");
+  app.add_flag("--squaredDistance,-s", squaredDistance, "computes squared distance.");
+  app.add_flag("--saveNearestPoint,-n", saveNearestPoint, "save the nearest point obtained during the computation of the minimal distance (point of B).");
+  app.add_option("--maxScaleDistance", maxScaleDistance, "set the default max value use to display the distance", true);
+  
+  app.add_flag("--exportDistanceEstimationType", exportDistanceEstimationType, "Export as face color the type of"
+               " distance estimation used for each face (blue for projection, green for edge projection and white"
+               "for euclidean distance.)");
+  app.add_option("minScaleDistance",minScaleDistance, "set the default min value use to display the distance", true);
+
+  
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
 
   
   DGtal::Mesh<Z3i::RealPoint> theMeshRef(true);
@@ -179,11 +240,7 @@ main(int argc,char **argv)
   MeshReader<Z3i::RealPoint>::importOFFFile(inputCompMeshName, theMeshComp, false);
   MeshReader<Z3i::RealPoint>::importOFFFile(inputMeshName, projOkMesh, false);
   
-  double maxScaleDistance = vm["maxScaleDistance"].as<double>();
-  double minScaleDistance = vm["minScaleDistance"].as<double>();
-  bool useFaceCenterDistance =  vm.count("faceCenterDistance");
-  bool saveNearestPoint = vm.count("saveNearestPoint");
-  bool squaredDistance = vm.count("squaredDistance");
+
   
   trace.info()<< "reading the input Comp mesh ok: "<< theMeshComp.nbVertex() <<  std::endl;
   
@@ -276,8 +333,7 @@ main(int argc,char **argv)
   }
   
   std::ofstream outDistances;
-  std::string outName = vm["output"].as<std::string>();
-  outDistances.open(outName.c_str(), std::ofstream::out);
+  outDistances.open(outputFileName.c_str(), std::ofstream::out);
   std::string name  = argv[0];
   name = name.substr(name.find_last_of("/")+1);
   outDistances << "# resulting distances computed from the " << name << " program of the DGtalTools-contrib project." << std::endl;
@@ -311,14 +367,13 @@ main(int argc,char **argv)
   }
   
   std::ofstream outMesh;
-  if(vm.count("outputMesh")){
-    std::string outputMeshName = vm["outputMesh"].as<std::string>();
-    outMesh.open(outputMeshName.c_str(), std::ofstream::out);
+  if(outputMeshFileName.size()>0){
+    outMesh.open(outputMeshFileName.c_str(), std::ofstream::out);
     MeshWriter<Z3i::RealPoint>::export2OFF(outMesh, theNewMeshDistance,true);
     outMesh.close();
   }
   
-  if(vm.count("exportDistanceEstimationType")){
+  if(exportDistanceEstimationType){
     std::ofstream outApproxDistance;
     outApproxDistance.open("distanceEstimationType.off", std::ofstream::out);
     MeshWriter<Z3i::RealPoint>::export2OFF(outApproxDistance, projOkMesh,true);
