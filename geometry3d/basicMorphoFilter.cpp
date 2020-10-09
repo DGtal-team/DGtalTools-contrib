@@ -24,6 +24,44 @@
  */
 
 
+/**
+ @page basicMorphoFilter basicMorphoFilter
+ 
+ @brief  Apply the Rosin Threshold algorithm.
+
+ @b Usage:   basicMorphoFilter [input]
+
+ @b Allowed @b options @b are :
+ 
+ @code
+ Positionals:
+   1 TEXT:FILE REQUIRED                  input file name in 3d volume.
+   2 TEXT=result.vol                     export the filtered volume extracted
+
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED         input file name in 3d volume.
+   -o,--output TEXT=result.vol           export the filtered volume extracted
+   -s,--sizeFilter UINT                  size of the filter
+   -e,--erode                            apply erosion
+   -m,--median                           apply median filter
+   -d,--dilate                           apply dilatation
+   -c,--closure                          apply closure
+   -n,--nbRepeat UINT=1                  repeat the selected type of operation
+
+@endcode
+
+ @b Example:
+
+ @code
+ basicMorphoFilter ${DGtal}/examples/samples/lobster.vol -e lobsErode2_2.vol -s 2 -n 2
+ @endcode
+
+ @see
+ @ref basicMorphoFilter.cpp
+
+ */
+
 #include <iostream>
 #include <fstream>
 
@@ -33,12 +71,11 @@
 #include "DGtal/io/writers/GenericWriter.h"
 
 #include "DGtal/images/ImageContainerBySTLVector.h"
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+
+#include "CLI11.hpp"
+
 
 using namespace DGtal;
-namespace po = boost::program_options;
 
 typedef typename Z3i::Point Point3D;
 typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char> Image3D;
@@ -121,52 +158,42 @@ applyErodeDilate(const TImage &anImage, unsigned int size, bool isErode){
 
 
 
-
 int
 main(int argc,char **argv)
 
 {
-  
   typedef typename Image3D::Domain::ConstIterator ImageDomIterator;
-
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "input file name in 3d volume.")
-    ("sizeFilter,s", po::value<unsigned int>(), "size of the filter")
-    ("erode,e",  "apply erosion")
-    ("median,m",  "apply median filter")
-    ("dilate,d",  "apply dilatation")
-    ("closure,c", "apply closure")
-    ("nbRepeat,n", po::value<unsigned int>()->default_value(1), "repeat the selected type of operation" )
-    ("output,o", po::value<std::string>(),  "export the filtered volume extracted");
-    
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);
-  }catch(const std::exception& ex){
-    trace.info()<< "Error checking program options: "<< ex.what()<< std::endl;
-    parseOK=false;
-  }
-  po::notify(vm);
-  if(vm.count("help")||argc<=1|| !parseOK )
-  {
-    trace.info()<< "Apply basic morpho filter from a ball structural element" <<std::endl << "Options: "<<std::endl
-		  << general_opt << "\n";
-    return 0;
-  }
-    
-  std::string inputVol = vm["input"].as<std::string>();
-  std::string outputVol = vm["output"].as<std::string>();
-  bool erode = vm.count("erode");
-  bool dilate = vm.count("dilate");
-  bool closure = vm.count("closure");
-  bool median = vm.count("median");
-  unsigned int nbRepeat = vm["nbRepeat"].as<unsigned int>();
-  unsigned int size = vm["sizeFilter"].as<unsigned int>();    
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  app.description("Apply basic morpho filter from a ball structural element.\n Example:"
+                  "./geometry3d/basicMorphoFilter ${DGtal}/examples/samples/lobster.vol -e lobsErode2_2.vol -s 2 -n 2");
+  std::string inputFileName;
+  std::string outputFileName {"result.vol"};
+  unsigned int sizeFilter;
+  unsigned int nbRepeat {1};
+  bool erode {false};
+  bool dilate {false};
+  bool median {false};
+  bool closure {false};
   
-  Image3D inputImage = VolReader<Image3D>::importVol(inputVol);
+  
+  app.add_option("-i,--input,1", inputFileName, "input file name in 3d volume." )
+  ->required()
+  ->check(CLI::ExistingFile);
+  app.add_option("--output,-o,2", outputFileName, "export the filtered volume extracted", true);
+  app.add_option("--sizeFilter,-s", sizeFilter, "size of the filter");
+  app.add_flag("--erode,-e", "apply erosion");
+  app.add_flag("--median,-m", "apply median filter");
+  app.add_flag("--dilate,-d", "apply dilatation");
+  app.add_flag("--closure,-c", "apply closure");
+  app.add_option("--nbRepeat,-n",nbRepeat, "repeat the selected type of operation", true);
+  
+  
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+  
+  Image3D inputImage = VolReader<Image3D>::importVol(inputFileName);
   Image3D imageRes(inputImage);
 
   for(ImageDomIterator it = inputImage.domain().begin(); it != inputImage.domain().end(); it++){
@@ -177,30 +204,26 @@ main(int argc,char **argv)
     if(median){
       trace.info() << std::endl;
       trace.info() << "applying " << "median" << std::endl;
-      imageRes = applyMedian(imageRes, size);
+      imageRes = applyMedian(imageRes, sizeFilter);
       trace.info() << std::endl;
       
     }
     else if (!closure) {
       trace.info() << std::endl;
       trace.info() << "applying " << (erode ? "erosion": "dilatation") << std::endl;
-      imageRes = applyErodeDilate(imageRes, size, !dilate);
+      imageRes = applyErodeDilate(imageRes, sizeFilter, !dilate);
       trace.info() << std::endl;
 
     }else if(!median) {
       trace.info() << "applying " << "closure" << std::endl;
       trace.info() << "applying " << "dilate" << std::endl;
-      imageRes = applyErodeDilate(imageRes, size, false);
+      imageRes = applyErodeDilate(imageRes, sizeFilter, false);
       trace.info() << "applying " << "erode" << std::endl;
-      imageRes = applyErodeDilate(imageRes, size, true);
+      imageRes = applyErodeDilate(imageRes, sizeFilter, true);
     }
   }
 
   trace.info() << std::endl;
-  imageRes >>  outputVol;
+  imageRes >>  outputFileName;
     
 }
-
-
-
-

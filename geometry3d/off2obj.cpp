@@ -36,15 +36,13 @@
 #include "DGtal/io/writers/MeshWriter.h"
 #include "DGtal/helpers/StdDefs.h"
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
+
 
 ///////////////////////////////////////////////////////////////////////////////
 using namespace std;
 using namespace DGtal;
 ///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
 
 
 /**
@@ -57,18 +55,24 @@ namespace po = boost::program_options;
  @b Allowed @b options @b are :
 
  @code
-  -h [ --help ]         display this message
-  -i [ --input ] arg    an input mesh file in .off format. 
-  -o [ --output ] arg   an output file (can generate .obj and .mtl if color 
-                        option is selected) 
-  -c [ --colors ]       convert by taking into account the mesh colors (from 
-                        each faces).
+  
+ Positionals:
+   1 TEXT:FILE REQUIRED                  an input mesh file in .off format.
+
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED         an input mesh file in .off format.
+   -o,--output TEXT                      an output file (can generate .obj and .mtl if color option is selected)
+   -n,--invertNormals BOOLEAN            invert the normals (face orientation).
+   -c,--colors                           convert by taking into account the mesh colors (from each faces).
+
+ 
  @endcode
 
  @b Example: 
 
  @code
-	 off2obj -i file.off -o file.obj -c  
+ off2obj $DGtal/examples/samples/tref.off converted.obj
  @endcode
 
  @see
@@ -79,62 +83,39 @@ namespace po = boost::program_options;
 
 int main( int argc, char** argv )
 {
-  // parse command line -------------------------------------------------------
-  po::options_description general_opt("Allowed options are");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value<std::string >(), "an input mesh file in .off format. " )
-    ("output,o", po::value<std::string >(), "an output file (can generate .obj and .mtl if color option is selected) " )
-    ("invertNormals,n", "invert the normals (face orientation).")
-    ("colors,c", "convert by taking into account the mesh colors (from each faces)." );
-
-  bool parseOK=true;
-  po::variables_map vm;
-  try
-    {
-      po::store(po::parse_command_line(argc, argv, general_opt), vm);
-    }
-  catch(const std::exception& ex)
-    {
-      parseOK=false;
-      trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-    }
   
-
-  // check if min arguments are given and tools description ------------------
-  po::notify(vm);
-  if( !parseOK || vm.count("help")||argc<=1)
-    {
-      std::cout << "Usage: " << argv[0] << " [input]\n"
-                << "Converts a .off mesh into the .obj format.\n"
-                << general_opt << "\n"
-                << "Typical use example:\n \t off2obj -i file.off -o file.obj -c  \n";
-      return 0;
-    }  
-  if(! vm.count("input") || ! vm.count("output"))
-    {
-      trace.error() << " The input/output file name was not defined" << endl;
-      return 1;
-    }
-
-
-
-  //  recover the  args ----------------------------------------------------
-  string inputFileName = vm["input"].as<string>();
-  string outputFileName = vm["output"].as<string>();
-
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string inputFileName;
+  std::string outputFileName {"result.obj"};
+  bool invertNormals {false};
+  bool colors {false};
   
+  app.description("Converts a .off mesh into the .obj format.\n"
+                  "Typical use example:\n \t off2obj -i file.off -o file.obj -c  \n");
+  app.add_option("-i,--input,1", inputFileName, "an input mesh file in .off format." )
+  ->required()
+  ->check(CLI::ExistingFile);
+  app.add_option("--output,-o,2", outputFileName, "an output file (can generate .obj and .mtl if color option is selected)");
+  app.add_option("--invertNormals,-n", invertNormals, "invert the normals (face orientation).");
+  app.add_flag("--colors,-c",colors, "convert by taking into account the mesh colors (from each faces).");
+
+ 
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
   std::string basename = outputFileName.substr(0, outputFileName.find_last_of("."));
   std::stringstream outname; outname << basename << ".obj"; 
   // read input mesh
-  DGtal::Mesh<DGtal::Z3i::RealPoint> aMesh(vm.count("colors"));
+  DGtal::Mesh<DGtal::Z3i::RealPoint> aMesh(colors);
 
   MeshReader<DGtal::Z3i::RealPoint>::importOFFFile(inputFileName,
-                                                   aMesh, vm.count("invertNormals"));
+                                                   aMesh, invertNormals);
   
   ofstream fout;
   fout.open(outname.str().c_str());
-  if(!vm.count("colors"))
+  if(!colors)
     {
       MeshWriter<DGtal::Z3i::RealPoint>::export2OBJ(fout,aMesh);
     }
@@ -145,9 +126,6 @@ int main( int argc, char** argv )
       foutmtl.open(outnamemtl.str().c_str());
       MeshWriter<DGtal::Z3i::RealPoint>::export2OBJ_colors(fout, foutmtl, outnamemtl.str(),aMesh);
     }
-  
-
-
   return 0;
 }
 
