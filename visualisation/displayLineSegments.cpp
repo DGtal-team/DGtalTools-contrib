@@ -249,7 +249,7 @@ int main( int argc, char** argv )
   ->expected(4);
   app.add_option("--customPointColor", vectCustomPointColor,  "set the R, G, B, A components of the colors of the mesh faces and eventually the color R, G, B, A of the mesh edge lines (set by default to black). " )
   ->expected(4);
-  app.add_option("--noDisplayEndPoints,-e", noDisplayEndPoints, "to not display segment end points.");
+  app.add_flag("--noDisplayEndPoints,-e", noDisplayEndPoints, "to not display segment end points.");
   app.add_flag("--noDisplayEndPointsSec", noDisplayEndPointsSec, "to not display segment end points of second set.");
   app.add_option("--outputFile,-o,2",output, "<filename> save output file automatically according the file format extension.");
   
