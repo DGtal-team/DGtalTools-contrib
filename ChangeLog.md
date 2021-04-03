@@ -2,7 +2,7 @@
 # DGtalTools-contrib  1.2
 
 - *global*
-  - Travis: Fix old default osx_image with xcode12.2 and remove non used boost
+  - Fix Appveyor and Travis  wioth old default osx_image with xcode12.2 and remove non used boost
     cmake references. (Bertrand Kerautret [#53](https://github.com/DGtal-team/DGtalTools/pull/53)) 
 
 
