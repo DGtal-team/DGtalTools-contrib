@@ -1,4 +1,4 @@
-version: 0.9beta.{build}
+version: 1.0.{build}
 
 environment:
   BOOST_ROOT: "C:\\Libraries\\boost_1_63_0"
@@ -69,7 +69,7 @@ before_build:
   - cmake -Wno-dev -G"%VS_GEN%" -DCMAKE_BUILD_TYPE=%CONFIG% -DWITH_QGLVIEWER:BOOL=ON -DWITH_QT5:BOOL=ON -DQGLVIEWER_INCLUDE_DIR=C:\projects\libqglviewer -DQGLVIEWER_LIBRARIES=C:\projects\libqglviewer\QGLViewer\QGLViewer2.lib -DBUILD_TESTING:BOOL=OFF -DBUILD_EXAMPLES:BOOL=OFF -DBUILD_SHARED_LIBS:BOOL=FALSE  -DZLIB_LIBRARY=c:/zlib-install/lib/zlibd.lib -DZLIB_INCLUDE_DIR=c:/zlib-install/include/  -DBOOST_ROOT=%BOOST_ROOT% .
   - msbuild /m /p:Configuration=%CONFIG% /p:Platform=%B_NAME% DGtal.sln 
   - cd %APPVEYOR_BUILD_FOLDER%
-  - cmake -Wno-dev -G"%VS_GEN%" -DCMAKE_BUILD_TYPE=%CONFIG%   -DBOOST_ROOT=%BOOST_ROOT%   -DBOOST_LIBRARYDIR="%BOOST_LIBRARYDIR%" -DDGtal_DIR=C:\projects\dgtal .
+  - cmake -Wno-dev -G"%VS_GEN%" -DCMAKE_BUILD_TYPE=%CONFIG%   -DDGtal_DIR=C:\projects\dgtal .
 
 
 build_script:
