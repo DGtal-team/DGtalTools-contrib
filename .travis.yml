@@ -1,7 +1,6 @@
 language: cpp
 dist: xenial
-
-
+osx_image: xcode12.2
 
 compiler:
   - gcc

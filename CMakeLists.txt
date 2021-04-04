@@ -5,6 +5,7 @@
 PROJECT(DGtalTools-contrib)
 
 cmake_minimum_required (VERSION 3.1) 
+cmake_policy(SET CMP0057 NEW)
 
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
@@ -62,23 +63,6 @@ SET(VERSION ${DGtalToolsContrib_VERSION_MAJOR}.${DGtalToolsContrib_VERSION_MINOR
 
 
 
-
- # -----------------------------------------------------------------------------
- # Looking for boost
- # -----------------------------------------------------------------------------
-set(Boost_USE_STATIC_LIBS   ON)
-set(Boost_USE_MULTITHREADED ON)
-set(Boost_USE_STATIC_RUNTIME OFF)
-set(Boost_FOUND FALSE)
-FIND_PACKAGE(Boost 1.50.0 REQUIRED)
-if ( Boost_FOUND )
-  ADD_DEFINITIONS(${BOOST_DEFINITIONS} -DBOOST_ALL_NO_LIB)
-  # SYSTEM to avoid warnings from boost.
-  include_directories(SYSTEM ${Boost_INCLUDE_DIRS} )
-  SET(DGtalToolsContribLibDependencies ${DGtalToolsContribLibDependencies}
-     ${Boost_LIBRAIRIES})
-   SET(DGtalLibInc ${Boost_INCLUDE_DIRS})  
-endif( Boost_FOUND )
 
 
 
