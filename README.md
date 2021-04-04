@@ -7,6 +7,7 @@ Various tools from the community built using DGtal. Contrary to the DGtalTools p
 
 More Information
 ----------------
+* Release 1.1.1 DOI [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4395059.svg)](https://doi.org/10.5281/zenodo.4395059)
 * Release 0.9.4.1 DOI [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1207828.svg)](https://doi.org/10.5281/zenodo.1207828)
 * Release 0.9.4 DOI [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1203421.svg)](https://doi.org/10.5281/zenodo.1203421)
 * Release 0.9.3 DOI [![DOI](https://zenodo.org/badge/43562168.svg)](https://zenodo.org/badge/latestdoi/43562168)
