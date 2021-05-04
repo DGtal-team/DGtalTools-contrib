@@ -83,43 +83,40 @@ The simplest way to start creating a new tool is to use the script
 [DGtalScripts](https://github.com/DGtal-team/DGtalScripts)
 scripts. This script generates a new empty tool containing only these minimal features:
   - inclusion of a DGtal base headers;
-  - example of input options use (based on the ```boost::program_options```).
-    For instance, you can complete this example of options:
-    ```c++
-       po::options_description general_opt("Allowed options are");
-       general_opt.add_options()
-            ("help,h", "display this message")
-            ("param,p", po::value< double >(), "a special parameter")
- 
-     ```
-
   - description the tool including a simple use example. You can refer to existing samples of the DGtal directory:
     ```c++
-
-       trace.info() << "Usage: " << argv[0] << " [options] input\n"
+       std::stringstream ss; 
+       ss << "Usage: " << argv[0] << " [options] input\n"
                  << "Display a 3D curve given as the <input> filename (with possibly projections and/or tangent information) by using QGLviewer.\n"
                  << general_opt << "\n\n";
-       trace.info() << "Example:\n"
+       ss << "Example:\n"
                  << "3dCurveViewer -C -b 1 -3 -2 -c ${DGtal}/examples/samples/sinus.dat\n";
-      return 0;
+      
 ```
+  - example of input options use (based on the ```CLI11```).
+    For instance, you can complete this example of options:
+    ```c++
+ 	CLI::App app;
+  	app.description("Description of your tool with basic usage." + ss.str());
+	app.add_option("--input,-i,1", inputFilename, "description of the input...");
+	app.add_option("--output,-o,2", outputFilename, "description of the output...");
+	app.get_formatter()->column_width(40);
+        CLI11_PARSE(app, argc, argv);
+     ```
 
-
-
+  
 
 
 Then, when your tool is defined, you have to include it in the
 CMakeLists.txt file associated to its group. For instance, if you
 create a new tool **xxx** in the group **Visualisation**, you have to
-update the *CMakeLists.txt* file of the directory ```DGtalTools/visualisation```:
+update the *CMakeLists.txt* file of the directory ```DGtalTools-contrib/visualisation```:
 ```cmake
-
-SET(DGTAL_TOOLS_SRC
+       SET(DGTAL_TOOLS_SRC
 	displayTgtCoverAlphaTS
         xxx
 )
 ```
-
 
 
 
