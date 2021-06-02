@@ -18,7 +18,7 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 
 
-FIND_PACKAGE(DGtal 1.0.0 REQUIRED)
+FIND_PACKAGE(DGtal 1.2.0 REQUIRED)
 INCLUDE_DIRECTORIES(${DGTAL_INCLUDE_DIRS})
 LINK_DIRECTORIES(${DGTAL_LIBRARY_DIRS})
 
@@ -53,7 +53,7 @@ include_directories( "${PROJECT_SOURCE_DIR}/ext/" )
 # -----------------------------------------------------------------------------
 # SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 SET(DGtalToolsContrib_VERSION_MAJOR 1)
-SET(DGtalToolsContrib_VERSION_MINOR 1)
+SET(DGtalToolsContrib_VERSION_MINOR 2)
 SET(DGtalToolsContrib_VERSION_PATCH 0)
 SET(DGTALTOOLSContrib_VERSION "${DGtalToolsContrib_VERSION_MAJOR}.${DGtalToolsContrib_VERSION_MINOR}.${DGtalToolsContrib_VERSION_PATCH}")
 SET(PROJECT_VERSION "${DGtalToolsContrib_VERSION_MAJOR}.${DGtalToolsContrib_VERSION_MINOR}.${DGtalToolsContrib_VERSION_PATCH}")
