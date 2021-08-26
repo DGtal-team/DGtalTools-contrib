@@ -1,6 +1,7 @@
 # DGtalTools-contrib  1.3 (beta)
 
-
+- Continuous integration does not use Travis anymore but Github Actions.
+  (Bertrand Kerautret [#58](https://github.com/DGtal-team/DGtalTools-contrib/pull/58))
 
 
 
@@ -8,7 +9,7 @@
 
 - *global*
   - Fix Appveyor and Travis  wioth old default osx_image with xcode12.2 and remove non used boost
-    cmake references. (Bertrand Kerautret [#53](https://github.com/DGtal-team/DGtalTools/pull/53)) 
+    cmake references. (Bertrand Kerautret [#53](https://github.com/DGtal-team/DGtalTools-contrib/pull/53)) 
 
 
 
