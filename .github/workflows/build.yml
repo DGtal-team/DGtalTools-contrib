@@ -51,15 +51,15 @@ jobs:
        if: matrix.os == 'ubuntu-latest'
        shell: bash
        working-directory: ${{runner.workspace}}/build
-       run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_GLOBAL $CONFIG_LINUX -G Ninja
+       run: cmake $GITHUB_WORKSPACE  -DDGTAL_DIR=${{runner.workspace}}/buildDGtal -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_GLOBAL $CONFIG_LINUX -G Ninja
      - name: Configure CMake (macOS)
        if: matrix.os == 'macOS-latest'
        shell: bash
        working-directory: ${{runner.workspace}}/build
-       run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_GLOBAL $CONFIG_MAC -G Ninja
+       run: cmake $GITHUB_WORKSPACE  -DDGTAL_DIR=${{runner.workspace}}/buildDGtal -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_GLOBAL $CONFIG_MAC -G Ninja
 
      - name: Build
        working-directory: ${{runner.workspace}}/build
        shell: bash
        # Execute the build.  You can specify a specific target with "--target <NAME>"
-       run: cmake --build . --config $BUILD_TYPE  -DDGTAL_DIR=${{runner.workspace}}/buildDGtal -G Ninja
+       run: cmake --build . --config $BUILD_TYPE  -G Ninja
