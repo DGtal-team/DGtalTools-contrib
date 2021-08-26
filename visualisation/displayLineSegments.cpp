@@ -208,6 +208,7 @@ int main( int argc, char** argv )
   std::string inputSec;
   std::string output;
   std::string outputPDF;
+  std::string outputPNG;
   std::string outputEPS;
   std::string outputSVG;
   std::string backgroundImage;
@@ -324,15 +325,15 @@ int main( int argc, char** argv )
     else
       if (extension=="eps")
       {
-        aBoard.saveCairo(outputFileName.c_str(),Board2D::CairoEPS );
+        aBoard.saveCairo(output.c_str(),Board2D::CairoEPS );
       }
       else if (extension=="pdf")
       {
-        aBoard.saveCairo(outputFileName.c_str(),Board2D::CairoPDF );
+        aBoard.saveCairo(output.c_str(),Board2D::CairoPDF );
       }
       else if (extension=="png")
       {
-        aBoard.saveCairo(outputFileName.c_str(),Board2D::CairoPNG );
+        aBoard.saveCairo(output.c_str(),Board2D::CairoPNG );
       }
 #endif
       else if(extension=="eps")
