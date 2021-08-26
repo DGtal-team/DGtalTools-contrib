@@ -35,7 +35,8 @@ jobs:
        run: cmake -E make_directory ${{runner.workspace}}/build
 
      
-     - name: DGtalBuild
+     - name: DGtalBuild (linux)
+       if: matrix.os == 'ubuntu-latest'
        shell: bash
        working-directory: ${{runner.workspace}}/build
        run: |
@@ -44,9 +45,19 @@ jobs:
            mkdir buildDGtal
            cd buildDGtal
            echo  cmake .. $CONFIG_LINUX -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  -G Ninja
-           if: matrix.os == 'ubuntu-latest'
            cmake .. $CONFIG_LINUX -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  -G Ninja
-           if: matrix.os == 'macOS-latest'
+           ninja
+
+     - name: DGtalBuild (macOS)
+       if: matrix.os == 'macOS-latest'
+       shell: bash
+       working-directory: ${{runner.workspace}}/build
+       run: |
+           git clone --depth 1 https://github.com/DGtal-team/DGtal.git
+           cd DGtal
+           mkdir buildDGtal
+           cd buildDGtal
+           echo  cmake .. $CONFIG_MAC -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  -G Ninja
            cmake .. $CONFIG_MAC -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  -G Ninja
            ninja
 
