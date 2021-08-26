@@ -52,6 +52,7 @@ jobs:
        shell: bash
        working-directory: ${{runner.workspace}}/build
        run: cmake $GITHUB_WORKSPACE  -DDGtal_DIR=${{runner.workspace}}/build/DGtal/buildDGtal -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_GLOBAL $CONFIG_LINUX -G Ninja
+       
      - name: Configure CMake (macOS)
        if: matrix.os == 'macOS-latest'
        shell: bash
@@ -62,4 +63,4 @@ jobs:
        working-directory: ${{runner.workspace}}/build
        shell: bash
        # Execute the build.  You can specify a specific target with "--target <NAME>"
-       run: cmake --build . --config $BUILD_TYPE  -G Ninja
+       run: cmake --build . --config $BUILD_TYPE  
