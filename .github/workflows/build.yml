@@ -34,18 +34,7 @@ jobs:
      - name: Create Build Environment
        run: cmake -E make_directory ${{runner.workspace}}/build
 
-     - name: Configure CMake (linux)
-       if: matrix.os == 'ubuntu-latest'
-       shell: bash
-       working-directory: ${{runner.workspace}}/build
-       run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_GLOBAL $CONFIG_LINUX -G Ninja
-
-     - name: Configure CMake (macOS)
-       if: matrix.os == 'macOS-latest'
-       shell: bash
-       working-directory: ${{runner.workspace}}/build
-       run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_GLOBAL $CONFIG_MAC -G Ninja
-
+     
      - name: DGtalBuild
        shell: bash
        working-directory: ${{runner.workspace}}/build
@@ -57,6 +46,17 @@ jobs:
            echo  cmake .. -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  -DDGTALTOOLS_RANDOMIZED_BUILD_THRESHOLD=25 -G Ninja
            cmake .. -DBUILD_EXAMPLES=false -DBUILD_TESTING=false -DDGTALTOOLS_RANDOMIZED_BUILD_THRESHOLD=25  -G Ninja
            ninja
+
+     - name: Configure CMake (linux)
+       if: matrix.os == 'ubuntu-latest'
+       shell: bash
+       working-directory: ${{runner.workspace}}/build
+       run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_GLOBAL $CONFIG_LINUX -G Ninja
+     - name: Configure CMake (macOS)
+       if: matrix.os == 'macOS-latest'
+       shell: bash
+       working-directory: ${{runner.workspace}}/build
+       run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_GLOBAL $CONFIG_MAC -G Ninja
 
      - name: Build
        working-directory: ${{runner.workspace}}/build
