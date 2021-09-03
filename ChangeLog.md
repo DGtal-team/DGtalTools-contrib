@@ -1,6 +1,6 @@
 # DGtalTools-contrib  1.3 (beta)
 
-*visualisation*
+- *visualisation*
  - displayLineSegments: fix variable name and remove unused variables.
    (Phuc Ngo  [#59](https://github.com/DGtal-team/DGtalTools-contrib/pull/59))
 
