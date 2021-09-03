@@ -207,7 +207,6 @@ int main( int argc, char** argv )
   std::string inputFileName;
   std::string inputSec;
   std::string output;
-  std::string outputPDF;
   std::string outputPNG;
   std::string outputEPS;
   std::string outputSVG;
@@ -261,7 +260,6 @@ int main( int argc, char** argv )
 
 
 #ifdef WITH_CAIRO
-  app.add_option("--outputPDF", outputPDF, "outputPDF <filename> specify pdf format.");
   app.add_option("--outputPNG", outputPNG, "outputPNG <filename> specify pdf format.");
 #endif
 
