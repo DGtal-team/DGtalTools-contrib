@@ -207,9 +207,6 @@ int main( int argc, char** argv )
   std::string inputFileName;
   std::string inputSec;
   std::string output;
-  std::string outputPDF;
-  std::string outputEPS;
-  std::string outputSVG;
   std::string backgroundImage;
   std::string outputStreamEPS;
   std::string outputStreamFIG;
@@ -257,12 +254,6 @@ int main( int argc, char** argv )
   app.add_flag("--outputStreamSVG", outputStreamSVG, "specify svg for output stream format.");
   app.add_flag("--outputStreamFIG", outputStreamFIG, "specify fig for output stream format.");
   app.add_flag("--invertYaxis", invertYaxis, "invertYaxis invert the Y axis for display contours (used only with --SDP)");
-
-
-#ifdef WITH_CAIRO
-  app.add_option("--outputPDF", outputPDF, "outputPDF <filename> specify pdf format.");
-  app.add_option("--outputPNG", outputPNG, "outputPNG <filename> specify pdf format.");
-#endif
 
   app.add_option("--backgroundImage", backgroundImage, "backgroundImage <filename> : display image as background");
   app.add_option("--alphaBG", alpha, "alphaBG <value> 0-1.0 to display the background image in transparency (default 1.0), (transparency works only if cairo is available)");
@@ -324,15 +315,15 @@ int main( int argc, char** argv )
     else
       if (extension=="eps")
       {
-        aBoard.saveCairo(outputFileName.c_str(),Board2D::CairoEPS );
+        aBoard.saveCairo(output.c_str(),Board2D::CairoEPS );
       }
       else if (extension=="pdf")
       {
-        aBoard.saveCairo(outputFileName.c_str(),Board2D::CairoPDF );
+        aBoard.saveCairo(output.c_str(),Board2D::CairoPDF );
       }
       else if (extension=="png")
       {
-        aBoard.saveCairo(outputFileName.c_str(),Board2D::CairoPNG );
+        aBoard.saveCairo(output.c_str(),Board2D::CairoPNG );
       }
 #endif
       else if(extension=="eps")
