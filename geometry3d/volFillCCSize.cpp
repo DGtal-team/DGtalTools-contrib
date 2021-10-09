@@ -57,7 +57,7 @@ using namespace Z3i;
  -h,--help                             Print this help message and exit
  -i,--input TEXT:FILE REQUIRED         vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm (with 3 dims)) file
  -o,--output TEXT REQUIRED             Output SDP filename
- -b,--ballSize FLOAT=3                 set the ball size
+ --bgValue, -b INT                     Consider this value as background in order to ignore it from the filling.
  */
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -68,7 +68,7 @@ typedef ImageContainerBySTLVector<Z3i::Domain,  DGtal::uint64_t> Image3DI;
 
 template<typename TImage, typename TImageOut>
 void
-intensityFromNbVoxCC(const TImage &anImage,  TImageOut &anImageOut){
+intensityFromNbVoxCC(const TImage &anImage,  TImageOut &anImageOut, unsigned int bg = 0){
   auto maxLabel = *(std::max_element(anImage.begin(), anImage.end()));
   //tab representing for each intensity label, the number of voxels that belongs to the CC.
   std::vector< DGtal::uint64_t> nbVox(static_cast< DGtal::uint64_t>(maxLabel));
@@ -88,7 +88,9 @@ intensityFromNbVoxCC(const TImage &anImage,  TImageOut &anImageOut){
   i=0;
   for(auto &p: anImage.domain()){
     DGtal::trace.progressBar(i, anImage.domain().size());
-    anImageOut.setValue(p,  static_cast< DGtal::uint64_t>(nbVox[anImage(p)]));
+    if (anImage(p) != bg){
+      anImageOut.setValue(p,  static_cast< DGtal::uint64_t>(nbVox[anImage(p)]));
+    }
     i++;
   }
   DGtal::trace.endBlock();
@@ -103,18 +105,19 @@ int main( int argc, char** argv )
   app.description("Fills each Connected Components by using as intensity the number of voxels of the CC component. The input file is supposed to be segmented (ie each CC is represented by its labels (int)).");
   std::string inputFilename;
   std::string outputFilename;
+  int bgValue {0};
   
   app.add_option("--input,-i,1", inputFilename, "vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm (with 3 dims))& file")->required()->check(CLI::ExistingFile);
   app.add_option("--output,-o,2", outputFilename, "Output volume saved as longvol.")->required();
-  
+  app.add_option("--bgValue",bgValue, "Consider this value as background in order to ignore it from the filling." );
   
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
   // END parse command line using CLI ----------------------------------------------
 
-  Image3DI image = GenericReader<Image3DI>::import(inputFilename );
+  Image3DI image = GenericReader<Image3DI>::import(inputFilename);
   Image3DI imageOut (image.domain());
-  intensityFromNbVoxCC(image, imageOut);
+  intensityFromNbVoxCC(image, imageOut, bgValue);
   GenericWriter<Image3DI>::exportFile(outputFilename, imageOut);
   return 0;
 }
