@@ -11,3 +11,4 @@
 - [ ] New entry in the [ChangeLog.md](https://github.com/DGtal-team/DGtalTools-contrib/blob/master/ChangeLog.md) added.
 - [ ] Update the readme with potentially a screenshot of the tools if it applies. 
 - [ ] No warning raised in Debug ```cmake``` mode (otherwise, Travis C.I. will fail).
+- [ ] All continuous integration tests pass (Github Actions & appveyor).

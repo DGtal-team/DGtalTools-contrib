@@ -14,8 +14,8 @@ More Information
 * Release 0.9.3 DOI [![DOI](https://zenodo.org/badge/43562168.svg)](https://zenodo.org/badge/latestdoi/43562168)
 * Release 0.9.2 DOI [![DOI](https://zenodo.org/badge/4888/DGtal-team/DGtalTools-contrib.svg)](https://zenodo.org/badge/latestdoi/4888/DGtal-team/DGtalTools-contrib)
 * Release 0.9.1 DOI [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.45131.svg)](http://dx.doi.org/10.5281/zenodo.45131)
-* Linux/MacOS build: [![Build Status](https://api.travis-ci.org/DGtal-team/DGtalTools-contrib.svg?branch=master)](https://travis-ci.org/DGtal-team/DGtalTools-contrib)
-* Windows build: [![Build status](https://ci.appveyor.com/api/projects/status/sq9w7r1xs8078g7j?svg=true)](https://ci.appveyor.com/project/kerautret/dgtaltools-contrib)
+* Continuous Integration (Linux/MacOS) ![Build status](https://github.com/DGtal-team/DGtalTools-contrib/actions/workflows/build.yml/badge.svg)
+* Continuous Integration (Windows): [![Build status](https://ci.appveyor.com/api/projects/status/sq9w7r1xs8078g7j?svg=true)](https://ci.appveyor.com/project/kerautret/dgtaltools-contrib)
 
 Organisation
 ============
