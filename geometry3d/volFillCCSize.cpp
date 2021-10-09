@@ -109,7 +109,7 @@ int main( int argc, char** argv )
   
   app.add_option("--input,-i,1", inputFilename, "vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm (with 3 dims))& file")->required()->check(CLI::ExistingFile);
   app.add_option("--output,-o,2", outputFilename, "Output volume saved as longvol.")->required();
-  app.add_option("--bgValue",bgValue, "Consider this value as background in order to ignore it from the filling." );
+  app.add_option("--bgValue",bgValue, "Consider this value as background in order to ignore it from the filling.", true );
   
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
