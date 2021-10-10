@@ -62,12 +62,12 @@ using namespace Z3i;
 ///////////////////////////////////////////////////////////////////////////////
 
 typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char> Image3D;
-typedef ImageContainerBySTLVector<Z3i::Domain,  DGtal::uint64_t> Image3DI;
+typedef ImageContainerBySTLVector<Z3i::Domain, unsigned int> Image3DI;
 
 
 
 template<typename TImage, typename TImageOut>
-void
+unsigned int
 intensityFromNbVoxCC(const TImage &anImage,  TImageOut &anImageOut, unsigned int bg = 0){
   auto maxLabel = *(std::max_element(anImage.begin(), anImage.end()));
   //tab representing for each intensity label, the number of voxels that belongs to the CC.
@@ -94,21 +94,20 @@ intensityFromNbVoxCC(const TImage &anImage,  TImageOut &anImageOut, unsigned int
     i++;
   }
   DGtal::trace.endBlock();
-  
-  
+  return maxLabel;
 }
 
 int main( int argc, char** argv )
 {
   // parse command line CLI-------------------------------------------------------
   CLI::App app;
-  app.description("Fills each Connected Components by using as intensity the number of voxels of the CC component. The input file is supposed to be segmented (ie each CC is represented by its labels (int)).");
+  app.description("Fills each Connected Components by using as intensity the number of voxels of the CC component. The input file is supposed to be segmented (ie each CC is represented by its labels (int)). The output is scaled in 255 to be exported in vol or other.");
   std::string inputFilename;
   std::string outputFilename;
   int bgValue {0};
   
   app.add_option("--input,-i,1", inputFilename, "vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm (with 3 dims))& file")->required()->check(CLI::ExistingFile);
-  app.add_option("--output,-o,2", outputFilename, "Output volume saved as longvol.")->required();
+  app.add_option("--output,-o,2", outputFilename, "Output volume saved as vol.")->required();
   app.add_option("--bgValue",bgValue, "Consider this value as background in order to ignore it from the filling.", true );
   
   app.get_formatter()->column_width(40);
@@ -117,8 +116,13 @@ int main( int argc, char** argv )
 
   Image3DI image = GenericReader<Image3DI>::import(inputFilename);
   Image3DI imageOut (image.domain());
-  intensityFromNbVoxCC(image, imageOut, bgValue);
-  GenericWriter<Image3DI>::exportFile(outputFilename, imageOut);
+  unsigned int m = intensityFromNbVoxCC(image, imageOut, bgValue);
+  typedef DGtal::functors::Rescaling<unsigned int ,unsigned char> RescalFCT;
+  typedef ConstImageAdapter<Image3DI, Image3DI::Domain, functors::Identity, unsigned char, RescalFCT> ImageAdapt;
+  functors::Identity id;
+  RescalFCT rescale (0, m, 0,255);
+  ImageAdapt img (imageOut,imageOut.domain(), id, rescale );
+  GenericWriter<ImageAdapt>::exportFile(outputFilename, img);
   return 0;
 }
 
