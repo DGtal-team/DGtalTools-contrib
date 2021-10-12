@@ -31,11 +31,6 @@
 #include "DGtal/io/readers/GenericReader.h"
 #include "DGtal/io/writers/GenericWriter.h"
 
-#include "DGtal/io/boards/Board3D.h"
-#include "DGtal/io/DrawWithDisplay3DModifier.h"
-#include "DGtal/shapes/implicit/ImplicitBall.h"
-#include "DGtal/shapes/GaussDigitizer.h"
-
 #include "CLI11.hpp"
 
 using namespace std;
@@ -94,7 +89,8 @@ intensityFromNbVoxCC(const TImage &anImage,  TImageOut &anImageOut, unsigned int
     i++;
   }
   DGtal::trace.endBlock();
-  return maxLabel;
+  return  *(std::max_element(anImageOut.begin(), anImageOut.end()));
+
 }
 
 int main( int argc, char** argv )
@@ -117,12 +113,8 @@ int main( int argc, char** argv )
   Image3DI image = GenericReader<Image3DI>::import(inputFilename);
   Image3DI imageOut (image.domain());
   unsigned int m = intensityFromNbVoxCC(image, imageOut, bgValue);
-  typedef DGtal::functors::Rescaling<unsigned int ,unsigned char> RescalFCT;
-  typedef ConstImageAdapter<Image3DI, Image3DI::Domain, functors::Identity, unsigned char, RescalFCT> ImageAdapt;
-  functors::Identity id;
-  RescalFCT rescale (0, m, 0,255);
-  ImageAdapt img (imageOut,imageOut.domain(), id, rescale );
-  GenericWriter<ImageAdapt>::exportFile(outputFilename, img);
+  DGtal::trace.info() << "nb CC max: " << m << std::endl;
+  GenericWriter<Image3DI>::exportFile(outputFilename, imageOut);
   return 0;
 }
 
