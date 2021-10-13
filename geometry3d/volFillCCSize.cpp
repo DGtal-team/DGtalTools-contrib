@@ -30,6 +30,7 @@
 #include "DGtal/helpers/StdDefs.h"
 #include "DGtal/io/readers/GenericReader.h"
 #include "DGtal/io/writers/GenericWriter.h"
+#include "DGtal/images/ConstImageAdapter.h"
 
 #include "CLI11.hpp"
 
