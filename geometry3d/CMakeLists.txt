@@ -5,6 +5,7 @@ SET(DGTAL_TOOLS_DEVEL_SRC
     basicMorphoFilter
     xyzScale
     off2obj
+    obj2off
     off2sdp
 )
 
