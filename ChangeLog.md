@@ -2,9 +2,16 @@
 
 - Continuous integration does not use Travis anymore but Github Actions.
   (Bertrand Kerautret [#58](https://github.com/DGtal-team/DGtalTools-contrib/pull/58))
+
 - *visualisation*
   - displayLineSegments: fix variable name and remove unused variables.
    (Phuc Ngo  [#59](https://github.com/DGtal-team/DGtalTools-contrib/pull/59))
+
+
+- *geometry3d*
+  - obj2off: converts a .obj mesh into the .off format.
+    (Bertrand Kerautret [#61](https://github.com/DGtal-team/DGtalTools-contrib/pull/61))
+    
 
 
 
