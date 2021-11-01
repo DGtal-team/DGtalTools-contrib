@@ -9,7 +9,7 @@
 
 
 - *geometry3d*
-  - obj2off: converts a .obj mesh into the .off format.
+  - obj2off: converts an obj mesh to the .off format.
     (Bertrand Kerautret [#61](https://github.com/DGtal-team/DGtalTools-contrib/pull/61))
     
 
