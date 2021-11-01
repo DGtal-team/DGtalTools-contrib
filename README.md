@@ -68,7 +68,7 @@ As the previous section but in 3d, it contains actually these tools:
    - xyzScale: a basic tool to adjust the scale of an xyz file.
    - off2obj: tool to convert a mesh represented in off format into obj format.
    - off2sdp: converts a mesh into a set of points (.sdp).
-   - volFillCCSize: fills each Connected Components by using as intensity the number of voxels of the CC.   
+   - volFillCCSize: fills each Connected Component with a value corresponding to the number of voxels of the CC.   
 <table><tr>
 <td> <img width="268" src="https://cloud.githubusercontent.com/assets/772865/12481207/d20d246c-c047-11e5-8986-ae17a582c977.png"  </td>
 <td> <img width="268" alt="result after olFillCSSize" src="https://user-images.githubusercontent.com/772865/138257925-60b3d30e-3a00-46ee-b9bc-fc44dff65f65.png">
