@@ -5,7 +5,7 @@
    (Phuc Ngo  [#59](https://github.com/DGtal-team/DGtalTools-contrib/pull/59))
 
 - *Geometry3d*
-   - volFillCCSize: new tool to fill each Connected Components by using as intensity the number of voxels of the CC.   
+   - volFillCCSize: new tool to fill each Connected Component with a value corresponding to the number of voxels of the CC.   
 
 
 # DGtalTools-contrib  1.2
