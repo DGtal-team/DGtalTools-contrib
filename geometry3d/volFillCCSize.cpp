@@ -103,7 +103,7 @@ int main( int argc, char** argv )
 {
   // parse command line CLI-------------------------------------------------------
   CLI::App app;
-  app.description("Fills each Connected Components by using as intensity the number of voxels of the CC. The input file is supposed to be segmented (ie each CC is represented by its labels (integer)).");
+  app.description("Fills each Connected Component with a value corresponding to the number of voxels of the CC. The input file is supposed to be segmented (ie each CC is represented by its labels (integer)).");
   std::string inputFilename;
   std::string outputFilename;
   int bgValue {0};
