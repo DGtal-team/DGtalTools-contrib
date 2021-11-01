@@ -6,6 +6,7 @@ SET(DGTAL_TOOLS_DEVEL_SRC
     xyzScale
     off2obj
     off2sdp
+    volFillCCSize
 )
 
 
