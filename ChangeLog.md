@@ -1,5 +1,5 @@
 # DGtalTools-contrib  1.3 (beta)
-
+(test)
 - Continuous integration does not use Travis anymore but Github Actions.
   (Bertrand Kerautret [#58](https://github.com/DGtal-team/DGtalTools-contrib/pull/58))
 
