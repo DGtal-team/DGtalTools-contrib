@@ -1,5 +1,9 @@
 # DGtalTools-contrib  1.3 (beta)
 
+
+- Fix autoEdge option of GraphViewer  (inverted interpretation from CLI transform)
+  (Bertrand Kerautret with Craig Hiernard [#64](https://github.com/DGtal-team/DGtalTools-contrib/pull/64))
+
 - Continuous integration does not use Travis anymore but Github Actions.
   (Bertrand Kerautret [#58](https://github.com/DGtal-team/DGtalTools-contrib/pull/58))
 

@@ -93,6 +93,7 @@ int main( int argc, char** argv )
   std::string nameFileEdge;
   double r {1.0};
   bool useRadiiFile {false};
+  bool autoEdgeOpt {false};
   std::vector<unsigned int> vectColMesh;
   std::vector<unsigned int> vectColVertex;
   std::vector<unsigned int> vectColEdge;
@@ -102,7 +103,7 @@ int main( int argc, char** argv )
 
   app.add_option("--inputVertex,-v", nameFileVertex, "input file containing the vertex list.")->required()->check(CLI::ExistingFile);
   app.add_option("--inputEdge,-e", nameFileEdge, "input file containing the edge list.")->required()->check(CLI::ExistingFile);
-  auto autoEdgeOpt = app.add_flag("--autoEdge,-a", "generate edge list from vertex order.");
+  app.add_flag("--autoEdge,-a", autoEdgeOpt, "generate edge list from vertex order.");
   auto inputRadiiOpt = app.add_option("--inputRadii,-r", nameFileRadii, "input file containing the radius for each vertex.");
   app.add_option("--ballRadius,-b", r, "radius of vertex balls.", true);
   auto addMeshOpt = app.add_option("--addMesh,-m", meshName, "add mesh in the display.");
@@ -132,7 +133,7 @@ int main( int argc, char** argv )
   // Structures to store vertex and edges read in input files
   std::vector<Z3i::RealPoint> vectVertex = PointListReader<Z3i::RealPoint>::getPointsFromFile(nameFileVertex);
   std::vector<Z2i::Point> vectEdges;
-  if(autoEdgeOpt->count()>0)
+  if(!autoEdgeOpt)
   {
     vectEdges =  PointListReader<Z2i::Point>::getPointsFromFile(nameFileEdge);
   }
