@@ -12,7 +12,8 @@
    (Phuc Ngo  [#59](https://github.com/DGtal-team/DGtalTools-contrib/pull/59))
 
 - *Geometry3d*
-   - volFillCCSize: new tool to fill each Connected Component with a value corresponding to the number of voxels of the CC.   
+   - volFillCCSize: new tool to fill each Connected Component with a value corresponding to the number of voxels of the CC.     - vol2meshAndNormals: new tool to estimate normal vectors (using VCM) from digital surface defined in 3D volume. It exports the mesh and the normals vectors. (backport Jacques-Olivier Lachaud from VCM repository and update with CLI)
+    (Bertrand Kerautret and Jacques-Olivier Lachaud [#65](https://github.com/DGtal-team/DGtalTools-contrib/pull/65))
 
 - *geometry3d*
   - obj2off: converts an obj mesh to the .off format.

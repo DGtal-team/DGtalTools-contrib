@@ -8,6 +8,7 @@ SET(DGTAL_TOOLS_DEVEL_SRC
     obj2off
     off2sdp
     volFillCCSize
+    vol2meshAndNormals
 )
 
 
