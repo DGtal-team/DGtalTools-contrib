@@ -73,7 +73,7 @@ typedef KSpace::Surfel Surfel;
 typedef KSpace::SCell SCell;
 
 template <typename Surface>
-bool exportSteppedSurfaceAsOff( std::ostream& output,
+void exportSteppedSurfaceAsOff( std::ostream& output,
                                 const Surface& surface )
 {
   typedef typename Surface::KSpace        KSpace;
