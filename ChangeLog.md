@@ -1,5 +1,4 @@
-# DGtalTools-contrib  1.3 (beta)
-
+# DGtalTools-contrib  1.3 
 
 - Fix autoEdge option of GraphViewer  (inverted interpretation from CLI transform)
   (Bertrand Kerautret with Craig Hiernard [#64](https://github.com/DGtal-team/DGtalTools-contrib/pull/64))
@@ -9,10 +8,10 @@
 
 - *visualisation*
   - displayLineSegments: fix variable name and remove unused variables.
-   (Phuc Ngo  [#59](https://github.com/DGtal-team/DGtalTools-contrib/pull/59))
+   (Phuc Ngo [#59](https://github.com/DGtal-team/DGtalTools-contrib/pull/59))
 
 - *Geometry3d*
-   - volFillCCSize: new tool to fill each Connected Component with a value corresponding to the number of voxels of the CC.   
+   - volFillCCSize: new tool to fill each Connected Component with a value corresponding to the number of voxels of the CC.
 
 - *geometry3d*
   - obj2off: converts an obj mesh to the .off format.
