@@ -92,7 +92,7 @@ protected:
   EditMode myMode;
   std::vector<unsigned int> myVectFaceSelected;
   std::deque<RealMesh> myUndoQueue;
-  std::deque<std::vector<RealMesh::Face>> myUndoQueueSelected;
+  std::deque<std::vector<RealMesh::MeshFace>> myUndoQueueSelected;
   
 };
 
