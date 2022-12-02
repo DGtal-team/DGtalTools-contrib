@@ -4,7 +4,7 @@
 # -----------------------------------------------------------------------------
 PROJECT(DGtalTools-contrib)
 
-cmake_minimum_required (VERSION 3.1) 
+cmake_minimum_required (VERSION 3.11) 
 cmake_policy(SET CMP0057 NEW)
 
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
@@ -18,7 +18,7 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 
 
-FIND_PACKAGE(DGtal 1.3.0 REQUIRED)
+FIND_PACKAGE(DGtal 1.3 REQUIRED)
 INCLUDE_DIRECTORIES(${DGTAL_INCLUDE_DIRS})
 LINK_DIRECTORIES(${DGTAL_LIBRARY_DIRS})
 
@@ -53,8 +53,8 @@ include_directories( "${PROJECT_SOURCE_DIR}/ext/" )
 # -----------------------------------------------------------------------------
 # SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 SET(DGtalToolsContrib_VERSION_MAJOR 1)
-SET(DGtalToolsContrib_VERSION_MINOR 3)
-SET(DGtalToolsContrib_VERSION_PATCH 0)
+SET(DGtalToolsContrib_VERSION_MINOR 4)
+SET(DGtalToolsContrib_VERSION_PATCH beta)
 SET(DGTALTOOLSContrib_VERSION "${DGtalToolsContrib_VERSION_MAJOR}.${DGtalToolsContrib_VERSION_MINOR}.${DGtalToolsContrib_VERSION_PATCH}")
 SET(PROJECT_VERSION "${DGtalToolsContrib_VERSION_MAJOR}.${DGtalToolsContrib_VERSION_MINOR}.${DGtalToolsContrib_VERSION_PATCH}")
 SET(VERSION ${DGtalToolsContrib_VERSION_MAJOR}.${DGtalToolsContrib_VERSION_MINOR}.${DGtalToolsContrib_VERSION_PATCH})
