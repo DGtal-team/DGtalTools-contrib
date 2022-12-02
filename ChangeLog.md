@@ -1,25 +1,22 @@
 # DGtalTools-contrib  1.3 
 
-- Fix autoEdge option of GraphViewer  (inverted interpretation from CLI transform)
-  (Bertrand Kerautret with Craig Hiernard [#64](https://github.com/DGtal-team/DGtalTools-contrib/pull/64))
-
-- Continuous integration does not use Travis anymore but Github Actions.
-  (Bertrand Kerautret [#58](https://github.com/DGtal-team/DGtalTools-contrib/pull/58))
-
-- *visualisation*
-  - displayLineSegments: fix variable name and remove unused variables.
-   (Phuc Ngo [#59](https://github.com/DGtal-team/DGtalTools-contrib/pull/59))
+- *global*
+  - Continuous integration does not use Travis anymore but Github Actions.
+   (Bertrand Kerautret [#58](https://github.com/DGtal-team/DGtalTools-contrib/pull/58))
 
 - *Geometry3d*
-   - volFillCCSize: new tool to fill each Connected Component with a value corresponding to the number of voxels of the CC.
-     (Bertrand Kerauret [60](https://github.com/DGtal-team/DGtalTools-contrib/pull/60)
-   - vol2meshAndNormals: new tool to estimate normal vectors (using VCM) from digital surface defined in 3D volume. It exports the mesh and the normal vectors. (backport Jacques-Olivier Lachaud from VCM repository and update with CLI)
+  - volFillCCSize: new tool to fill each Connected Component with a value corresponding to the number of voxels of the CC.
+    (Bertrand Kerauret [60](https://github.com/DGtal-team/DGtalTools-contrib/pull/60)
+  - vol2meshAndNormals: new tool to estimate normal vectors (using VCM) from digital surface defined in 3D volume. It exports the mesh and the normal vectors. (backport Jacques-Olivier Lachaud from VCM repository and update with CLI)
     (Bertrand Kerautret and Jacques-Olivier Lachaud [#65](https://github.com/DGtal-team/DGtalTools-contrib/pull/65))
-
-- *geometry3d*
   - obj2off: converts an obj mesh to the .off format.
     (Bertrand Kerautret [#61](https://github.com/DGtal-team/DGtalTools-contrib/pull/61))
     
+- *visualisation*
+  - displayLineSegments: fix variable name and remove unused variables.
+    (Phuc Ngo [#59](https://github.com/DGtal-team/DGtalTools-contrib/pull/59))
+  - Fix autoEdge option of GraphViewer  (inverted interpretation from CLI transform)
+    (Bertrand Kerautret with Craig Hiernard [#64](https://github.com/DGtal-team/DGtalTools-contrib/pull/64))
 
 
 
