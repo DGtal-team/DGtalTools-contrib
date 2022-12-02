@@ -335,7 +335,7 @@ ViewerMesh<Space, KSpace>::filterVisibleFaces(const double anAngleMax)
                                    QGLViewer::camera()->viewDirection().y,
                                    QGLViewer::camera()->viewDirection().z};
 
-  std::vector<unsigned int> vectFaceToRemove;
+    std::vector<RealMesh::Index> vectFaceToRemove;
   for (unsigned int i = 0; i < myMesh.nbFaces(); i++)
     {
       DGtal::Z3i::RealPoint c = myMesh.getFaceBarycenter(i);
