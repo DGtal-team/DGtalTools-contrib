@@ -1,5 +1,4 @@
-# DGtalTools-contrib  1.3 (beta)
-
+# DGtalTools-contrib  1.3 
 
 - Fix autoEdge option of GraphViewer  (inverted interpretation from CLI transform)
   (Bertrand Kerautret with Craig Hiernard [#64](https://github.com/DGtal-team/DGtalTools-contrib/pull/64))
@@ -9,10 +8,11 @@
 
 - *visualisation*
   - displayLineSegments: fix variable name and remove unused variables.
-   (Phuc Ngo  [#59](https://github.com/DGtal-team/DGtalTools-contrib/pull/59))
+   (Phuc Ngo [#59](https://github.com/DGtal-team/DGtalTools-contrib/pull/59))
 
 - *Geometry3d*
-   - volFillCCSize: new tool to fill each Connected Component with a value corresponding to the number of voxels of the CC.     
+   - volFillCCSize: new tool to fill each Connected Component with a value corresponding to the number of voxels of the CC.
+     (Bertrand Kerauret [60](https://github.com/DGtal-team/DGtalTools-contrib/pull/60)
    - vol2meshAndNormals: new tool to estimate normal vectors (using VCM) from digital surface defined in 3D volume. It exports the mesh and the normal vectors. (backport Jacques-Olivier Lachaud from VCM repository and update with CLI)
     (Bertrand Kerautret and Jacques-Olivier Lachaud [#65](https://github.com/DGtal-team/DGtalTools-contrib/pull/65))
 

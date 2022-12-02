@@ -148,7 +148,7 @@ int main( int argc, char** argv )
   double scalePen {1.0};
 
   app.add_option("--input,-i,1", inputFilename, "input file: mesh (off,obj).")->required()->check(CLI::ExistingFile);
-  app.add_option("--outputFile,-o", outputFilename, "save output file automatically according the file format extension.",true);
+  app.add_option("--outputFile,-o,2", outputFilename, "save output file automatically according the file format extension.",true);
   auto scalePenOpt = app.add_option("--scalePen,-s", scalePen, "change the scale factor of the pen size (by default 1.0, real size: penSize*scale).", true);
   app.add_option("--penColor,-c", colors, "change the scale factor of the pen size (by default 1.0)");
   

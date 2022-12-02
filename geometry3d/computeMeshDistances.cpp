@@ -254,7 +254,7 @@ main(int argc,char **argv)
   
   int cptFace=0;
   for (unsigned int i = 0; i<theMeshRef.nbFaces(); i++){
-    std::vector<unsigned int>  aFace = theMeshRef.getFace(i);
+    std::vector<DGtal::Mesh<Z3i::RealPoint>::Index>  aFace = theMeshRef.getFace(i);
     cptFace++;
     trace.progressBar(cptFace, theMeshRef.nbFaces());
     double distanceMin = std::numeric_limits<double>::max();    
@@ -266,7 +266,7 @@ main(int argc,char **argv)
     // compute the minimal distance of the point of A to one face of point B.
     for (unsigned int j=0; j < theMeshComp.nbFaces(); j++){
       // project center (cA) of a face of A into faces of B.
-      std::vector<unsigned int>  aFaceB = theMeshComp.getFace(j);
+      std::vector<DGtal::Mesh<Z3i::RealPoint>::Index>  aFaceB = theMeshComp.getFace(j);
       RPoint pB0 = theMeshComp.getVertex(aFaceB.at(0));
       RPoint pB1 = theMeshComp.getVertex(aFaceB.at(1));
       RPoint pB2 = theMeshComp.getVertex(aFaceB.at(2));
