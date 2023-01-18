@@ -46,7 +46,7 @@ using namespace DGtal;
 /**
  @page meshAxisCutter meshAxisCutter
  
- @brief  Cut the input mesh according one axis into sereral separate meshes.
+ @brief  Cut the input mesh according one axis into several separate meshes.
 
  Usage: ./geometry3d/meshAxisCutter [OPTIONS] 1 2 [3]
 
@@ -95,7 +95,7 @@ int main( int argc, char** argv )
         << "Typical use example:\n \t meshAxisCutter  $DGtal/examples/samples/bimbaPoly.obj result  5 \n";
   // parse command line using CLI-------------------------------------------------------
   CLI::App app;
-  app.description("Cut the input mesh according one axis into sereral separate meshes.\n" + usage.str() );
+  app.description("Cut the input mesh according one axis into several separate meshes.\n" + usage.str() );
   app.add_option("--input,-i,1", inputFileName, "Input file")->required()->check(CLI::ExistingFile);
   app.add_option("--output,-o,2", outputFileName, "Output filename base")->required();
   app.add_option("--nbParts,-p,3", nbP, "the number of parts", true);
