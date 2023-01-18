@@ -46,13 +46,25 @@ using namespace DGtal;
 /**
  @page meshAxisCutter meshAxisCutter
  
- @brief  Description of the tool...
+ @brief  Cut the input mesh according one axis into sereral separate meshes.
 
- @b Usage:   meshAxisCutter [input]
+ Usage: ./geometry3d/meshAxisCutter [OPTIONS] 1 2 [3]
 
+ Positionals:
+   1 TEXT:FILE REQUIRED                  Input file
+   2 TEXT REQUIRED                       Output filename base
+   3 UINT=2                              the number of parts
  @b Allowed @b options @b are :
- 
  @code
+
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED         Input file
+   -o,--output TEXT REQUIRED             Output filename base
+   -p,--nbParts UINT=2                   the number of parts
+   -a,--axis UINT=3                      the axis to cut the mesh
+
+ 
   -h [ --help ]           display this message
   -i [ --input ] arg      an input file...
   -p [ --parameter] arg   a double parameter...
@@ -61,10 +73,9 @@ using namespace DGtal;
  @b Example:
 
  @code
-     meshAxisCutter -i  $DGtal/examples/samples/....
+     meshAxisCutter - $DGtal/examples/samples/bimbaPoly.obj result  5
  @endcode
 
- @image html resmeshAxisCutter.png "Example of result. "
 
  @see
  @ref meshAxisCutter.cpp
@@ -76,12 +87,12 @@ int main( int argc, char** argv )
 {
 
   unsigned int nbP {2};
-  unsigned int axis {3};
+  unsigned int axis {2};
   std::string inputFileName;
   std::string outputFileName;
   std::stringstream usage;
   usage << "Usage: " << argv[0] << " [input]\n"
-        << "Typical use example:\n \t meshAxisCutter -i ... \n";
+        << "Typical use example:\n \t meshAxisCutter  $DGtal/examples/samples/bimbaPoly.obj result  5 \n";
   // parse command line using CLI-------------------------------------------------------
   CLI::App app;
   app.description("Cut the input mesh according one axis into sereral separate meshes.\n" + usage.str() );

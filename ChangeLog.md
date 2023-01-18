@@ -1,6 +1,8 @@
 # DGtalTools-contrib  1.4 (beta)
 
-
+- *Geometry3d *
+  - meshAxisCutter: new tools cut the input mesh according one axis into sereral separate meshes.
+   (Bertrand Kerautret [#71](https://github.com/DGtal-team/DGtalTools-contrib/pull/71))
 
 # DGtalTools-contrib  1.3 
 
