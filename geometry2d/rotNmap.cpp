@@ -51,31 +51,31 @@ using namespace DGtal;
  Applies a rotation in the input normal map (it rotates both the position and normals orientation to be consistant.
  Usage: ./geometry2d/rotNmap [input]
  Typical use example:
-       rotNmap normalMap.png normalRotated 1.5
-
+ rotNmap normalMap.png normalRotated 1.5
+ 
  Usage: ./geometry2d/rotNmap [OPTIONS] 1 2 [3]
-
+ 
  Positionals:
-   1 TEXT:FILE REQUIRED                  Input file
-   2 TEXT REQUIRED                       Output SDP filename
-   3 FLOAT=3.14                          a double angle
-
+ 1 TEXT:FILE REQUIRED                  Input file
+ 2 TEXT REQUIRED                       Output SDP filename
+ 3 FLOAT=3.14                          a double angle
+ 
  Options:
-   -h,--help                             Print this help message and exit
-   -i,--input TEXT:FILE REQUIRED         Input file
-   -o,--output TEXT REQUIRED             Output SDP filename
-   -a,--angle FLOAT=3.14                 a double angle
-
+ -h,--help                             Print this help message and exit
+ -i,--input TEXT:FILE REQUIRED         Input file
+ -o,--output TEXT REQUIRED             Output SDP filename
+ -a,--angle FLOAT=3.14                 a double angle
+ 
  @b Allowed @b options @b are :
  @code
-
-   -h,--help                             Print this help message and exit
-   -i,--input TEXT:FILE REQUIRED         Input file
-   -o,--output TEXT REQUIRED             Output SDP filename
-   -a,--angle FLOAT=3.14                 a double angle
+ 
+ -h,--help                             Print this help message and exit
+ -i,--input TEXT:FILE REQUIRED         Input file
+ -o,--output TEXT REQUIRED             Output SDP filename
+ -a,--angle FLOAT=3.14                 a double angle
  @endcode
  
-
+ 
  */
 
 
@@ -85,6 +85,7 @@ int main( int argc, char** argv )
     std::string inputFileName;
     std::string outputFileName;
     std::stringstream usage;
+    bool onlyNormal {false};
     usage << "Usage: " << argv[0] << " [input]\n"
     << "Typical use example:\n \t rotNmap normalMap.png normalRotated 1.5 \n";
     // parse command line using CLI-------------------------------------------------------
@@ -93,6 +94,7 @@ int main( int argc, char** argv )
     app.add_option("--input,-i,1", inputFileName, "Input file")->required()->check(CLI::ExistingFile);
     app.add_option("--output,-o,2", outputFileName, "Output SDP filename")->required();
     app.add_option("--angle,-a, 3", alpha, "a double angle", true);
+    app.add_flag("--onlyNormal,-n", onlyNormal, "rotate only normal not the map itself");
     
     app.get_formatter()->column_width(40);
     CLI11_PARSE(app, argc, argv);
@@ -110,28 +112,37 @@ int main( int argc, char** argv )
     ColorImage inputImage = STBReader<ColorImage>::import(inputFileName);
     ColorImage outputImage (inputImage.domain());
     trace.info() << " [done] size:"
-                 <<  inputImage.domain().lowerBound()-inputImage.domain().upperBound()
-                 << std::endl;
+    <<  inputImage.domain().lowerBound()-inputImage.domain().upperBound()
+    << std::endl;
     // Rotating normals with angle:
     for (auto p: outputImage.domain()){
         Z2i::Point center (inputImage.domain().upperBound()[0]/2,
                            inputImage.domain().upperBound()[1]/2);
-        Z3i::RealPoint n (0.0, 0.0, 0.0);
-        Z2i::Point pr ((p[0]-center[0])*cos(alpha) - (p[1]-center[1])*sin(alpha),
-                        (p[1]-center[1])*cos(alpha) + (p[0]-center[0])*sin(alpha));
+        Z2i::RealPoint n (0.0, 0.0);
+        Z2i::Point pr ((p[0]-center[0])*cos(-alpha)  - (inputImage.domain().upperBound()[1]-p[1]-center[1])*sin(-alpha),
+                       (inputImage.domain().upperBound()[1]-p[1]-center[1])*cos(-alpha)
+                       + (p[0]-center[0])*sin(-alpha));
         pr[0] = pr[0]+center[0];
-        pr[1] = pr[1]+center[1];
-        if (outputImage.domain().isInside(pr)){
-            n[0] = ((double)inputImage(pr).red()/255.0)*2.0-1.0;
-            n[1] = ((double)inputImage(pr).green()/255.0)*2.0-1.0;
+        pr[1] = inputImage.domain().upperBound()[1]-(pr[1]+center[1]);
+        if (outputImage.domain().isInside(pr)|| onlyNormal){
+            n[0] = ((double)inputImage(onlyNormal ? p:pr).red()/255.0)*2.0-1.0;
+            n[1] = ((double)inputImage(onlyNormal ? p:pr).green()/255.0)*2.0-1.0;
             double x = n[0];
             double y = n[1];
-            n[0] = x*cos(alpha) - y*sin(alpha);
-            n[1] = y*cos(alpha) + x*sin(alpha);
-            Color c (static_cast<unsigned int>((n[0]+1.0)*128.0),
-                     static_cast<unsigned int>((n[1]+1.0)*128.0),
-                     inputImage(pr).blue());
-            outputImage.setValue(p, c);
+            n[0] = x*cos(-alpha) - y*sin(-alpha);
+            n[1] = y*cos(-alpha) + x*sin(-alpha);
+            if (onlyNormal){
+                Color c (static_cast<unsigned int>(std::min(255.0,(n[0]+1.0)*128.0)),
+                         static_cast<unsigned int>(std::min(255.0,(n[1]+1.0)*128.0)),
+                         inputImage(p).blue());
+                outputImage.setValue(p, c);
+            }
+            else{
+                Color c (static_cast<unsigned int>(std::min(255.0,(n[0]+1.0)*128.0)),
+                         static_cast<unsigned int>(std::min(255.0,(n[1]+1.0)*128.0)),
+                         inputImage(pr).blue());
+                outputImage.setValue(p, c);
+            }
         }
     }
     
