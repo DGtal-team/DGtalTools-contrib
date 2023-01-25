@@ -86,6 +86,8 @@ int main( int argc, char** argv )
     std::string outputFileName;
     std::stringstream usage;
     bool onlyNormal {false};
+    bool fillFlat {false};
+    
     usage << "Usage: " << argv[0] << " [input]\n"
     << "Typical use example:\n \t rotNmap normalMap.png normalRotated 1.5 \n";
     // parse command line using CLI-------------------------------------------------------
@@ -95,6 +97,7 @@ int main( int argc, char** argv )
     app.add_option("--output,-o,2", outputFileName, "Output SDP filename")->required();
     app.add_option("--angle,-a, 3", alpha, "a double angle", true);
     app.add_flag("--onlyNormal,-n", onlyNormal, "rotate only normal not the map itself");
+    app.add_flag("--fillFlat,-f", fillFlat, "fill area with missing information by vertical normal (ie Color (128, 128, 255))");
     
     app.get_formatter()->column_width(40);
     CLI11_PARSE(app, argc, argv);
@@ -143,6 +146,9 @@ int main( int argc, char** argv )
                          inputImage(pr).blue());
                 outputImage.setValue(p, c);
             }
+        }else if (fillFlat){
+            Color c (128, 128, 255);
+            outputImage.setValue(p, c);
         }
     }
     
