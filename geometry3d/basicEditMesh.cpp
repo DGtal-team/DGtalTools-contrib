@@ -144,7 +144,8 @@ main(int argc,char **argv)
   
 
   DGtal::Mesh<Z3i::RealPoint> theMesh(true);
-  MeshReader<Z3i::RealPoint>::importOFFFile(inputMeshName, theMesh, false);
+  theMesh << inputMeshName;
+
   DGtal::Mesh<Z3i::RealPoint> theNewMesh(true);
 
   
@@ -217,8 +218,7 @@ main(int argc,char **argv)
     }
   trace.info()<< "nbFaces init: " << theNewMesh.nbFaces() << std::endl;
   trace.info()<< "New nbFaces: " << theMesh.nbFaces() << std::endl;  
-  std::ofstream outMesh;
-  outMesh.open(outputMeshName.c_str(), std::ofstream::out);
-  MeshWriter<Z3i::RealPoint>::export2OFF(outMesh, theNewMesh);
+  theNewMesh >> outputMeshName; 
+  
   
 }
