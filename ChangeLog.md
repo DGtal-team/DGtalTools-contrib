@@ -1,7 +1,10 @@
 # DGtalTools-contrib  1.4 (beta)
 
+- *Geometry3d*
 
-
+  - basicEditMesh: improvement of mesh read using generic reader/writer. 
+    (Bertrand Kerautret [#72](https://github.com/DGtal-team/DGtalTools-contrib/pull/72))
+ 
 # DGtalTools-contrib  1.3 
 
 - *global*
