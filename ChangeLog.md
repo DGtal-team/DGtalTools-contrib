@@ -1,7 +1,8 @@
 # DGtalTools-contrib  1.4 (beta)
 
 - *Geometry3d*
-
+  - meshAxisCutter: new tool cut the input mesh according one axis into several separate meshes.
+   (Bertrand Kerautret [#71](https://github.com/DGtal-team/DGtalTools-contrib/pull/71))
   - basicEditMesh: improvement of mesh read using generic reader/writer. 
     (Bertrand Kerautret [#72](https://github.com/DGtal-team/DGtalTools-contrib/pull/72))
  
