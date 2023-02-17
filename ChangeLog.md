@@ -1,7 +1,7 @@
 # DGtalTools-contrib  1.4 (beta)
 
 - *Geometry2d*
-  - rotNmap: new tools tp apply a rotation in the input normal map (it
+  - rotNmap: new tools to apply a rotation in the input normal map (it
     rotates both the position and normals orientation to be
     consistant. 
    (Bertrand Kerautret [#70](https://github.com/DGtal-team/DGtalTools-contrib/pull/70))
