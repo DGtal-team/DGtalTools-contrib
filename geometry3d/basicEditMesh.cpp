@@ -216,8 +216,8 @@ main(int argc,char **argv)
  
         }
     }
-  trace.info()<< "nbFaces init: " << theNewMesh.nbFaces() << std::endl;
-  trace.info()<< "New nbFaces: " << theMesh.nbFaces() << std::endl;  
+  trace.info()<< "nbFaces init: " << theMesh.nbFaces() << std::endl;
+  trace.info()<< "New nbFaces: " << theNewMesh.nbFaces() << std::endl;
   theNewMesh >> outputMeshName; 
   
   
