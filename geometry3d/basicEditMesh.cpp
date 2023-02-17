@@ -75,7 +75,8 @@ main(int argc,char **argv)
   double scale;
   double percentFirst;
   double percent;
-  
+  unsigned int rescaleToCube {0};
+    
   app.description("Apply basic mesh edition (scale change, mesh face contraction, face filtering).\n"
                   "Example: ./geometry3d/basicEditMesh ${DGtal}/examples/samples/tref.off --filterVisiblePart 0.3 resultFiltered.off");
 
@@ -94,7 +95,7 @@ main(int argc,char **argv)
   app.add_option("--ny,-y", ny, "arg = define the ny of the direction of filtering, see --filterVisiblePart.", true);
   app.add_option("--nz,-z", nz, "arg = define the nz of the direction of filtering, see --filterVisiblePart.", true);
   auto scaleOpt = app.add_option("--scale",scale, "change the scale factor" );
-  
+  app.add_option("--rescaleToCube", rescaleToCube, "change the scale factor of the input mesh such that its bounding box size corresponds to the size of a cube given as argument.", false);
   auto filterFF = app.add_option("--filterFirstFaces",percentFirst,"arg= X : filters the X% of the first faces of the input mesh.");
   auto filterNBF = app.add_option("--filterNbFaces",percent,  "arg = X % limits the number of face by keeping only X percent of faces." );
   
@@ -142,9 +143,15 @@ main(int argc,char **argv)
     moduloLimitFace = (int)(100.0/percent);
   } 
   
-
   DGtal::Mesh<Z3i::RealPoint> theMesh(true);
   theMesh << inputMeshName;
+  if (rescaleToCube != 0)
+  {
+      auto bb = theMesh.getBoundingBox();
+      auto s = bb.second-bb.first;
+      auto maxSize = *s.maxElement();
+      scale = rescaleToCube/maxSize;
+  }
 
   DGtal::Mesh<Z3i::RealPoint> theNewMesh(true);
 
@@ -208,7 +215,7 @@ main(int argc,char **argv)
     
   }  
 
-  if( scaleOpt->count()>0 )
+  if( scaleOpt->count()>0 || theMesh.nbFaces() != 0)
     {
       for(unsigned int i =0; i<theNewMesh.nbVertex(); i++)
         {
