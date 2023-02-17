@@ -9,6 +9,7 @@ SET(DGTAL_TOOLS_DEVEL_SRC
     off2sdp
     volFillCCSize
     vol2meshAndNormals
+    meshAxisCutter
 )
 
 
