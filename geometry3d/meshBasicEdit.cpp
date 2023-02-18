@@ -72,7 +72,7 @@ main(int argc,char **argv)
   double nx {0};
   double ny {0};
   double nz {1.0};
-  double scale;
+  double scale {0.0};
   double percentFirst;
   double percent;
   unsigned int rescaleToCube {100};
@@ -97,7 +97,7 @@ main(int argc,char **argv)
   app.add_option("--nz,-z", nz, "arg = define the nz of the direction of filtering, see --filterVisiblePart.", true);
   auto scaleOpt = app.add_option("--scale",scale, "change the scale factor" );
   auto rescaleToCubeOpt = app.add_option("--rescaleToCube", rescaleToCube, "change the scale factor of the input mesh such that its bounding box size corresponds to the size of a cube given as argument.", true);
-  app.add_option("--rescaleInterToCube", rescaleInterToCube, "same than rescaleToCube but only if the bounding box max size is outside the interval given as parameters.", false)
+  app.add_option("--rescaleInterToCube", rescaleInterToCube, "same than rescaleToCube but only if the bounding box max size is outside the interval given as parameters, in the other cases nothing is done (even using --rescaleToCube).", false)
     ->expected(2);
 
   auto filterFF = app.add_option("--filterFirstFaces",percentFirst,"arg= X : filters the X% of the first faces of the input mesh.");
@@ -154,9 +154,19 @@ main(int argc,char **argv)
       auto bb = theMesh.getBoundingBox();
       auto s = bb.second-bb.first;
       auto maxSize = *s.maxElement();
-      if (rescaleInterToCube.size() == 0 || (maxSize > rescaleInterToCube[1] || maxSize < rescaleInterToCube[0])) {
+      if (rescaleToCubeOpt->count() >0 )
+      {
           scale = rescaleToCube/(double)maxSize;
       }
+      if( maxSize > rescaleInterToCube[1] || maxSize < rescaleInterToCube[0] )
+      {
+          scale = rescaleToCube/(double)maxSize;
+      } // in this case the rescaleToCube will not be applied
+      else if (rescaleInterToCube.size() != 0)
+      {
+          scale = 1.0;
+      }
+      
   }
 
   DGtal::Mesh<Z3i::RealPoint> theNewMesh(true);
@@ -221,7 +231,7 @@ main(int argc,char **argv)
     
   }  
 
-  if( scaleOpt->count()>0 || theMesh.nbFaces() != 0)
+  if( scale != 0.0 && scale != 1.0 )
     {
       for(unsigned int i =0; i<theNewMesh.nbVertex(); i++)
         {
