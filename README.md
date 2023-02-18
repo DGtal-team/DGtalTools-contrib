@@ -62,7 +62,7 @@ Geometry3d
 
 As the previous section but in 3d, it contains actually these tools:
 
-   - basicEditMesh: to apply basic mesh edition (scale change, mesh face contraction, face filtering).
+   - meshBasicEdit: to apply basic mesh edition (scale change, mesh face contraction, face filtering).
    - basicMorphoFilter: apply basic morpho filter from a ball structural element.
    - computeMeshDistances: computes for each face of a mesh A the minimal distance to another mesh B.
    - meshAxisCutter: cuts the input mesh according one axis into sereral separate meshes.
