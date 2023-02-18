@@ -15,11 +15,11 @@ using namespace DGtal;
 
 
 /**
- @page basicEditMesh basicEditMesh
+ @page basicEditMesh meshBasicEdit.cpp
  
  @brief  Apply the Rosin Threshold algorithm.
 
- @b Usage:   basicEditMesh [input]
+ @b Usage:   meshBasicEdit.cpp [input]
 
  @b Allowed @b options @b are :
  
@@ -48,12 +48,12 @@ using namespace DGtal;
  @b Example:
 
  @code
-   basicEditMesh ${DGtal}/examples/samples/tref.off --filterVisiblePart 0.3 toto.offbasicEditMesh -i
+   meshBasicEdit.cpp ${DGtal}/examples/samples/tref.off --filterVisiblePart 0.3 toto.offmeshBasicEdit.cpp -i
  @endcode
 
 
  @see
- @ref basicEditMesh.cpp
+ @ref meshBasicEdit.cpp.cpp
 
  */
 int
@@ -63,9 +63,9 @@ main(int argc,char **argv)
   typedef typename Z3i::RealPoint TPoint;
 
   // parse command line using CLI ----------------------------------------------
-     CLI::App app;
-     std::string inputMeshName;
-     std::string outputMeshName;
+  CLI::App app;
+  std::string inputMeshName;
+  std::string outputMeshName;
   std::vector<double> vectDistAndBBox;
   std::vector<double> paramBallArea;
   double theMaxAngle;
@@ -78,13 +78,13 @@ main(int argc,char **argv)
   unsigned int rescaleToCube {0};
     
   app.description("Apply basic mesh edition (scale change, mesh face contraction, face filtering).\n"
-                  "Example: ./geometry3d/basicEditMesh ${DGtal}/examples/samples/tref.off --filterVisiblePart 0.3 resultFiltered.off");
+                  "Example: ./geometry3d/meshBasicEdit.cpp ${DGtal}/examples/samples/tref.off --filterVisiblePart 0.3 resultFiltered.off");
 
   app.add_option("-i,--input,1", inputMeshName, "input file name of mesh vertex given as OFF format." )
       ->required()
       ->check(CLI::ExistingFile);
   
-  app.add_option("—-output,-o",outputMeshName,"arg = file.off : export the resulting mesh associated to the fiber extraction." );
+  app.add_option("-o,—-output,2",outputMeshName,"arg = file.off : export the resulting mesh associated to the fiber extraction.");
   app.add_option("--shrinkArea,-s",vectDistAndBBox,"arg = <dist> <bounding box> apply a mesh shrinking on the defined area.")
   ->expected(7);
   app.add_option("--shrinkBallArea,-b", paramBallArea,  "arg = <dist> <x> <y> <z> <radius> apply a mesh shrinking on the  area defined by a ball centered at x y z.")
