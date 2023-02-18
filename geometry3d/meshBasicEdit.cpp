@@ -155,7 +155,7 @@ main(int argc,char **argv)
       auto s = bb.second-bb.first;
       auto maxSize = *s.maxElement();
       if (rescaleInterToCube.size() == 0 || (maxSize > rescaleInterToCube[1] || maxSize < rescaleInterToCube[0])) {
-          scale = rescaleToCube/maxSize;
+          scale = rescaleToCube/(double)maxSize;
       }
   }
 
