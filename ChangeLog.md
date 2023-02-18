@@ -1,12 +1,15 @@
 # DGtalTools-contrib  1.4 (beta)
 
-- *Geometry3d*
+- *Geometry2d*
+  - rotNmap: new tools to apply a rotation in the input normal map (it
+    rotates both the position and normals orientation to be
+    consistant. (Bertrand Kerautret [#70](https://github.com/DGtal-team/DGtalTools-contrib/pull/70))
   - meshAxisCutter: new tool cut the input mesh according one axis into several separate meshes.
    (Bertrand Kerautret [#71](https://github.com/DGtal-team/DGtalTools-contrib/pull/71))
   - basicEditMesh: improvement of mesh read using generic reader/writer. 
     (Bertrand Kerautret [#72](https://github.com/DGtal-team/DGtalTools-contrib/pull/72))
  
-# DGtalTools-contrib  1.3 
+ # DGtalTools-contrib  1.3 
 
 - *global*
   - Continuous integration does not use Travis anymore but Github Actions.
