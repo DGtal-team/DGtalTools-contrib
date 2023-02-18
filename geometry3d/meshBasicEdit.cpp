@@ -65,7 +65,7 @@ main(int argc,char **argv)
   // parse command line using CLI ----------------------------------------------
   CLI::App app;
   std::string inputMeshName;
-  std::string outputMeshName;
+  std::string outputMeshName{"result.obj"};
   std::vector<double> vectDistAndBBox;
   std::vector<double> paramBallArea;
   double theMaxAngle;
@@ -84,7 +84,7 @@ main(int argc,char **argv)
       ->required()
       ->check(CLI::ExistingFile);
   
-  app.add_option("-o,—-output,2",outputMeshName,"arg = file.off : export the resulting mesh associated to the fiber extraction.");
+  app.add_option("-o,--output,2",outputMeshName,"arg = file.off : export the resulting mesh associated to the fiber extraction.");
   app.add_option("--shrinkArea,-s",vectDistAndBBox,"arg = <dist> <bounding box> apply a mesh shrinking on the defined area.")
   ->expected(7);
   app.add_option("--shrinkBallArea,-b", paramBallArea,  "arg = <dist> <x> <y> <z> <radius> apply a mesh shrinking on the  area defined by a ball centered at x y z.")
