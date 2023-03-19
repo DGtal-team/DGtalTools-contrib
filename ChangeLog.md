@@ -8,7 +8,11 @@
    (Bertrand Kerautret [#71](https://github.com/DGtal-team/DGtalTools-contrib/pull/71))
   - basicEditMesh: improvement of mesh read using generic reader/writer. 
     (Bertrand Kerautret [#72](https://github.com/DGtal-team/DGtalTools-contrib/pull/72))
- 
+
+- *visualisation*
+  - graphViewer: new options to apply a scale factors on the radius input values
+    and to display constant tube section. (Bertrand Kerautret [#74](https://github.com/DGtal-team/DGtalTools-contrib/pull/74))
+
  # DGtalTools-contrib  1.3 
 
 - *global*
