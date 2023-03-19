@@ -49,11 +49,13 @@ Options:
   -v,--inputVertex TEXT:FILE REQUIRED   input file containing the vertex list.
   -e,--inputEdge TEXT:FILE REQUIRED     input file containing the edge list.
   -a,--autoEdge                         generate edge list from vertex order.
+  --cstSectionEdgeRad                   use a constant edge radius between two consecutive vertices.
   -r,--inputRadii TEXT                  input file containing the radius for each vertex.
   -b,--ballRadius FLOAT=1               radius of vertex balls.
   -m,--addMesh TEXT                     add mesh in the display.
   --meshColor UINT ...                  specify the color of mesh.
   --vertexColor UINT ...                specify the color of vertex.
+  -s,--scaleRadius FLOAT=1              apply a scale factors on the radius input values
   --edgeColor UINT ...                  specify the color of edges.
   -c,--colormap                         display vertex colored by order in vertex file or by radius scale if the radius file is specidfied (-r).
   -d,--doSnapShotAndExit TEXT           save display snapshot into file. Notes that the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D). If the camera setting was not saved it will use the default camera setting.
