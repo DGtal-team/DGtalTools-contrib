@@ -92,6 +92,7 @@ int main( int argc, char** argv )
   std::string nameFileVertex;  
   std::string nameFileEdge;
   double r {1.0};
+  double scaleRadius {1.0};
   bool useRadiiFile {false};
   bool autoEdgeOpt {false};
   std::vector<unsigned int> vectColMesh;
@@ -109,6 +110,7 @@ int main( int argc, char** argv )
   auto addMeshOpt = app.add_option("--addMesh,-m", meshName, "add mesh in the display.");
   auto meshColorOpt = app.add_option("--meshColor", vectColMesh, "specify the color of mesh.");
   auto vertexColorOpt = app.add_option("--vertexColor", vectColVertex, "specify the color of vertex.");
+  app.add_option("--scaleRadius,-s", scaleRadius, "apply a scale factors on the radius input values", true);
   auto edgeColorOpt = app.add_option("--edgeColor", vectColEdge, "specify the color of edges.");
   auto colormapOpt = app.add_flag("--colormap, -c","display vertex colored by order in vertex file or by radius scale if the radius file is specidfied (-r).");
   auto doSnapShotAndExitOpt = app.add_option("--doSnapShotAndExit,-d", name, "save display snapshot into file. Notes that the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D). If the camera setting was not saved it will use the default camera setting.");
@@ -180,7 +182,15 @@ int main( int argc, char** argv )
                    << vectRadii.size() << ")." << std::endl;
       return 1;
     }
-    hueShade = HueShadeColorMap<int>((*(std::min_element(vectRadii.begin(),vectRadii.end())))*10000,(*(std::max_element(vectRadii.begin(),vectRadii.end())))*10000);
+    hueShade = HueShadeColorMap<int>((*(std::min_element(vectRadii.begin(),
+                                                         vectRadii.end())))*10000,
+                                     (*(std::max_element(vectRadii.begin(),
+                                                         vectRadii.end())))*10000);
+    if (scaleRadius != 1.0){
+      for(auto &v: vectRadii){
+        v *= scaleRadius; 
+      }
+    }
   }
 
 
@@ -221,7 +231,9 @@ int main( int argc, char** argv )
       vertex = { vectVertex[e[0]], vectVertex[e[1]] };
       radii = { vectRadii[e[0]], vectRadii[e[1]] };
       Mesh<Z3i::RealPoint>::createTubularMesh(aMesh, vertex, radii, 0.05);
-      viewer << (useRadiiFile ? CustomColors3D( hueShade(radii[0]*10000), hueShade(radii[1]*10000) ) : CustomColors3D( hueShade(e[0]), hueShade(e[1]) ));
+      viewer << (useRadiiFile ? CustomColors3D( hueShade(radii[0]*10000),
+                                                hueShade(radii[1]*10000) ) : CustomColors3D( hueShade(e[0]),
+                                                                                             hueShade(e[1]) ));
       viewer << aMesh;
     }
   }
@@ -249,7 +261,7 @@ int main( int argc, char** argv )
 
   viewer << Viewer3D<>::updateDisplay;
   
-  if(doSnapShotAndExitOpt->count() > 0){
+ if(doSnapShotAndExitOpt->count() > 0){
     // Appy cleaning just save the last snap
     DGtal::trace.info() << "sorting surfel according camera position....";
     viewer.sortSurfelFromCamera();
