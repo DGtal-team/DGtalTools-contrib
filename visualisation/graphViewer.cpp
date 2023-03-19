@@ -95,6 +95,7 @@ int main( int argc, char** argv )
   double scaleRadius {1.0};
   bool useRadiiFile {false};
   bool autoEdgeOpt {false};
+  bool cstSectionEdgeRad {false};
   std::vector<unsigned int> vectColMesh;
   std::vector<unsigned int> vectColVertex;
   std::vector<unsigned int> vectColEdge;
@@ -105,6 +106,7 @@ int main( int argc, char** argv )
   app.add_option("--inputVertex,-v", nameFileVertex, "input file containing the vertex list.")->required()->check(CLI::ExistingFile);
   app.add_option("--inputEdge,-e", nameFileEdge, "input file containing the edge list.")->required()->check(CLI::ExistingFile);
   app.add_flag("--autoEdge,-a", autoEdgeOpt, "generate edge list from vertex order.");
+  app.add_flag("--cstSectionEdgeRad",cstSectionEdgeRad,  "use a constant edge radius between two consecutive vertices.");
   auto inputRadiiOpt = app.add_option("--inputRadii,-r", nameFileRadii, "input file containing the radius for each vertex.");
   app.add_option("--ballRadius,-b", r, "radius of vertex balls.", true);
   auto addMeshOpt = app.add_option("--addMesh,-m", meshName, "add mesh in the display.");
@@ -229,7 +231,12 @@ int main( int argc, char** argv )
     {
       Mesh<Z3i::RealPoint> aMesh;
       vertex = { vectVertex[e[0]], vectVertex[e[1]] };
-      radii = { vectRadii[e[0]], vectRadii[e[1]] };
+      if (cstSectionEdgeRad) {
+        radii = { std::min(vectRadii[e[0]], vectRadii[e[1]]), std::min(vectRadii[e[0]], vectRadii[e[1]]) };  
+      }
+      else {
+        radii = { vectRadii[e[0]], vectRadii[e[1]] };
+      }
       Mesh<Z3i::RealPoint>::createTubularMesh(aMesh, vertex, radii, 0.05);
       viewer << (useRadiiFile ? CustomColors3D( hueShade(radii[0]*10000),
                                                 hueShade(radii[1]*10000) ) : CustomColors3D( hueShade(e[0]),
@@ -243,7 +250,12 @@ int main( int argc, char** argv )
     for ( const auto& e: vectEdges )
     {
       vertex = { vectVertex[e[0]], vectVertex[e[1]] };
-      radii = { vectRadii[e[0]], vectRadii[e[1]] };
+      if (cstSectionEdgeRad) {
+        radii = { std::min(vectRadii[e[0]], vectRadii[e[1]]), std::min(vectRadii[e[0]], vectRadii[e[1]]) };  
+        }
+        else {
+          radii = { vectRadii[e[0]], vectRadii[e[1]] };
+        }
       Mesh<Z3i::RealPoint>::createTubularMesh(aMesh, vertex, radii, 0.05);
     }
     viewer << CustomColors3D(DGtal::Color::Black, edgeColor);
