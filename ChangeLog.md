@@ -9,6 +9,10 @@
   - basicEditMesh: improvement of mesh read using generic reader/writer. 
     (Bertrand Kerautret [#72](https://github.com/DGtal-team/DGtalTools-contrib/pull/72))
  
+ - *Geometry3d*
+  - basicMorphoFilter: fix a bug on the dilate/erode options. 
+    (Bertrand Kerautret [#74](https://github.com/DGtal-team/DGtalTools-contrib/pull/74))  
+  
  # DGtalTools-contrib  1.3 
 
 - *global*
