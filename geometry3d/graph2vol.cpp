@@ -51,16 +51,21 @@ using namespace DGtal;
 
  @b Allowed @b options @b are :
  
+
  @code
-  -h [ --help ]           display this message
-  -i [ --input ] arg      an input file...
-  -p [ --parameter] arg   a double parameter...
+ -h,--help                             Print this help message and exit
+  -v,--inputVertex TEXT:FILE REQUIRED   input file containing the vertex list.
+  -e,--inputEdge TEXT:FILE REQUIRED     input file containing the edge list.
+  -r,--inputRadii TEXT:FILE REQUIRED    input file containing the radius for each vertex.
+  -g,--gridSize FLOAT                   grid size.
+  -o,--output TEXT REQUIRED             Output volumic filename
+  --interpolRadius                      Interpolation of radius
  @endcode
 
  @b Example:
 
  @code
-     graph2vol -i  $DGtal/examples/samples/....
+     graph2vol  -v res_vertex.dat -e res_edges.dat -r res_radius.dat
  @endcode
 
  @image html resgraph2vol.png "Example of result. "
@@ -132,7 +137,7 @@ int main( int argc, char** argv )
   std::string outputFileName;
   std::stringstream usage;
   usage << "Usage: " << argv[0] << " [input]\n"
-        << "Typical use example:\n \t graph2vol -i ... \n";
+        << "Typical use example:\n \t graph2vol -v res_vertex.dat -e res_edges.dat -r res_radius.dat \n";
   // parse command line using CLI-------------------------------------------------------
   CLI::App app;
   app.description("Your program description.\n" + usage.str() );
