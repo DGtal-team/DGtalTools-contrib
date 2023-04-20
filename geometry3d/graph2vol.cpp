@@ -30,6 +30,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 #include "DGtal/base/Common.h"
 #include "DGtal/helpers/StdDefs.h"
+#include <DGtal/io/readers/TableReader.h>
+#include <DGtal/io/readers/PointListReader.h>
 
 #include "CLI11.hpp"
 
@@ -98,12 +100,18 @@ int main( int argc, char** argv )
   
   // Some nice processing  --------------------------------------------------
   
-  
-    trace.info() << "Starting " << argv[0]  << "with input: " <<  nameFileVertex
-              << " and output :" << outputFileName
-              << " param: " << parameter <<std::endl;
-  
+  // Structures to store vertex and edges read in input files
+  std::vector<Z3i::RealPoint> vectVertex = PointListReader<Z3i::RealPoint>::getPointsFromFile(nameFileVertex);
+  std::vector<Z2i::Point> vectEdges =  PointListReader<Z2i::Point>::getPointsFromFile(nameFileEdge);
+  std::vector<double> vectRadii = TableReader<double>::getColumnElementsFromFile(nameFileRadii,0);
+    
+  trace.info() << "Starting " << argv[0]  <<std::endl;
+  trace.info() << "Nb vertex read : " << vectVertex.size() << std::endl;
+  trace.info() << "Nb edges read : " << vectEdges.size() << std::endl;
+  trace.info() << "Nb radius read : " << vectRadii.size() << std::endl;
 
+    
+    
   return 0;
 }
 
