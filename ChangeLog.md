@@ -12,7 +12,11 @@
  - *Geometry3d*
   - basicMorphoFilter: fix a bug on the dilate/erode options. 
     (Bertrand Kerautret [#74](https://github.com/DGtal-team/DGtalTools-contrib/pull/74))  
-  
+  - graph2vol: new tool to transform graph based object into volumetric object. 
+    (Bertrand Kerautret [#76](https://github.com/DGtal-team/DGtalTools-contrib/pull/76))
+    
+    
+
  # DGtalTools-contrib  1.3 
 
 - *global*

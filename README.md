@@ -66,6 +66,7 @@ As the previous section but in 3d, it contains actually these tools:
    - basicEditMesh: to apply basic mesh edition (scale change, mesh face contraction, face filtering).
    - basicMorphoFilter: apply basic morpho filter from a ball structural element.
    - computeMeshDistances: computes for each face of a mesh A the minimal distance to another mesh B.
+   - graph2vol: converts graph object into volumetric image.
    - meshAxisCutter: cuts the input mesh according one axis into sereral separate meshes.
    - volLocalMax: extract the local maximas of a vol image within a spherical kernel.
    - xyzScale: a basic tool to adjust the scale of an xyz file.
