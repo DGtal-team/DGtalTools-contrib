@@ -32,6 +32,7 @@
 #include "DGtal/helpers/StdDefs.h"
 #include <DGtal/io/readers/TableReader.h>
 #include <DGtal/io/readers/PointListReader.h>
+#include "DGtal/io/writers/GenericWriter.h"
 
 #include "CLI11.hpp"
 
@@ -69,11 +70,47 @@ using namespace DGtal;
 
  */
 
+typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char> Image3D;
+
+
+template<typename TPoint, typename TPointD>
+inline
+bool
+projectOnStraightLine(const TPoint & ptA,
+                      const TPoint & ptB,
+                      const TPoint & ptC,
+                      TPointD & ptProjected)
+{
+    if (ptA==ptC)
+    {
+        for(auto i=0; i<TPoint::dimension; i++){ ptProjected[i]=ptA[i];}
+        return true;
+    }
+    if (ptB==ptC)
+    {
+        for(auto i=0; i<TPoint::dimension; i++){ ptProjected[i]=ptB[i];}
+        return true ;
+    }
+    
+    TPointD vAB = ptB - ptA;
+    TPointD vABn = vAB / vAB.norm();
+      
+    TPointD vAC = ptC-ptA;
+    double distPtA_Proj = vAC.dot(vABn);
+    
+    for(auto i=0; i<TPoint::dimension; i++){ ptProjected[i]= ptA[i]+vABn[i]*(distPtA_Proj);}
+    bool res = false;
+    for(auto i=0; i<TPoint::dimension; i++) { res = res || (ptA[i]<ptB[i] && ptProjected[i]<=ptB[i]); }
+    return distPtA_Proj>=0 && res;
+
+}
+
+
 
 int main( int argc, char** argv )
 {
-
-  double parameter {1.0};
+  double gridSize = 1.0;
+  int brdVol = 5;
   std::string nameFileVertex;
   std::string nameFileEdge;
   std::string nameFileRadii;
@@ -89,7 +126,6 @@ int main( int argc, char** argv )
   app.add_option("--inputEdge,-e", nameFileEdge, "input file containing the edge list.")->required()->check(CLI::ExistingFile);
   app.add_option("--inputRadii,-r", nameFileRadii, "input file containing the radius for each vertex.")
     ->required()->check(CLI::ExistingFile);
-
   app.add_option("--output,-o", outputFileName, "Output volumic filename")->required();
 
     
@@ -110,8 +146,43 @@ int main( int argc, char** argv )
   trace.info() << "Nb edges read : " << vectEdges.size() << std::endl;
   trace.info() << "Nb radius read : " << vectRadii.size() << std::endl;
 
+  // Compute the domain associated to the set vertices
+  Z3i::Point lb = Z3i::Point(static_cast<int>(vectVertex.front()[0]),
+                             static_cast<int>(vectVertex.front()[1]),
+                             static_cast<int>(vectVertex.front()[2]));
+  Z3i::Point ub = lb;
+
+  for ( auto const &v: vectVertex ) {
+        for(int i=0; i< 3; i++){
+            if (v[i] < lb[i]) {
+                lb[i] = static_cast<int>(v[i]);
+            }
+            if (v[i] > ub[i]) {
+                ub[i] = static_cast<int>(v[i]);
+            }
+        }
+    }
+  trace.info() << "Bouding box found " << lb << " " << ub << std::endl;
+  Z3i::Domain dom (lb - Z3i::Point::diagonal()*brdVol,
+                   ub + Z3i::Point::diagonal()*brdVol);
+  Image3D res (dom);
     
+  for (auto const &p: dom){
+      // Filling from cylinders
+      for(auto const e: vectEdges){
+            Z3i::RealPoint p0 = vectVertex[e[0]];
+            Z3i::RealPoint p1 = vectVertex[e[1]];
+            Z3i::RealPoint pr (p[0], p[1], p[2]);
+            double r = vectRadii[e[0]];
+            Z3i::RealPoint pprof;
+            auto isProj = projectOnStraightLine(p0, p1, pr, pprof);
+          if (isProj && (pr-pprof).norm() < r ) {
+              res.setValue(p, 255);
+          }
+        }
+    }
     
+  res >> outputFileName;
   return 0;
 }
 
