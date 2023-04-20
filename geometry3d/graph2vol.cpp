@@ -99,18 +99,32 @@ projectOnStraightLine(const TPoint & ptA,
     double distPtA_Proj = vAC.dot(vABn);
     
     for(auto i=0; i<TPoint::dimension; i++){ ptProjected[i]= ptA[i]+vABn[i]*(distPtA_Proj);}
-    bool res = false;
-    for(auto i=0; i<TPoint::dimension; i++) { res = res || (ptA[i]<ptB[i] && ptProjected[i]<=ptB[i]); }
-    return distPtA_Proj>=0 && res;
-
+    TPointD vPA = ptA - ptProjected;
+    TPointD vPB = ptB - ptProjected;
+    return vPB.dot(vPA) <= 0 ;
 }
 
 
+void
+compBB(std::vector<Z3i::RealPoint> vpts,
+       Z3i::Point &lb, Z3i::Point &ub){
+    for ( auto const &v: vpts ) {
+        for(int i=0; i< 3; i++){
+            if (v[i] < lb[i]) {
+                lb[i] = static_cast<int>(v[i]);
+            }
+            if (v[i] > ub[i]) {
+                ub[i] = static_cast<int>(v[i]);
+            }
+        }
+    }
+}
 
 int main( int argc, char** argv )
 {
   double gridSize = 1.0;
-  int brdVol = 5;
+  bool interpolRadius = false;
+  int brdVol = 2;
   std::string nameFileVertex;
   std::string nameFileEdge;
   std::string nameFileRadii;
@@ -126,8 +140,9 @@ int main( int argc, char** argv )
   app.add_option("--inputEdge,-e", nameFileEdge, "input file containing the edge list.")->required()->check(CLI::ExistingFile);
   app.add_option("--inputRadii,-r", nameFileRadii, "input file containing the radius for each vertex.")
     ->required()->check(CLI::ExistingFile);
+  app.add_option("--gridSize,-g", gridSize, "grid size.");
   app.add_option("--output,-o", outputFileName, "Output volumic filename")->required();
-
+  app.add_flag("--interpolRadius", interpolRadius, "Interpolation of radius");
     
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
@@ -150,38 +165,53 @@ int main( int argc, char** argv )
   Z3i::Point lb = Z3i::Point(static_cast<int>(vectVertex.front()[0]),
                              static_cast<int>(vectVertex.front()[1]),
                              static_cast<int>(vectVertex.front()[2]));
-  Z3i::Point ub = lb;
-
-  for ( auto const &v: vectVertex ) {
-        for(int i=0; i< 3; i++){
-            if (v[i] < lb[i]) {
-                lb[i] = static_cast<int>(v[i]);
-            }
-            if (v[i] > ub[i]) {
-                ub[i] = static_cast<int>(v[i]);
-            }
-        }
+   Z3i::Point ub = lb;
+    for ( auto  &v: vectVertex ) {
+        for(int i=0; i< 3; i++) v[i] *= gridSize;
     }
+    for ( auto  &v: vectRadii ) {
+        v *= gridSize;
+    }
+  brdVol *= gridSize;
+  compBB(vectVertex, lb, ub);
   trace.info() << "Bouding box found " << lb << " " << ub << std::endl;
   Z3i::Domain dom (lb - Z3i::Point::diagonal()*brdVol,
                    ub + Z3i::Point::diagonal()*brdVol);
+    double rMax = *std::max_element(vectRadii.begin(), vectRadii.end());
+    
   Image3D res (dom);
     
-  for (auto const &p: dom){
-      // Filling from cylinders
-      for(auto const e: vectEdges){
-            Z3i::RealPoint p0 = vectVertex[e[0]];
-            Z3i::RealPoint p1 = vectVertex[e[1]];
+    for(auto const e: vectEdges){
+        Z3i::RealPoint p0 = vectVertex[e[0]];
+        Z3i::RealPoint p1 = vectVertex[e[1]];
+        Z3i::Point pl, pu;
+        compBB({p0, p1}, pl, pu);
+        Z3i::Domain subDom (pl - Z3i::Point::diagonal()*brdVol,
+                            pu + Z3i::Point::diagonal()*brdVol);
+        for (const auto &p: subDom){
             Z3i::RealPoint pr (p[0], p[1], p[2]);
-            double r = vectRadii[e[0]];
+            double r = std::min(vectRadii[e[0]], vectRadii[e[1]]);
+            double r0 =vectRadii[e[0]];
+            double r1 =vectRadii[e[1]];
+            double diffr = r1 - r0;
             Z3i::RealPoint pprof;
             auto isProj = projectOnStraightLine(p0, p1, pr, pprof);
-          if (isProj && (pr-pprof).norm() < r ) {
-              res.setValue(p, 255);
-          }
+            double dist0 = (pprof-p0).norm()/(p0-p1).norm();
+            double rl = r0+diffr*dist0;
+            if (interpolRadius){
+                if (isProj && (pr-pprof).norm() <= rl ) {
+                    res.setValue(p, (rl/rMax)*255);
+                }
+            }else{
+                if (isProj && (pr-pprof).norm() <= r ) {
+                    res.setValue(p, (r/rMax)*255);
+                }
+            }
         }
     }
     
+    
+
   res >> outputFileName;
   return 0;
 }
