@@ -7,7 +7,10 @@ PROJECT(DGtalTools-contrib)
 cmake_minimum_required (VERSION 3.11) 
 cmake_policy(SET CMP0057 NEW)
 
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
 
 
 # -----------------------------------------------------------------------------
@@ -16,7 +19,7 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
  set (CMAKE_CXX_STANDARD 11)
  set (CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
-
+include(polyscope)
 
 FIND_PACKAGE(DGtal 1.3 REQUIRED)
 INCLUDE_DIRECTORIES(${DGTAL_INCLUDE_DIRS})
@@ -41,6 +44,7 @@ if(WITH_OPENCV)
    include_directories(${OpenCV_INCLUDE_DIRS})
 
 endif()
+
 
 
 # CLI11
