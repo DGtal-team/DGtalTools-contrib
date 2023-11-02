@@ -1,4 +1,4 @@
-# DGtalTools-contrib  1.4 (beta)$
+# DGtalTools-contrib  1.4 (beta)
 - *global*
   - Continuous integration on windows does not use Appveyopr anymore but Github Actions.
    (Bertrand Kerautret [#77](https://github.com/DGtal-team/DGtalTools-contrib/pull/77))
