@@ -1,4 +1,7 @@
-# DGtalTools-contrib  1.4 (beta)
+# DGtalTools-contrib  1.4 (beta)$
+- *global*
+  - Continuous integration on windows does not use Appveyopr anymore but Github Actions.
+   (Bertrand Kerautret [#77](https://github.com/DGtal-team/DGtalTools-contrib/pull/77))
 
 - *Geometry2d*
   - rotNmap: new tools to apply a rotation in the input normal map (it
