@@ -5,8 +5,6 @@
 #include <DGtal/helpers/ShortcutsGeometry.h>
 #include "DGtal/io/readers/MeshReader.h"
 #include "DGtal/io/writers/MeshWriter.h"
-#include "DGtal/io/readers/PointListReader.h"
-
 
 #include <polyscope/polyscope.h>
 #include <polyscope/surface_mesh.h>
@@ -21,47 +19,66 @@ using namespace Z3i;
 
 typedef PolygonalSurface<Z3i::RealPoint> PolySurface;
 
-static PolySurface polysurf;
-static PolySurface reconsSelectSurf;
-static  std::vector<std::vector<std::size_t>> facesSelectSurf;
-
+static PolySurface currentPolysurf;
 static std::vector<int> vectSelection;
+static long int shiftFaceIndex  = 0;
+static float paintRad = 1.0;
 
-static  int shiftFaceIndex  = 0;
+static const int labelSelect = 200;
+static const int labelRef = 50;
+
+static std::string outputFileName {"result.obj"};
+
+
+void addSurfaceInPolyscope(PolySurface &psurf){
+    polyscope::removeStructure("InputMesh");
+    std::vector<std::vector<std::size_t>> faces;
+    vectSelection.clear();
+    for(auto &face: psurf.allFaces()){
+        faces.push_back(psurf.verticesAroundFace( face ));
+        vectSelection.push_back(labelSelect);
+    }
+    auto digsurf = polyscope::registerSurfaceMesh("InputMesh",
+                                                  psurf.positions(), faces);
+    digsurf->addFaceScalarQuantity("selection", vectSelection);
+    digsurf->setAllQuantitiesEnabled(true);
+    shiftFaceIndex =  psurf.nbVertices();
+
+}
 
 static Z3i::RealPoint
-getFaceBarycenter(PolySurface &polysurf, const PolySurface::Face &aFace){
+getFaceBarycenter(PolySurface &polysurff, const PolySurface::Face &aFace){
     Z3i::RealPoint res(0.0, 0.0, 0.0);
-    for(auto const &v: polysurf.verticesAroundFace(aFace)){
-        res += polysurf.positions()[v];
+    for(auto const &v: polysurff.verticesAroundFace(aFace)){
+        res += polysurff.positions()[v];
     }
-    double s = (double) polysurf.verticesAroundFace(aFace).size();
-    return res/s;
+    return res/polysurff.verticesAroundFace(aFace).size();
 }
 
 // Helper function
-std::vector<PolySurface::Face> faceAround( PolySurface &polysurf, PolySurface::Face faceId,
-                                    double radius){
+std::vector<PolySurface::Face> faceAround(PolySurface &polysurff,
+                                          PolySurface::Face faceId,
+                                          double radius){
     std::vector<PolySurface::Face> result;
     std::queue<PolySurface::Vertex> q;
     std::map<PolySurface::Face, bool> fVisited;
     std::map<PolySurface::Face, bool> vVisited;
 
-    for (auto const &v : polysurf.verticesAroundFace(faceId) ){
+    for (auto const &v : polysurff.verticesAroundFace(faceId) ){
         q.push(v);
     }
     fVisited[faceId] = true;
     bool addNewFaces = true;
     while (!q.empty() ) {
         PolySurface::Vertex v = q.front(); q.pop();
-        auto listFace = polysurf.facesAroundVertex(v);
+        auto listFace = polysurff.facesAroundVertex(v);
         for (auto const & f : listFace){
             if (fVisited.count(f)==0){
-                if((getFaceBarycenter(polysurf, f) -
-                    getFaceBarycenter(polysurf, faceId)).norm() < radius){
+                if((getFaceBarycenter(polysurff, f) -
+                    getFaceBarycenter(polysurff, faceId)).norm() < radius){
                     fVisited[f]=true;
                     result.push_back(f);
-                    for (auto const & v : polysurf.verticesAroundFace(f)){
+                    for (auto const & v : polysurff.verticesAroundFace(f)){
                         if (vVisited.count(v)==0){
                             vVisited[v]=true;
                             q.push(v);
@@ -75,23 +92,83 @@ std::vector<PolySurface::Face> faceAround( PolySurface &polysurf, PolySurface::F
 }
 
 
+void deleteSelectedFaces(){
+    PolySurface newSur;
+    std::vector<bool> vertexUsed (currentPolysurf.nbVertices(), false);
+    for ( unsigned int i = 0; i< currentPolysurf.nbFaces(); i++ ){
+        if (vectSelection[i]==labelSelect){
+            auto face = currentPolysurf.verticesAroundFace( i );
+            for (auto v: face){
+                vertexUsed[v] = true;
+            }
+        }
+    }
+    auto lp = currentPolysurf.positions();
+    for(unsigned int i = 0; i < currentPolysurf.nbVertices(); i++){
+        if(vertexUsed[i]){
+            newSur.addVertex(lp[i]);
+        }
+    }
+    std::vector<int> translateIndexId;
+    int currentIndex = 0;
+    for(unsigned int i = 0; i < currentPolysurf.nbVertices(); i++ ){
+        if (vertexUsed[i]){
+            translateIndexId.push_back(currentIndex);
+            currentIndex++;
+        }else{
+            translateIndexId.push_back(-1);
+        }
+    }
+    for ( unsigned int f = 0; f< currentPolysurf.nbFaces(); f++ ){
+        if (vectSelection[f]==labelSelect){
+            auto face = currentPolysurf.verticesAroundFace( f );
+            for (unsigned int i = 0; i<face.size(); i++){
+                face[i]=translateIndexId[face[i]];
+            }
+            newSur.addPolygonalFace(PolySurface::PolygonalFace( face.cbegin(), face.cend()));
+        }
+    }
+    newSur.build();
+    currentPolysurf = newSur;
+    addSurfaceInPolyscope(newSur);
+}
+
 void callbackFaceID() {
+    ImGui::Text("Setting selection:");
+    ImGui::SliderFloat("radius values", &paintRad, 0.01f, 10.0f, "ratio = %.3f");
+    ImGui::Text("Action:");
+    if (ImGui::Button("Clear selection")) {
+        for(auto &i : vectSelection){
+            i=labelSelect;
+        }
+    }
+    if (ImGui::Button("delete selected faces")) {
+        deleteSelectedFaces();
+    }
+    if (ImGui::Button("save in .obj")) {
+        std::ofstream obj_stream( outputFileName.c_str() );
+        MeshHelpers::exportOBJ(obj_stream, currentPolysurf);
+    }
     ImGuiIO& io = ImGui::GetIO();
     auto digsurf = polyscope::getSurfaceMesh("InputMesh");
     if (io.MouseDoubleClicked[0]) {
         unsigned long indexSelect = polyscope::pick::getSelection().second;
-       if (indexSelect < shiftFaceIndex){
-            std::cout << "vertices selected" << std::endl;
+        unsigned long nb = 0;
+        // face selected
+        if (indexSelect >= shiftFaceIndex){
+            nb = (unsigned long) polyscope::pick::getSelection().second - shiftFaceIndex;
         }else{
-            int nb = (int) polyscope::pick::getSelection().second - shiftFaceIndex;
-            std::cout << "face selected " << nb  << std::endl;
-            if (nb > 0 && nb < vectSelection.size()){
-                auto fVois = faceAround(polysurf, nb, 2);
-                std::cout << "face around " << fVois.size()  << std::endl;
-                vectSelection[nb] = 0;
-                for (auto f: fVois){
-                    vectSelection[f] = 50;
-                }
+            // vertex selected (selecting a face connected to it)
+            if(currentPolysurf.facesAroundVertex(polyscope::pick::getSelection().second)
+               .size()> 0){
+                nb = currentPolysurf.facesAroundVertex(polyscope::pick::getSelection().second)[0];
+            }
+        }
+        if (nb > 0 && nb < vectSelection.size()){
+            auto fVois = faceAround(currentPolysurf, nb, paintRad);
+            vectSelection[nb] = 0;
+            for (auto f: fVois){
+                vectSelection[f] = labelRef;
             }
         }
     }
@@ -106,17 +183,20 @@ void callbackFaceID() {
 int main(int argc, char** argv)
 {
     std::string inputFileName {""};
+    
+
     std::string colorFileName; // The file containing the index to be colored in the colors
 
     // parse command line using CLI ----------------------------------------------
     CLI::App app;
-      
-    app.description("Test display accumulation\n"
-                    " testPolyscope -i file.obj  \n");
-    app.add_option("-i,--input,1", inputFileName, "an input mesh file in .obj format." )
+    app.description("polyMeshEdit \n"
+                    " polyMeshEdit -i file.obj  \n");
+    app.add_option("-i,--input,1", inputFileName, "an input mesh file in .obj or .off format." )
     ->required()
     ->check(CLI::ExistingFile);
-   
+    app.add_option("-o,--output,2", outputFileName, "an output mesh file in .obj or .off format." )
+    ->check(CLI::ExistingFile);
+
    
     app.get_formatter()->column_width(40);
     CLI11_PARSE(app, argc, argv);
@@ -126,21 +206,14 @@ int main(int argc, char** argv)
     DGtal::Mesh<DGtal::Z3i::RealPoint> aMesh(true);
     aMesh << inputFileName;
     
-    DGtal::MeshHelpers::mesh2PolygonalSurface(aMesh, polysurf);
-    DGtal::MeshHelpers::mesh2PolygonalSurface(aMesh, reconsSelectSurf);
+    DGtal::MeshHelpers::mesh2PolygonalSurface(aMesh, currentPolysurf);
     shiftFaceIndex = aMesh.nbVertex();
-    std::vector<std::vector<std::size_t>> faces;
-    for(auto &face: polysurf.allFaces()){
-        faces.push_back(polysurf.verticesAroundFace( face ));
-        vectSelection.push_back(200);
-    }
     polyscope::state::userCallback = callbackFaceID;
-    vectSelection[0]=0;
-    auto digsurf = polyscope::registerSurfaceMesh("InputMesh", polysurf.positions(), faces);
-    digsurf->addFaceScalarQuantity("selection", vectSelection);
-    digsurf->setAllQuantitiesEnabled(true);
+
+    addSurfaceInPolyscope(currentPolysurf);
     polyscope::show();
 
     return 0;
 }
+
 
