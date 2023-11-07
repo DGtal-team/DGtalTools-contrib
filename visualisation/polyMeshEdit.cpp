@@ -154,12 +154,12 @@ void callbackFaceID() {
     srand((unsigned) time(NULL));
 
     ImGui::Text("Setting selection size:");
-    ImGui::SliderFloat("radius values", &paintRad, 0.01f, 10.0f, "ratio = %.3f");
+    ImGui::SliderFloat("radius values", &paintRad, 0.01f, 10.0f, "size = %.3f");
 
     ImGui::Separator();
 
     ImGui::Text("Set selection freq:");
-    ImGui::SliderInt(" freq (1=select all, 2= select 1 over 2", &partialF, 1, 100, "ratio = %i");
+    ImGui::SliderInt(" freq (1=select all, 2=select 1over2)", &partialF, 1, 10, "freq = %i");
     ImGui::Separator();
     
     ImGui::Text("Action:");
