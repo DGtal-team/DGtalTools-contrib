@@ -23,6 +23,8 @@ static PolySurface currentPolysurf;
 static std::vector<int> vectSelection;
 static long int shiftFaceIndex  = 0;
 static float paintRad = 1.0;
+static int partialF = 1;
+
 
 static const int labelSelect = 200;
 static const int labelRef = 50;
@@ -88,8 +90,23 @@ std::vector<PolySurface::Face> faceAround(PolySurface &polysurff,
             }
         }
     }
+    
     return result;
 }
+/**
+ * Remove face from selectio with a probability of 1/selFreq
+ */
+void partialSelect(int selFreq=1){
+    srand((unsigned) time(NULL));
+    for ( unsigned int i = 0; i< currentPolysurf.nbFaces(); i++ ){
+        if (vectSelection[i]==labelRef){
+            if (rand()%selFreq==0){
+                vectSelection[i]=labelSelect;
+            }
+        }
+    }
+}
+
 
 
 void deleteSelectedFaces(){
@@ -134,8 +151,17 @@ void deleteSelectedFaces(){
 }
 
 void callbackFaceID() {
-    ImGui::Text("Setting selection:");
+    srand((unsigned) time(NULL));
+
+    ImGui::Text("Setting selection size:");
     ImGui::SliderFloat("radius values", &paintRad, 0.01f, 10.0f, "ratio = %.3f");
+
+    ImGui::Separator();
+
+    ImGui::Text("Set selection freq:");
+    ImGui::SliderInt(" freq (1=select all, 2= select 1 over 2", &partialF, 1, 100, "ratio = %i");
+    ImGui::Separator();
+    
     ImGui::Text("Action:");
     if (ImGui::Button("Clear selection")) {
         for(auto &i : vectSelection){
@@ -145,6 +171,7 @@ void callbackFaceID() {
     if (ImGui::Button("delete selected faces")) {
         deleteSelectedFaces();
     }
+ 
     if (ImGui::Button("save in .obj")) {
         std::ofstream obj_stream( outputFileName.c_str() );
         MeshHelpers::exportOBJ(obj_stream, currentPolysurf);
@@ -164,12 +191,18 @@ void callbackFaceID() {
                 nb = currentPolysurf.facesAroundVertex(polyscope::pick::getSelection().second)[0];
             }
         }
+        
         if (nb > 0 && nb < vectSelection.size()){
             auto fVois = faceAround(currentPolysurf, nb, paintRad);
             vectSelection[nb] = 0;
+            srand((unsigned) time(NULL));
             for (auto f: fVois){
-                vectSelection[f] = labelRef;
-            }
+                if (rand()%partialF==0){
+                    vectSelection[f]=labelRef;
+                }else{
+                    vectSelection[f]=labelSelect;
+                }
+             }
         }
     }
     digsurf -> removeQuantity("selection");
