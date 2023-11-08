@@ -20,9 +20,12 @@ using namespace Z3i;
 typedef PolygonalSurface<Z3i::RealPoint> PolySurface;
 
 static PolySurface currentPolysurf;
+static PolySurface firstPolysurf;
+
 static std::vector<int> vectSelection;
 static long int shiftFaceIndex  = 0;
 static float paintRad = 1.0;
+static float noiseLevel = 1.0;
 static int partialF = 1;
 
 
@@ -44,7 +47,7 @@ void addSurfaceInPolyscope(PolySurface &psurf){
                                                   psurf.positions(), faces);
     digsurf->addFaceScalarQuantity("selection", vectSelection);
     digsurf->setAllQuantitiesEnabled(true);
-    shiftFaceIndex =  psurf.nbVertices();
+    shiftFaceIndex =  psurf.positions().size();
 
 }
 
@@ -107,8 +110,73 @@ void partialSelect(int selFreq=1){
     }
 }
 
+void noisify(double scale = 0.01){
+    
+    srand((unsigned) time(NULL));
+    for ( unsigned int i = 0; i< currentPolysurf.nbFaces(); i++ ){
+        Z3i::RealPoint pDep(((double)(rand()%100000)/100000.0)*scale,
+                            ((double)(rand()%100000)/100000.0)*scale,
+                            ((double)(rand()%100000)/100000.0)*scale);
+        if (vectSelection[i]==labelRef){
+            for (auto f: currentPolysurf.verticesAroundFace(i)){
+                currentPolysurf.positions()[f][0] += pDep[0];
+                currentPolysurf.positions()[f][1] += pDep[1];
+                currentPolysurf.positions()[f][2] += pDep[2];
 
+            }
+        }
+    }
+    addSurfaceInPolyscope(currentPolysurf);
+}
 
+DGtal::Mesh<DGtal::Z3i::RealPoint>
+meshFixVertexUnity(DGtal::Mesh<DGtal::Z3i::RealPoint> &aMesh){
+    DGtal::Mesh<DGtal::Z3i::RealPoint> res;
+    std::map<DGtal::Z3i::RealPoint, bool> mapPt;
+    std::vector<bool> vertexUsed (aMesh.nbVertex(), false);
+    for ( unsigned int f = 0; f< aMesh.nbFaces(); f++ ){
+        auto face = aMesh.getFace(f);
+        for (unsigned int i = 0; i<face.size(); i++){
+            vertexUsed[face[i]] = true;
+            if (mapPt.count(aMesh.getVertex(face[i]))==0){
+                mapPt[aMesh.getVertex(face[i])]=true;
+            }
+        }
+    }
+   
+    std::vector<int> translateIndexId;
+    int currentIndex = 0;
+    for(unsigned int i = 0; i < aMesh.nbVertex(); i++ ){
+        if (vertexUsed[i]){
+            res.addVertex(aMesh.getVertex(i));
+            translateIndexId.push_back(currentIndex);
+            currentIndex++;
+        }else{
+            translateIndexId.push_back(-1);
+        }
+    }
+    vertexUsed =  std::vector<bool> (aMesh.nbVertex(), false);
+
+    for ( unsigned int f = 0; f< aMesh.nbFaces(); f++ ){
+        auto face = aMesh.getFace(f);
+        for (unsigned int i = 0; i<face.size(); i++){
+                face[i]=translateIndexId[face[i]];
+            vertexUsed[face[i]] = true;
+        }
+        res.addFace(face);
+    }
+    unsigned int cpt = 0;
+    for (unsigned int i = 0; i < aMesh.nbVertex(); i++){
+        if (vertexUsed[i]){
+            cpt++;
+        }
+    }
+    std::cout << "init " << aMesh.nbVertex();
+    std::cout << "trans " << res.nbVertex();
+    std::cout << "cpt" << cpt;
+
+    return res;
+}
 void deleteSelectedFaces(){
     PolySurface newSur;
     std::vector<bool> vertexUsed (currentPolysurf.nbVertices(), false);
@@ -161,21 +229,39 @@ void callbackFaceID() {
     ImGui::Text("Set selection freq:");
     ImGui::SliderInt(" freq (1=select all, 2=select 1over2)", &partialF, 1, 10, "freq = %i");
     ImGui::Separator();
-    
+    ImGui::Text("Noise parameters:");
+    ImGui::SliderFloat("noise scale", &noiseLevel, 0.001, 10, "scale = %f");
+    ImGui::Separator();
+
     ImGui::Text("Action:");
     if (ImGui::Button("Clear selection")) {
         for(auto &i : vectSelection){
             i=labelSelect;
         }
     }
+    ImGui::SameLine();
     if (ImGui::Button("delete selected faces")) {
         deleteSelectedFaces();
     }
- 
+    ImGui::SameLine();
+    if (ImGui::Button("noisify selected faces")) {
+        noisify(noiseLevel);
+    }
+    ImGui::Separator();
+    ImGui::Text("IO");
+
     if (ImGui::Button("save in .obj")) {
         std::ofstream obj_stream( outputFileName.c_str() );
         MeshHelpers::exportOBJ(obj_stream, currentPolysurf);
     }
+    ImGui::SameLine();
+
+    if (ImGui::Button("reload src")) {
+        currentPolysurf = firstPolysurf;
+        addSurfaceInPolyscope(currentPolysurf);
+        
+    }
+
     ImGuiIO& io = ImGui::GetIO();
     auto digsurf = polyscope::getSurfaceMesh("InputMesh");
     if (io.MouseDoubleClicked[0]) {
@@ -238,12 +324,12 @@ int main(int argc, char** argv)
     // read input mesh
     DGtal::Mesh<DGtal::Z3i::RealPoint> aMesh(true);
     aMesh << inputFileName;
-    
+    aMesh = meshFixVertexUnity(aMesh);
     DGtal::MeshHelpers::mesh2PolygonalSurface(aMesh, currentPolysurf);
     shiftFaceIndex = aMesh.nbVertex();
     polyscope::state::userCallback = callbackFaceID;
-
     addSurfaceInPolyscope(currentPolysurf);
+    firstPolysurf = currentPolysurf;
     polyscope::show();
 
     return 0;
