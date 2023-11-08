@@ -111,18 +111,16 @@ void partialSelect(int selFreq=1){
 }
 
 void noisify(double scale = 0.01){
-    
     srand((unsigned) time(NULL));
     for ( unsigned int i = 0; i< currentPolysurf.nbFaces(); i++ ){
-        Z3i::RealPoint pDep(((double)(rand()%100000)/100000.0)*scale,
-                            ((double)(rand()%100000)/100000.0)*scale,
-                            ((double)(rand()%100000)/100000.0)*scale);
+        Z3i::RealPoint pDep(((double)(rand()%100000-50000)/100000.0)*scale,
+                            ((double)(rand()%100000-50000)/100000.0)*scale,
+                            ((double)(rand()%100000-50000)/100000.0)*scale);
         if (vectSelection[i]==labelRef){
             for (auto f: currentPolysurf.verticesAroundFace(i)){
                 currentPolysurf.positions()[f][0] += pDep[0];
                 currentPolysurf.positions()[f][1] += pDep[1];
                 currentPolysurf.positions()[f][2] += pDep[2];
-
             }
         }
     }
@@ -230,7 +228,7 @@ void callbackFaceID() {
     ImGui::SliderInt(" freq (1=select all, 2=select 1over2)", &partialF, 1, 10, "freq = %i");
     ImGui::Separator();
     ImGui::Text("Noise parameters:");
-    ImGui::SliderFloat("noise scale", &noiseLevel, 0.001, 10, "scale = %f");
+    ImGui::SliderFloat("noise scale", &noiseLevel, 0.001, 2, "scale = %f");
     ImGui::Separator();
 
     ImGui::Text("Action:");
