@@ -125,46 +125,7 @@ void noisify(double scale = 0.01){
     addSurfaceInPolyscope(currentPolysurf);
 }
 
-
-DGtal::Mesh<DGtal::Z3i::RealPoint>
-meshFixVertexUnity(DGtal::Mesh<DGtal::Z3i::RealPoint> &aMesh){
-    DGtal::Mesh<DGtal::Z3i::RealPoint> res;
-    std::map<DGtal::Z3i::RealPoint, bool> mapPt;
-    std::vector<bool> vertexUsed (aMesh.nbVertex(), false);
-    for ( unsigned int f = 0; f< aMesh.nbFaces(); f++ ){
-        auto face = aMesh.getFace(f);
-        for (unsigned int i = 0; i<face.size(); i++){
-            vertexUsed[face[i]] = true;
-            if (mapPt.count(aMesh.getVertex(face[i]))==0){
-                mapPt[aMesh.getVertex(face[i])]=true;
-            }
-        }
-    }
-    
-    std::vector<int> translateIndexId;
-    int currentIndex = 0;
-    for(unsigned int i = 0; i < aMesh.nbVertex(); i++ ){
-        if (vertexUsed[i]){
-            res.addVertex(aMesh.getVertex(i));
-            translateIndexId.push_back(currentIndex);
-            currentIndex++;
-        }else{
-            translateIndexId.push_back(-1);
-        }
-    }
-    vertexUsed =  std::vector<bool> (aMesh.nbVertex(), false);
-    
-    for ( unsigned int f = 0; f< aMesh.nbFaces(); f++ ){
-        auto face = aMesh.getFace(f);
-        for (unsigned int i = 0; i<face.size(); i++){
-            face[i]=translateIndexId[face[i]];
-            vertexUsed[face[i]] = true;
-        }
-        res.addFace(face);
-    }
-    return res;
-}
-            
+   
 
             
 void deleteSelectedFaces(){
@@ -332,10 +293,3 @@ int main(int argc, char** argv)
     return 0;
     
 }
-
-
-
-
-
-
-
