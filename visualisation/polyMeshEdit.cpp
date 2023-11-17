@@ -53,7 +53,7 @@ using namespace DGtal;
 /**
  @page polyMeshEdit polyMeshEdit
  
- @brief  Description of the tool...
+ @brief  polyMeshEdit tools to edit a mesh (add local noise remove selected faces). Note that the process rely on half edge data structure that can fails if the input is not topological consistant. If you want use other type of mesh, you can use meshViewerEdit that is based on the simple soup of triangles process (slower selection process).
 
  @b Usage:   polyMeshEdit [input]
 
@@ -353,16 +353,15 @@ void callbackFaceID() {
 int main(int argc, char** argv)
 {
     std::string inputFileName {""};
-    std::string colorFileName; // The file containing the index to be colored in the colors
     
     // parse command line using CLI ----------------------------------------------
     CLI::App app;
-    app.description("polyMeshEdit \n"
-                    " polyMeshEdit -i file.obj  \n");
+    app.description("polyMeshEdit tools to edit a mesh (add local noise remove selected faces). Note that the process rely on half edge data structure that can fails if the input is not topological consistant. If you want use other type of mesh, you can use meshViewerEdit that is based on the simple soup of triangles process (slower selection process). \n"
+                    " polyMeshEdit file.obj editedMesh.obj  \n");
     app.add_option("-i,--input,1", inputFileName, "an input mesh file in .obj or .off format." )
     ->required()
     ->check(CLI::ExistingFile);
-    app.add_option("-o,--output,2", outputFileName, "an output mesh file in .obj or .off format." )
+    app.add_option("-o,--output,2", outputFileName, "an output mesh file in .obj or .off format.", true )
     ->check(CLI::ExistingFile);
     
     
@@ -379,6 +378,7 @@ int main(int argc, char** argv)
     polyscope::state::userCallback = callbackFaceID;
     addSurfaceInPolyscope(currentPolysurf);
     firstPolysurf = currentPolysurf;
+    polyscope::options::buildGui=false;
     polyscope::show();
     return 0;
     
