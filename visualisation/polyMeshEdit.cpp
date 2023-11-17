@@ -245,7 +245,7 @@ void deleteSelectedFaces(){
 
 void callbackFaceID() {
     srand((unsigned) time(NULL));
-
+    ImGui::Begin("Editing tools");
     ImGui::Text("Setting selection size:");
     ImGui::SliderFloat("radius values", &paintRad, 0.01f, 10.0f, "size = %.3f");
 
@@ -342,6 +342,7 @@ void callbackFaceID() {
              }
         }
     }
+    ImGui::End();
     digsurf -> removeQuantity("selection");
     digsurf -> addFaceScalarQuantity("selection", vectSelection);
 }

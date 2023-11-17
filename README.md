@@ -97,3 +97,6 @@ This section, can contain all tools related to visualisation:
 |![](https://cloud.githubusercontent.com/assets/772865/12538777/cd8c2d28-c2e2-11e5-93ab-cb4a6cfadc8e.png)| ![](https://cloud.githubusercontent.com/assets/772865/12523276/22205f46-c156-11e5-827d-ec788baf7029.png) |<img width="260" alt="capture d ecran 2016-03-04 a 19 46 54" src="https://cloud.githubusercontent.com/assets/772865/13536787/02f16df6-e242-11e5-8541-88f8ca3f0a48.png">|
 | :-: | :-: | :-: |
 |displayTgtCoverAlphaTS|meshViewerEdit|graphViewer|
+|![](![Capture d’écran 2023-11-17 à 17 47 26](https://github.com/DGtal-team/DGtalTools-contrib/assets/772865/5da7e052-d332-4c1e-95bd-bfd06d4cd1e7))| | |
+| :-: | :-: | :-: |
+|polyMeshEdit | ||
