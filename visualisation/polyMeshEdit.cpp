@@ -28,6 +28,7 @@
  */
 
 ///////////////////////////////////////////////////////////////////////////////
+#define STB_IMAGE_IMPLEMENTATION
 
 #include <iostream>
 #include <DGtal/base/Common.h>
