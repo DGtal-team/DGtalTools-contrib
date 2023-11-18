@@ -28,7 +28,7 @@
  */
 
 ///////////////////////////////////////////////////////////////////////////////
-#define NO_ADD_STBIMAGE_IMPLEMENT
+#define NO_ADD_STBIMAGE_IMPLEMENT //To avoid duplicated linking errors (like LNK2005 in MSVC)
 #include <iostream>
 #include <DGtal/base/Common.h>
 #include <DGtal/helpers/StdDefs.h>
@@ -55,20 +55,28 @@ using namespace DGtal;
  
  @brief  polyMeshEdit tools to edit a mesh (add local noise remove selected faces). Note that the process rely on half edge data structure that can fails if the input is not topological consistant. If you want use other type of mesh, you can use meshViewerEdit that is based on the simple soup of triangles process (slower selection process).
 
- @b Usage:   polyMeshEdit [input]
+ @b Usage:   polyMeshEdit [OPTIONS] 1 [2]
+
 
  @b Allowed @b options @b are :
  
  @code
-  -h [ --help ]           display this message
-  -i [ --input ] arg      an input file...
-  -p [ --parameter] arg   a double parameter...
+ 
+ Positionals:
+   1 TEXT:FILE REQUIRED                  an input mesh file in .obj or .off format.
+   2 TEXT:FILE=result.obj                an output mesh file in .obj or .off format.
+   
+ 
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED         an input mesh file in .obj or .off format.
+   -o,--output TEXT:FILE=result.obj      an output mesh file in .obj or .off format.
  @endcode
 
  @b Example:
 
  @code
-     polyMeshEdit -i  $DGtal/examples/samples/....
+    polyMeshEdit $DGtal/examples/samples/bunnyhead.obj  bunnyEdited.obj
  @endcode
 
  @image html respolyMeshEdit.png "Example of result. "
@@ -358,12 +366,11 @@ int main(int argc, char** argv)
     // parse command line using CLI ----------------------------------------------
     CLI::App app;
     app.description("polyMeshEdit tool to edit a mesh (add local noise remove selected faces). Note that the process rely on half edge data structure that can fails if the input is not topological consistant. If you want use other type of mesh, you can use meshViewerEdit that is based on the simple soup of triangles process (slower selection process). \n"
-                    " polyMeshEdit file.obj editedMesh.obj  \n");
+                    " polyMeshEdit $DGtal/examples/samples/bunnyhead.obj  bunnyEdited.obj \n");
     app.add_option("-i,--input,1", inputFileName, "an input mesh file in .obj or .off format." )
     ->required()
     ->check(CLI::ExistingFile);
-    app.add_option("-o,--output,2", outputFileName, "an output mesh file in .obj or .off format.", true )
-    ->check(CLI::ExistingFile);
+    app.add_option("-o,--output,2", outputFileName, "an output mesh file in .obj or .off format.", true );
     
     
     app.get_formatter()->column_width(40);
