@@ -99,8 +99,17 @@ static int partialF = 1;
 static int randLarge = 100000;
 static const int unselectFlag = 200;
 static const int selectFlag = 50;
+static const int cursorFlag = 1;
 
 static std::string outputFileName {"result.obj"};
+
+void updateSelection(){
+    polyscope::removeStructure("selection");
+    auto digsurf = polyscope::getSurfaceMesh("InputMesh");
+    digsurf->addFaceScalarQuantity("selection", vectSelection)
+                 ->setMapRange(std::pair<double, double>{cursorFlag,unselectFlag});
+    digsurf->setAllQuantitiesEnabled(true);
+}
 
 
 void addSurfaceInPolyscope(PolySurface &psurf){
@@ -111,24 +120,22 @@ void addSurfaceInPolyscope(PolySurface &psurf){
         faces.push_back(psurf.verticesAroundFace( face ));
         vectSelection.push_back(unselectFlag);
     }
-    
     auto digsurf = polyscope::registerSurfaceMesh("InputMesh",
                                                   psurf.positions(), faces);
-    digsurf->addFaceScalarQuantity("selection", vectSelection);
-    digsurf->setAllQuantitiesEnabled(true);
+    updateSelection();
 }
 
 static Z3i::RealPoint
-getFaceBarycenter(PolySurface &polysurff, const PolySurface::Face &aFace){
+getFaceBarycenter(const PolySurface &polysurff, const PolySurface::Face &aFace) {
     Z3i::RealPoint res(0.0, 0.0, 0.0);
     for(auto const &v: polysurff.verticesAroundFace(aFace)){
-        res += polysurff.positions()[v];
+        res += polysurff.position(v);
     }
     return res/polysurff.verticesAroundFace(aFace).size();
 }
 
 // Helper function
-std::vector<PolySurface::Face> faceAround(PolySurface &polysurff,
+std::vector<PolySurface::Face> faceAround(const PolySurface &polysurff,
                                           PolySurface::Face faceId,
                                           double radius){
     std::vector<PolySurface::Face> result;
@@ -182,7 +189,12 @@ void partialSelect(int selFreq=1){
             if (rand()%selFreq==0)
             {
                 vectSelection[i]=unselectFlag;
+            }else
+            {
+                vectSelection[i]=selectFlag;
             }
+        }else{
+            vectSelection[i]=unselectFlag;
         }
     }
 }
@@ -332,10 +344,10 @@ void callbackFaceID() {
                 nb = currentPolysurf.facesAroundVertex(polyscope::pick::getSelection().second)[0];
             }
         }
-        
+
         if (nb > 0 && nb < vectSelection.size()){
             auto fVois = faceAround(currentPolysurf, nb, paintRad);
-            vectSelection[nb] = 0;
+            vectSelection[nb] = cursorFlag;
             srand((unsigned) time(NULL));
             for (auto f: fVois)
             {
@@ -351,8 +363,7 @@ void callbackFaceID() {
         }
     }
     ImGui::End();
-    digsurf -> removeQuantity("selection");
-    digsurf -> addFaceScalarQuantity("selection", vectSelection);
+    updateSelection();
 }
 
 
@@ -375,8 +386,8 @@ int main(int argc, char** argv)
     
     app.get_formatter()->column_width(40);
     CLI11_PARSE(app, argc, argv);
+    polyscope::options::programName = "PolyMeshEdit - (DGtalToolsContrib)";
     polyscope::init();
-    polyscope::options::programName = "PolyMeshEdit";
     polyscope::options::buildGui=false;
     // read input mesh
     DGtal::Mesh<DGtal::Z3i::RealPoint> aMesh(true);
@@ -386,7 +397,6 @@ int main(int argc, char** argv)
     polyscope::state::userCallback = callbackFaceID;
     addSurfaceInPolyscope(currentPolysurf);
     firstPolysurf = currentPolysurf;
-    polyscope::options::buildGui=false;
     polyscope::show();
     return 0;
     
