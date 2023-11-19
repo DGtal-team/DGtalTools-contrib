@@ -226,7 +226,6 @@ void noisify(double scale = 0.01){
     addSurfaceInPolyscope(currentPolysurf);
 }
 
-   
 
             
 void deleteSelectedFaces(){
@@ -345,7 +344,8 @@ void callbackFaceID() {
         {
             // vertex selected (selecting a face connected to it)
             if(currentPolysurf.facesAroundVertex(polyscope::pick::getSelection().second)
-               .size()> 0){
+               .size()> 0)
+            {
                 nb = currentPolysurf.facesAroundVertex(polyscope::pick::getSelection().second)[0];
             }
         }
@@ -399,13 +399,14 @@ int main(int argc, char** argv)
     aMesh << inputFileName;
     aMesh.removeIsolatedVertices();
     auto bb = aMesh.getBoundingBox();
+    // Setting scale mesh dependant parameters
     minPaintRad = (bb.second - bb.first).norm()/1000.0;
     maxPaintRad = (bb.second - bb.first).norm()/2.0;
     minNoiseLevel = (bb.second - bb.first).norm()/10000.0;
     maxNoiseLevel = (bb.second - bb.first).norm()/100.0;
     noiseLevel = (bb.second - bb.first).norm()/1000.0;
-
     paintRad = (bb.second - bb.first).norm()/50.0;
+    
     DGtal::MeshHelpers::mesh2PolygonalSurface(aMesh, currentPolysurf);
     polyscope::state::userCallback = callbackFaceID;
     addSurfaceInPolyscope(currentPolysurf);
