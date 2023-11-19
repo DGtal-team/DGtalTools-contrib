@@ -93,6 +93,12 @@ static PolySurface currentPolysurf;
 static PolySurface firstPolysurf;
 
 static std::vector<int> vectSelection;
+static float minPaintRad = 1.0;
+static float maxPaintRad = 100.0;
+static float minNoiseLevel = 1.0;
+static float maxNoiseLevel = 100.0;
+
+
 static float paintRad = 1.0;
 static float noiseLevel = 1.0;
 static int partialF = 1;
@@ -100,6 +106,7 @@ static int randLarge = 100000;
 static const int unselectFlag = 200;
 static const int selectFlag = 50;
 static const int cursorFlag = 1;
+
 
 static std::string outputFileName {"result.obj"};
 
@@ -267,15 +274,13 @@ void callbackFaceID() {
     srand((unsigned) time(NULL));
     ImGui::Begin("Editing tools");
     ImGui::Text("Setting selection size:");
-    ImGui::SliderFloat("radius values", &paintRad, 0.01f, 10.0f, "size = %.3f");
-
+    ImGui::SliderFloat("radius values", &paintRad, minPaintRad, maxPaintRad, "size = %.3f");
     ImGui::Separator();
-
     ImGui::Text("Set selection freq:");
     ImGui::SliderInt(" freq (1=select all, 2=select 1over2)", &partialF, 1, 10, "freq = %i");
     ImGui::Separator();
     ImGui::Text("Noise parameters:");
-    ImGui::SliderFloat("noise scale", &noiseLevel, 0.001, 2, "scale = %f");
+    ImGui::SliderFloat("noise scale", &noiseLevel, minNoiseLevel, maxNoiseLevel, "scale = %f");
     ImGui::Separator();
 
     ImGui::Text("Action:");
@@ -393,6 +398,14 @@ int main(int argc, char** argv)
     DGtal::Mesh<DGtal::Z3i::RealPoint> aMesh(true);
     aMesh << inputFileName;
     aMesh.removeIsolatedVertices();
+    auto bb = aMesh.getBoundingBox();
+    minPaintRad = (bb.second - bb.first).norm()/1000.0;
+    maxPaintRad = (bb.second - bb.first).norm()/2.0;
+    minNoiseLevel = (bb.second - bb.first).norm()/10000.0;
+    maxNoiseLevel = (bb.second - bb.first).norm()/100.0;
+    noiseLevel = (bb.second - bb.first).norm()/1000.0;
+
+    paintRad = (bb.second - bb.first).norm()/50.0;
     DGtal::MeshHelpers::mesh2PolygonalSurface(aMesh, currentPolysurf);
     polyscope::state::userCallback = callbackFaceID;
     addSurfaceInPolyscope(currentPolysurf);
