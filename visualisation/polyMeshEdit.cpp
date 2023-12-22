@@ -53,7 +53,7 @@ using namespace DGtal;
 /**
  @page polyMeshEdit polyMeshEdit
  
- @brief  polyMeshEdit tools to edit a mesh (add local noise remove selected faces). Note that the process rely on half edge data structure that can fails if the input is not topological consistant. If you want use other type of mesh, you can use meshViewerEdit that is based on the simple soup of triangles process (slower selection process).
+ @brief  polyMeshEdit tools to edit a mesh (add local noise and remove selected faces). Note that the process relies on the halfedge data structure that can fail if the input is not topologically consistant. If you want use other type of mesh, you can use meshViewerEdit that is based on the simple soup of triangles process (slower selection process).
 
  @b Usage:   polyMeshEdit [OPTIONS] 1 [2]
 
