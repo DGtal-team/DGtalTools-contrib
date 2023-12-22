@@ -381,7 +381,7 @@ int main(int argc, char** argv)
     
     // parse command line using CLI ----------------------------------------------
     CLI::App app;
-    app.description("polyMeshEdit tool to edit a mesh (add local noise remove selected faces). Note that the process rely on half edge data structure that can fails if the input is not topological consistant. If you want use other type of mesh, you can use meshViewerEdit that is based on the simple soup of triangles process (slower selection process). \n"
+    app.description("polyMeshEdit tool to edit a mesh (add local noise and remove selected faces). Note that the process relies on the halfedge data structure that can fail if the input is not topologically consistant. If you want use other type of mesh, you can use meshViewerEdit that is based on the simple soup of triangles process (slower selection process). \n"
                     " polyMeshEdit $DGtal/examples/samples/bunnyhead.obj  bunnyEdited.obj \n");
     app.add_option("-i,--input,1", inputFileName, "an input mesh file in .obj or .off format." )
     ->required()
