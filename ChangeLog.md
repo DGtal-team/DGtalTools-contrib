@@ -16,7 +16,7 @@
   - basicMorphoFilter: fix a bug on the dilate/erode options. 
     (Bertrand Kerautret [#74](https://github.com/DGtal-team/DGtalTools-contrib/pull/74))  
  - *visualisation*
-  - polyMeshEdit: tool to edit a mesh (add local noise remove selected faces).
+  - polyMeshEdit: tool to edit a mesh (add local noise, remove selected faces).
     (Bertrand Kerautret [#78](https://github.com/DGtal-team/DGtalTools-contrib/pull/78))
 
 
