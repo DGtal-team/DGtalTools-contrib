@@ -15,8 +15,12 @@
  - *Geometry3d*
   - basicMorphoFilter: fix a bug on the dilate/erode options. 
     (Bertrand Kerautret [#74](https://github.com/DGtal-team/DGtalTools-contrib/pull/74))  
-  
- # DGtalTools-contrib  1.3 
+ - *visualisation*
+  - polyMeshEdit: tool to edit a mesh (add local noise, remove selected faces).
+    (Bertrand Kerautret [#78](https://github.com/DGtal-team/DGtalTools-contrib/pull/78))
+
+
+# DGtalTools-contrib  1.3 
 
 - *global*
   - Continuous integration does not use Travis anymore but Github Actions.
