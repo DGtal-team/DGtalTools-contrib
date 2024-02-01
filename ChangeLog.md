@@ -1,4 +1,7 @@
 # DGtalTools-contrib  1.4 (beta)
+- *global*
+  - Continuous integration on windows does not use Appveyopr anymore but Github Actions.
+   (Bertrand Kerautret [#77](https://github.com/DGtal-team/DGtalTools-contrib/pull/77))
 
 - *Geometry2d*
   - rotNmap: new tools to apply a rotation in the input normal map (it
@@ -12,12 +15,16 @@
  - *Geometry3d*
   - basicMorphoFilter: fix a bug on the dilate/erode options. 
     (Bertrand Kerautret [#74](https://github.com/DGtal-team/DGtalTools-contrib/pull/74))  
+
   - graph2vol: new tool to transform graph based object into volumetric object. 
     (Bertrand Kerautret [#76](https://github.com/DGtal-team/DGtalTools-contrib/pull/76))
     
-    
+ - *visualisation*
+  - polyMeshEdit: tool to edit a mesh (add local noise, remove selected faces).
+    (Bertrand Kerautret [#78](https://github.com/DGtal-team/DGtalTools-contrib/pull/78))
 
- # DGtalTools-contrib  1.3 
+
+# DGtalTools-contrib  1.3 
 
 - *global*
   - Continuous integration does not use Travis anymore but Github Actions.
