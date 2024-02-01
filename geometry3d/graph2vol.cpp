@@ -59,7 +59,7 @@ using namespace DGtal;
   -e,--inputEdge TEXT:FILE REQUIRED     input file containing the edge list.
   -r,--inputRadii TEXT:FILE REQUIRED    input file containing the radius for each vertex.
   -g,--gridSize FLOAT                   grid size.
-  -m,--volMarge INT=2                   add volume margin from graph bouding box.
+  -m,--volMargin INT=2                   add volume margin from graph bouding box.
   -o,--output TEXT REQUIRED             Output volumic filename
   --interpolRadius                      Interpolation of radius
  @endcode
@@ -148,7 +148,7 @@ int main( int argc, char** argv )
   app.add_option("--inputRadii,-r", nameFileRadii, "input file containing the radius for each vertex.")
     ->required()->check(CLI::ExistingFile);
   app.add_option("--gridSize,-g", gridSize, "grid size.");
-  app.add_option("--volMarge,-m", brdVol, "add volume margin from graph bouding box.", true);
+  app.add_option("--volMargin,-m", brdVol, "add volume margin from graph bouding box.", true);
   app.add_option("--output,-o", outputFileName, "Output volumic filename")->required();
   app.add_flag("--interpolRadius", interpolRadius, "Interpolation of radius");
     
