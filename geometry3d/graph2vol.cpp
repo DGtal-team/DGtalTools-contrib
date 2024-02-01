@@ -45,9 +45,10 @@ using namespace DGtal;
 /**
  @page graph2vol graph2vol
  
- @brief  Description of the tool...
+ @brief  Convert a graph into a 3D volumetric file.
 
- @b Usage:   graph2vol [input]
+ @b Typical use example:
+ 	 graph2vol -v res_vertex.dat -e res_edges.dat -r res_radius.dat 
 
  @b Allowed @b options @b are :
  
@@ -58,6 +59,7 @@ using namespace DGtal;
   -e,--inputEdge TEXT:FILE REQUIRED     input file containing the edge list.
   -r,--inputRadii TEXT:FILE REQUIRED    input file containing the radius for each vertex.
   -g,--gridSize FLOAT                   grid size.
+  -m,--volMarge INT=2                   add volume margin from graph bouding box.
   -o,--output TEXT REQUIRED             Output volumic filename
   --interpolRadius                      Interpolation of radius
  @endcode
@@ -140,12 +142,13 @@ int main( int argc, char** argv )
         << "Typical use example:\n \t graph2vol -v res_vertex.dat -e res_edges.dat -r res_radius.dat \n";
   // parse command line using CLI-------------------------------------------------------
   CLI::App app;
-  app.description("Your program description.\n" + usage.str() );
-  app.add_option("--inputVertex,-v", nameFileVertex, "input file containing the vertex list.")->required()->check(CLI::ExistingFile);
+  app.description("Convert a graph into a 3D volumetric file.\n" + usage.str() );
+  app.add_option("--inputVertex,-v", nameFileVertex, "input file containing the vertex list (explicitly given where each line contains the Z3 coordinates).")->required()->check(CLI::ExistingFile);
   app.add_option("--inputEdge,-e", nameFileEdge, "input file containing the edge list.")->required()->check(CLI::ExistingFile);
   app.add_option("--inputRadii,-r", nameFileRadii, "input file containing the radius for each vertex.")
     ->required()->check(CLI::ExistingFile);
   app.add_option("--gridSize,-g", gridSize, "grid size.");
+  app.add_option("--volMarge,-m", brdVol, "add volume margin from graph bouding box.", true);
   app.add_option("--output,-o", outputFileName, "Output volumic filename")->required();
   app.add_flag("--interpolRadius", interpolRadius, "Interpolation of radius");
     
