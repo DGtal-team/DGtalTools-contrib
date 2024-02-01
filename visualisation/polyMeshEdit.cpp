@@ -28,7 +28,7 @@
  */
 
 ///////////////////////////////////////////////////////////////////////////////
-#define NO_ADD_STBIMAGE_IMPLEMENT //To avoid duplicated linking errors (like LNK2005 in MSVC)
+
 #include <iostream>
 #include <DGtal/base/Common.h>
 #include <DGtal/helpers/StdDefs.h>
