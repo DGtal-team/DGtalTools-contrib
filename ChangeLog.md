@@ -1,4 +1,11 @@
 # DGtalTools-contrib  1.4 (beta)
+- *build*
+  - Remove STBimage preprocessor instruction used to fix MVSC that is 
+    no more usefull since DGtal PR [175](https://github.com/DGtal-team/DGtal/pull/1715) 
+    (Bertrand Kerautret [#79](https://github.com/DGtal-team/DGtalTools-contrib/pull/79))
+
+
+
 - *global*
   - Continuous integration on windows does not use Appveyopr anymore but Github Actions.
    (Bertrand Kerautret [#77](https://github.com/DGtal-team/DGtalTools-contrib/pull/77))
