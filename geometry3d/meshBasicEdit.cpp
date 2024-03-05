@@ -15,11 +15,11 @@ using namespace DGtal;
 
 
 /**
- @page basicEditMesh basicEditMesh
+ @page basicEditMesh meshBasicEdit.cpp
  
  @brief  Apply the Rosin Threshold algorithm.
 
- @b Usage:   basicEditMesh [input]
+ @b Usage:   meshBasicEdit.cpp [input]
 
  @b Allowed @b options @b are :
  
@@ -48,12 +48,12 @@ using namespace DGtal;
  @b Example:
 
  @code
-   basicEditMesh ${DGtal}/examples/samples/tref.off --filterVisiblePart 0.3 toto.offbasicEditMesh -i
+   meshBasicEdit.cpp ${DGtal}/examples/samples/tref.off --filterVisiblePart 0.3 toto.offmeshBasicEdit.cpp -i
  @endcode
 
 
  @see
- @ref basicEditMesh.cpp
+ @ref meshBasicEdit.cpp.cpp
 
  */
 int
@@ -63,27 +63,29 @@ main(int argc,char **argv)
   typedef typename Z3i::RealPoint TPoint;
 
   // parse command line using CLI ----------------------------------------------
-     CLI::App app;
-     std::string inputMeshName;
-     std::string outputMeshName;
+  CLI::App app;
+  std::string inputMeshName;
+  std::string outputMeshName{"result.obj"};
   std::vector<double> vectDistAndBBox;
   std::vector<double> paramBallArea;
   double theMaxAngle;
   double nx {0};
   double ny {0};
   double nz {1.0};
-  double scale;
+  double scale {0.0};
   double percentFirst;
   double percent;
-  
+  unsigned int rescaleToCube {100};
+  std::vector<unsigned int> rescaleInterToCube;
+
   app.description("Apply basic mesh edition (scale change, mesh face contraction, face filtering).\n"
-                  "Example: ./geometry3d/basicEditMesh ${DGtal}/examples/samples/tref.off --filterVisiblePart 0.3 resultFiltered.off");
+                  "Example: ./geometry3d/meshBasicEdit.cpp ${DGtal}/examples/samples/tref.off --filterVisiblePart 0.3 resultFiltered.off");
 
   app.add_option("-i,--input,1", inputMeshName, "input file name of mesh vertex given as OFF format." )
       ->required()
       ->check(CLI::ExistingFile);
   
-  app.add_option("—-output,-o",outputMeshName,"arg = file.off : export the resulting mesh associated to the fiber extraction." );
+  app.add_option("-o,--output,2",outputMeshName,"arg = file.off : export the resulting mesh associated to the fiber extraction.");
   app.add_option("--shrinkArea,-s",vectDistAndBBox,"arg = <dist> <bounding box> apply a mesh shrinking on the defined area.")
   ->expected(7);
   app.add_option("--shrinkBallArea,-b", paramBallArea,  "arg = <dist> <x> <y> <z> <radius> apply a mesh shrinking on the  area defined by a ball centered at x y z.")
@@ -94,7 +96,10 @@ main(int argc,char **argv)
   app.add_option("--ny,-y", ny, "arg = define the ny of the direction of filtering, see --filterVisiblePart.", true);
   app.add_option("--nz,-z", nz, "arg = define the nz of the direction of filtering, see --filterVisiblePart.", true);
   auto scaleOpt = app.add_option("--scale",scale, "change the scale factor" );
-  
+  auto rescaleToCubeOpt = app.add_option("--rescaleToCube", rescaleToCube, "change the scale factor of the input mesh such that its bounding box size corresponds to the size of a cube given as argument.", true);
+  app.add_option("--rescaleInterToCube", rescaleInterToCube, "same than rescaleToCube but only if the bounding box max size is outside the interval given as parameters, in the other cases nothing is done (even using --rescaleToCube).", false)
+    ->expected(2);
+
   auto filterFF = app.add_option("--filterFirstFaces",percentFirst,"arg= X : filters the X% of the first faces of the input mesh.");
   auto filterNBF = app.add_option("--filterNbFaces",percent,  "arg = X % limits the number of face by keeping only X percent of faces." );
   
@@ -142,9 +147,27 @@ main(int argc,char **argv)
     moduloLimitFace = (int)(100.0/percent);
   } 
   
-
   DGtal::Mesh<Z3i::RealPoint> theMesh(true);
   theMesh << inputMeshName;
+  if (rescaleToCubeOpt->count() >0  || rescaleInterToCube.size() != 0 )
+  {
+      auto bb = theMesh.getBoundingBox();
+      auto s = bb.second-bb.first;
+      auto maxSize = *s.maxElement();
+      if (rescaleToCubeOpt->count() >0 )
+      {
+          scale = rescaleToCube/(double)maxSize;
+      }
+      if( maxSize > rescaleInterToCube[1] || maxSize < rescaleInterToCube[0] )
+      {
+          scale = rescaleToCube/(double)maxSize;
+      } // in this case the rescaleToCube will not be applied
+      else if (rescaleInterToCube.size() != 0)
+      {
+          scale = 1.0;
+      }
+      
+  }
 
   DGtal::Mesh<Z3i::RealPoint> theNewMesh(true);
 
@@ -208,7 +231,7 @@ main(int argc,char **argv)
     
   }  
 
-  if( scaleOpt->count()>0 )
+  if( scale != 0.0 && scale != 1.0 )
     {
       for(unsigned int i =0; i<theNewMesh.nbVertex(); i++)
         {
@@ -216,8 +239,8 @@ main(int argc,char **argv)
  
         }
     }
-  trace.info()<< "nbFaces init: " << theNewMesh.nbFaces() << std::endl;
-  trace.info()<< "New nbFaces: " << theMesh.nbFaces() << std::endl;  
+  trace.info()<< "nbFaces init: " << theMesh.nbFaces() << std::endl;
+  trace.info()<< "New nbFaces: " << theNewMesh.nbFaces() << std::endl;
   theNewMesh >> outputMeshName; 
   
   
