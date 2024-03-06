@@ -31,6 +31,7 @@
 #include "DGtal/base/Common.h"
 #include "DGtal/helpers/StdDefs.h"
 #include "DGtal/io/readers/MeshReader.h"
+#include "DGtal/io/readers/PointListReader.h"
 #include "DGtal/io/readers/TableReader.h"
 #include "DGtal/io/writers/MeshWriter.h"
 
@@ -70,17 +71,57 @@ using namespace DGtal;
  
  */
 
+struct PithSectionCenter {
+    std::vector<Z3i::RealPoint> myPith;
+    std::vector<Z3i::RealPoint> mySampledPith;
+    double myMinZ, myMaxZ;
+    const double sampleSize = 20.0;
+    int myNbIntervals;
+    PithSectionCenter(const std::vector<Z3i::RealPoint> &aPith): myPith(aPith){
+        myMaxZ = (*std::max_element(aPith.begin(), aPith.end(), [](auto a, auto b){return a[2] < b[2];}))[2];
+        myMinZ = (*std::min_element(aPith.begin(), aPith.end(), [](auto a, auto b){return a[2] < b[2];}))[2];
+        myNbIntervals = (myMaxZ - myMinZ)/sampleSize;
+        for (unsigned int i = 0; i < myNbIntervals; i++){
+            mySampledPith.push_back(Z3i::RealPoint(0,0,0));
+        }
+        for (auto const &p: myPith){
+            int i = (int) floor((p[2]-myMinZ)/sampleSize);
+            mySampledPith[i] = p;
+        }
+        //check if all sample are presents
+        unsigned int n = 0;
+        for (unsigned int i = 0; i < myNbIntervals; i++){
+            if (mySampledPith[i] != Z3i::RealPoint(0,0,0)){
+                n++;
+            }
+        }
+        if (n != mySampledPith.size()){
+            trace.warning() << "all samples are not represented: " << n << "over " << myNbIntervals << std::endl;
+        }
+    }
+    Z3i::RealPoint pithRepresentant(const Z3i::RealPoint &p) const {
+        int i = (int) floor((p[2]-myMinZ)/sampleSize);
+        assert(i > 0 && i < mySampledPith.size());
+        return mySampledPith[i];
+    }
+};
+
+
+
 
 int main( int argc, char** argv )
 {
-    typedef std::vector<double> CylCoordsCont;
     double parameter {1.0};
     std::string inputMeshFileName;
     std::string inputCLineFileName;
+    std::string inputPithFileName;
+    
     std::vector<double> basePoint;
     std::string outputBaseName;
     std::stringstream usage;
-    double angleRange = 1.2;
+    double normalAngleRange = 0.6;
+    double posAngleRange = 3.0;
+
 
     usage << "Usage: " << argv[0] << " [input]\n"
     << "Typical use example:\n \t meshTrunk2Pts -i ... \n";
@@ -91,9 +132,14 @@ int main( int argc, char** argv )
     ->required()->check(CLI::ExistingFile);
     app.add_option("--InputCCoords,-c,2", inputCLineFileName, "Input file containing cylinder coordinates")
     ->required()->check(CLI::ExistingFile);
+    app.add_option("--InputPithCoords,-p,3", inputPithFileName, "Input file containing pith coordinates")
+    ->required()->check(CLI::ExistingFile);
+
     app.add_option("--basePoint,-b",basePoint , "trunk base coordinate point", true)
     ->expected(3);
-    app.add_option("--angleRange,-a",angleRange , "angle range of accepted face orientations.");
+    app.add_option("--normalAngleRange,-a",normalAngleRange , "angle range of accepted face orientations.");
+    app.add_option("--posAngleRange,-a",posAngleRange , "position angle range of accepted mesh points.");
+
     app.add_option("--outputBaseName,-o,3", outputBaseName, "Output SDP filename")->required();
 
     
@@ -107,7 +153,8 @@ int main( int argc, char** argv )
     DGtal::Mesh<DGtal::Z3i::RealPoint> aMesh;
 
     DGtal::Mesh<DGtal::Z3i::RealPoint> aCenterLine;
-    std::vector<CylCoordsCont> cylCoordinates;
+    std::vector<DGtal::Z3i::RealPoint> cylCoordinates;
+    std::vector<DGtal::Z3i::RealPoint> pith;
     
     trace.info() << "Starting " << argv[0]  << "with input: "
     <<  inputMeshFileName << " and output :" << outputBaseName
@@ -115,12 +162,22 @@ int main( int argc, char** argv )
     
     trace.info() << "Reading input mesh...";
     aMesh << inputMeshFileName;
-    trace.info() << " [done]" << std::endl;
-    trace.info() << "Read mesh with " << aMesh.nbVertex() << std::endl;
-    
+    trace.info() << " [done] (" << aMesh.nbVertex() << ")" << std::endl;
+ 
+    trace.info() << "Reading input pith coordinates...";
+    pith = PointListReader<DGtal::Z3i::RealPoint>::getPointsFromFile(inputPithFileName);
+    trace.info() << " [done] (" << pith.size() << ")" <<  std::endl;
+    PithSectionCenter pSct (pith);
+ 
     trace.info() << "Reading input cylinder coordinates... (R,theta,Z)";
-    cylCoordinates = TableReader<double>::getLinesElementsFromFile(inputCLineFileName);
-    trace.info() << " [done]" << std::endl;
+    cylCoordinates = PointListReader<DGtal::Z3i::RealPoint>::getPointsFromFile(inputCLineFileName);
+    trace.info() << " [done] (" << cylCoordinates.size() << ")" << std::endl;
+    
+    
+    
+    
+    
+    
     trace.info() << "Read tab with " << cylCoordinates.size() << std::endl;
     Z3i::RealPoint ptBase;
     if (basePoint.size() >2){
@@ -158,8 +215,16 @@ int main( int argc, char** argv )
         Z3i::RealPoint p2 = aMesh.getVertex(aFace.at(2));
         Z3i::RealPoint vectNormal = ((p1-p0).crossProduct(p2 - p0)).getNormalized();
         vectNormal /= vectNormal.norm();
-        okOrientation = vectNormal.dot(aNormal) > cos(angleRange);
-        if( okOrientation ){
+        okOrientation = vectNormal.dot(aNormal) > cos(normalAngleRange);
+        
+        bool sectorCompatible = true;
+        auto pB = (p0+p1+p2)/3.0;
+        Z3i::RealPoint pC = pSct.pithRepresentant(pB);
+        Z3i::RealPoint vectDir = pB - pC;
+        vectDir /= vectDir.norm();
+        sectorCompatible = vectDir.dot(aNormal) > cos(posAngleRange/2.0);
+
+        if( okOrientation && sectorCompatible ){
             resultingMesh.addFace(aFace);
         }
     }
