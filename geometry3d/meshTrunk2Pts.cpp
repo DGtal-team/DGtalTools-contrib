@@ -32,6 +32,7 @@
 #include "DGtal/helpers/StdDefs.h"
 #include "DGtal/io/readers/MeshReader.h"
 #include "DGtal/io/readers/TableReader.h"
+#include "DGtal/io/writers/MeshWriter.h"
 
 #include "CLI11.hpp"
 
@@ -76,9 +77,11 @@ int main( int argc, char** argv )
     double parameter {1.0};
     std::string inputMeshFileName;
     std::string inputCLineFileName;
-    
+    std::vector<double> basePoint;
     std::string outputBaseName;
     std::stringstream usage;
+    double angleRange = 1.2;
+
     usage << "Usage: " << argv[0] << " [input]\n"
     << "Typical use example:\n \t meshTrunk2Pts -i ... \n";
     // parse command line using CLI-------------------------------------------------------
@@ -88,17 +91,21 @@ int main( int argc, char** argv )
     ->required()->check(CLI::ExistingFile);
     app.add_option("--InputCCoords,-c,2", inputCLineFileName, "Input file containing cylinder coordinates")
     ->required()->check(CLI::ExistingFile);
-    
+    app.add_option("--basePoint,-b",basePoint , "trunk base coordinate point", true)
+    ->expected(3);
+    app.add_option("--angleRange,-a",angleRange , "angle range of accepted face orientations.");
     app.add_option("--outputBaseName,-o,3", outputBaseName, "Output SDP filename")->required();
-    app.add_option("--parameter,-p", parameter, "a double parameter", true);
+
     
     app.get_formatter()->column_width(40);
     CLI11_PARSE(app, argc, argv);
     // END parse command line using CLI ----------------------------------------------
     
-    
+    DGtal::Mesh<DGtal::Z3i::RealPoint> resultingMesh;
+
     // Reading input mesh   --------------------------------------------------
     DGtal::Mesh<DGtal::Z3i::RealPoint> aMesh;
+
     DGtal::Mesh<DGtal::Z3i::RealPoint> aCenterLine;
     std::vector<CylCoordsCont> cylCoordinates;
     
@@ -115,8 +122,54 @@ int main( int argc, char** argv )
     cylCoordinates = TableReader<double>::getLinesElementsFromFile(inputCLineFileName);
     trace.info() << " [done]" << std::endl;
     trace.info() << "Read tab with " << cylCoordinates.size() << std::endl;
-
+    Z3i::RealPoint ptBase;
+    if (basePoint.size() >2){
+        ptBase[0] = basePoint[0];
+        ptBase[1] = basePoint[1];
+        ptBase[2] = basePoint[2];
+        trace.info() << "Input base point: " << ptBase << std::endl;
+    }
     
+    double baseRad = cylCoordinates[0][0];
+
+    // prepare resulting mesh
+    for (auto it = aMesh.vertexBegin(); it != aMesh.vertexEnd(); it++){
+        resultingMesh.addVertex(*it);
+    }
+    
+    
+    // First sector extraction
+    std::string extr1NamePts = outputBaseName+"_Extr1.pts";
+    std::string extr1NameMesh = outputBaseName+"_Extr1.off";
+
+    Z3i::RealPoint originExtr1 = ptBase;
+    originExtr1[0] += 2.0*baseRad;
+    Z3i::RealPoint aNormal = originExtr1 - ptBase;
+    aNormal = aNormal.getNormalized();
+    trace.info() << "Origin point from extraction simulation:"
+                  << originExtr1 << std::endl;
+    //a) filter faces from face normal vector
+    for (auto it = aMesh.faceBegin();
+         it!= aMesh.faceEnd(); it++){
+        DGtal::Mesh<Z3i::RealPoint>::MeshFace aFace = *it;
+        bool okOrientation = true;
+        Z3i::RealPoint p0 = aMesh.getVertex(aFace.at(1));
+        Z3i::RealPoint p1 = aMesh.getVertex(aFace.at(0));
+        Z3i::RealPoint p2 = aMesh.getVertex(aFace.at(2));
+        Z3i::RealPoint vectNormal = ((p1-p0).crossProduct(p2 - p0)).getNormalized();
+        vectNormal /= vectNormal.norm();
+        okOrientation = vectNormal.dot(aNormal) > cos(angleRange);
+        if( okOrientation ){
+            resultingMesh.addFace(aFace);
+        }
+    }
+    trace.info() << "Cleaning isolated vertices from " << resultingMesh.nbVertex();
+    resultingMesh.removeIsolatedVertices();
+    trace.info() << "to " << resultingMesh.nbVertex() << " [done]";
+
+    trace.info() << "Writing output mesh...";
+    resultingMesh >> extr1NameMesh;
+    trace.info() << "[done]." << std::endl;
     return 0;
 }
 
