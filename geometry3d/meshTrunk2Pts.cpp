@@ -34,9 +34,10 @@
 #include "DGtal/io/readers/PointListReader.h"
 #include "DGtal/io/readers/TableReader.h"
 #include "DGtal/io/writers/MeshWriter.h"
-
+#include <time.h>
+#include <cstdlib>
+#include <stdio.h>
 #include "CLI11.hpp"
-
 ///////////////////////////////////////////////////////////////////////////////
 using namespace std;
 using namespace DGtal;
@@ -71,6 +72,8 @@ using namespace DGtal;
  
  */
 
+
+
 struct PithSectionCenter {
     std::vector<Z3i::RealPoint> myPith;
     std::vector<Z3i::RealPoint> mySampledPith;
@@ -100,13 +103,41 @@ struct PithSectionCenter {
         }
     }
     Z3i::RealPoint pithRepresentant(const Z3i::RealPoint &p) const {
-        int i = (int) floor((p[2]-myMinZ)/sampleSize);
-        assert(i > 0 && i < mySampledPith.size());
+        unsigned int i = (unsigned int) ceil((p[2]-myMinZ)/sampleSize);
+        assert(i >= 0);
+        i = std::min((unsigned int)(mySampledPith.size()-1), i);
         return mySampledPith[i];
     }
 };
 
 
+struct TrunkDeformator {
+    double mySectorSize;
+    double myMinZ, myMaxZ;
+    int myNbSectors;
+    std::vector<double> mySectorShift;
+    const PithSectionCenter& mySectionCenter;
+    
+    TrunkDeformator(const PithSectionCenter &pSectCenter, double maxShift, double sectSize):
+                    mySectionCenter(pSectCenter),
+                    mySectorSize(sectSize){
+        myNbSectors = (int)floor((2.0*M_PI) / mySectorSize);
+        std::srand((unsigned int) std::time(NULL));
+        for (unsigned int i = 0; i < myNbSectors; i++){
+            double shift = rand()%((int)floor(2000.0*maxShift));
+            shift /= 2000.0;
+            mySectorShift.push_back(shift);
+        }
+    }
+    Z3i::RealPoint deform(const Z3i::RealPoint &pt, const Z3i::RealPoint &ptCyl) const {
+        Z3i::RealPoint res = pt;
+        unsigned int sectInd = (unsigned int) floor(ptCyl[1]/mySectorSize);
+        double ratioZ = (pt[2]-mySectionCenter.myMinZ)/(mySectionCenter.myMaxZ-mySectionCenter.myMinZ);
+        double hShift = mySectorShift[sectInd]*ratioZ;
+        res = res  + (pt-mySectionCenter.pithRepresentant(pt)).getNormalized()*hShift;
+        return res;
+    }
+};
 
 
 int main( int argc, char** argv )
@@ -121,7 +152,8 @@ int main( int argc, char** argv )
     std::stringstream usage;
     double normalAngleRange = 0.6;
     double posAngleRange = 3.0;
-
+    double ampliMaxShift = 100.0;
+    double sectSize = 0.3;
 
     usage << "Usage: " << argv[0] << " [input]\n"
     << "Typical use example:\n \t meshTrunk2Pts -i ... \n";
@@ -138,7 +170,9 @@ int main( int argc, char** argv )
     app.add_option("--basePoint,-b",basePoint , "trunk base coordinate point", true)
     ->expected(3);
     app.add_option("--normalAngleRange,-a",normalAngleRange , "angle range of accepted face orientations.");
-    app.add_option("--posAngleRange,-a",posAngleRange , "position angle range of accepted mesh points.");
+    app.add_option("--posAngleRange,-r",posAngleRange , "position angle range of accepted mesh points.");
+    app.add_option("--ampliMaxShift,-s",ampliMaxShift , "maximal amplitude of sector shift.");
+    app.add_option("--sectSize,-S",sectSize , "sector size of the deformation.");
 
     app.add_option("--outputBaseName,-o,3", outputBaseName, "Output SDP filename")->required();
 
@@ -228,6 +262,16 @@ int main( int argc, char** argv )
             resultingMesh.addFace(aFace);
         }
     }
+    //b) applying shift on sector
+    TrunkDeformator tDef (pSct, ampliMaxShift, sectSize);
+    for (unsigned int i = 0; i < resultingMesh.nbVertex(); i++){
+        Z3i::RealPoint &pt = resultingMesh.getVertex(i);
+        Z3i::RealPoint ptCyl = cylCoordinates[i];
+        Z3i::RealPoint newP = tDef.deform(pt, ptCyl);
+        pt[0] = newP[0]; pt[1] = newP[1]; pt[2] = newP[2];
+        
+    }
+    
     trace.info() << "Cleaning isolated vertices from " << resultingMesh.nbVertex();
     resultingMesh.removeIsolatedVertices();
     trace.info() << "to " << resultingMesh.nbVertex() << " [done]";
