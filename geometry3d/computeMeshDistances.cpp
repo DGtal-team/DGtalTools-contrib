@@ -89,12 +89,38 @@
 #include "DGtal/shapes/Mesh.h"
 #include "DGtal/math/linalg/SimpleMatrix.h"
 #include "DGtal/kernel/BasicPointFunctors.h"
-
+#include "DGtal/images/ImageContainerBySTLVector.h"
 
 using namespace DGtal;
 
 
 static const double approxSamePlane = 0.1;
+
+struct NeighborhoodMeshFace{
+    typedef ImageContainerBySTLVector<Z3i::Domain, std::vector<unsigned int>> FaceMap;
+    unsigned int myCellSize;
+    DGtal::Mesh<Z3i::RealPoint> myMesh;
+    FaceMap myMap;
+    NeighborhoodMeshFace(unsigned int cellSize,
+                         DGtal::Mesh<Z3i::RealPoint> aMesh): myMesh(aMesh),
+                         myCellSize(cellSize),
+                         myMap(FaceMap(Z3i::Domain())){
+        auto bb = aMesh.getBoundingBox();
+        myMap =  FaceMap(FaceMap::Domain(bb.first/myCellSize, bb.second/myCellSize));
+        for (unsigned int i = 0; i< myMesh.nbFaces(); i++){
+            auto b = myMesh.getFaceBarycenter(i);
+            auto p = Z3i::Point((int)floor(b[0]/myCellSize),(int)floor(b[1]/myCellSize),(int)floor(b[2]/myCellSize));
+            std::vector<unsigned int> v = myMap(p);
+            v.push_back(i);
+            myMap.setValue(p, v);
+        }
+    }
+    std::vector<unsigned int> faceNeighboring(const Z3i::RealPoint &p){
+        std::vector<unsigned int> res;
+        auto pp = Z3i::Point((int)floor(p[0]/myCellSize),(int)floor(p[1]/myCellSize),(int)floor(p[2]/myCellSize));
+        return myMap(pp);
+    }
+};
 
 template <typename TPoint>
 static
@@ -190,7 +216,8 @@ main(int argc,char **argv)
   bool exportDistanceEstimationType {false};
   double maxScaleDistance {0.1};
   double minScaleDistance {0.0};
-  
+  double cutDistance {10.0};
+    
   std::stringstream appDescr;
   appDescr << "Computes for each face of a mesh A the minimal distance to another mesh B. For each face of A, the minimal distance to B is computed by a brut force scan and the result can be exported as a mesh where the distances are represented in color scale. The maximal value of all these distances is also given as std output.";
   appDescr <<  "Example of use (from the DGtalTools-contrib directory:"<< "\n" <<
@@ -217,7 +244,8 @@ main(int argc,char **argv)
   app.add_flag("--squaredDistance,-s", squaredDistance, "computes squared distance.");
   app.add_flag("--saveNearestPoint,-n", saveNearestPoint, "save the nearest point obtained during the computation of the minimal distance (point of B).");
   app.add_option("--maxScaleDistance", maxScaleDistance, "set the default max value use to display the distance", true);
-  
+    app.add_option("--cutDistance", cutDistance, "set the distance beyond which the comparison is not made in order to improve performance.", true);
+
   app.add_flag("--exportDistanceEstimationType", exportDistanceEstimationType, "Export as face color the type of"
                " distance estimation used for each face (blue for projection, green for edge projection and white"
                "for euclidean distance.)");
@@ -241,9 +269,10 @@ main(int argc,char **argv)
   MeshReader<Z3i::RealPoint>::importOFFFile(inputMeshName, projOkMesh, false);
   
 
-  
   trace.info()<< "reading the input Comp mesh ok: "<< theMeshComp.nbVertex() <<  std::endl;
-  
+  trace.info()<< "Constructing compared mesh map ...";
+  NeighborhoodMeshFace neighorFaces (100, theMeshComp);
+  trace.info() << "[done]" << std::endl;
   
   
   double maxOfMin = 0;
@@ -264,15 +293,19 @@ main(int argc,char **argv)
     ProjType aProjType = INSIDE;
     vectNearestPt.push_back(cA);
     // compute the minimal distance of the point of A to one face of point B.
-    for (unsigned int j=0; j < theMeshComp.nbFaces(); j++){
+    auto vFaces = neighorFaces.faceNeighboring(cA);
+    for (unsigned int j=0; j < vFaces.size(); j++){
       // project center (cA) of a face of A into faces of B.
-      std::vector<DGtal::Mesh<Z3i::RealPoint>::Index>  aFaceB = theMeshComp.getFace(j);
-      RPoint pB0 = theMeshComp.getVertex(aFaceB.at(0));
-      RPoint pB1 = theMeshComp.getVertex(aFaceB.at(1));
-      RPoint pB2 = theMeshComp.getVertex(aFaceB.at(2));
-      RPoint cB =  theMeshComp.getFaceBarycenter(j);
+
+        std::vector<DGtal::Mesh<Z3i::RealPoint>::Index>  &aFaceB = theMeshComp.getFace(vFaces[j]);
+        
+        RPoint &pB0 = theMeshComp.getVertex(aFaceB[0]);
+        RPoint &pB1 = theMeshComp.getVertex(aFaceB[1]);
+        RPoint &pB2 = theMeshComp.getVertex(aFaceB[2]);
+
+        const RPoint &cB =  (pB0+pB1+pB2)/3.0;
       
-      if (useFaceCenterDistance){
+        if (useFaceCenterDistance){
         double distance = (cB-cA).norm();
         if (distance < distanceMin){
           distanceMin = distance;
