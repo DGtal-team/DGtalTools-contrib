@@ -71,7 +71,11 @@ using namespace DGtal;
  @ref meshTrunk2Pts.cpp
  
  */
-
+double
+gaussF(double x, double mu, double sigma){
+    double max = exp((-(mu)*(mu))/(2.0*sigma*sigma))*(1.0/(sigma*sqrt(2*M_PI)));
+    return (exp((-(x-mu)*(x-mu))/(2.0*sigma*sigma))*(1.0/(sigma*sqrt(2*M_PI))))/max;
+}
 
 
 struct PithSectionCenter {
@@ -132,8 +136,10 @@ struct TrunkDeformator {
     Z3i::RealPoint deform(const Z3i::RealPoint &pt, const Z3i::RealPoint &ptCyl) const {
         Z3i::RealPoint res = pt;
         unsigned int sectInd = (unsigned int) floor(ptCyl[1]/mySectorSize);
+        double posA = (((double) sectInd)*mySectorSize+mySectorSize/2.0)-ptCyl[1];
+        double gCoef = gaussF(posA, 0, mySectorSize/4.0 );
         double ratioZ = (pt[2]-mySectionCenter.myMinZ)/(mySectionCenter.myMaxZ-mySectionCenter.myMinZ);
-        double hShift = mySectorShift[sectInd]*ratioZ;
+        double hShift = mySectorShift[sectInd]*ratioZ*gCoef*0.5;
         res = res  + (pt-mySectionCenter.pithRepresentant(pt)).getNormalized()*hShift;
         return res;
     }
