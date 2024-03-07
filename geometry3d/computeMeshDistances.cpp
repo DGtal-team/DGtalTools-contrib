@@ -106,7 +106,14 @@ struct NeighborhoodMeshFace{
                          myCellSize(cellSize),
                          myMap(FaceMap(Z3i::Domain())){
         auto bb = aMesh.getBoundingBox();
-        myMap =  FaceMap(FaceMap::Domain(bb.first/myCellSize, bb.second/myCellSize));
+        myMap =  FaceMap(FaceMap::Domain(bb.first/myCellSize-Z3i::Point(2,2,2), bb.second/myCellSize+Z3i::Point(2,2,2)));
+        trace.info() << "NeighborhoodMeshFace size of digitized domain [" << myMap.domain().lowerBound()[0]
+                             << " " << myMap.domain().lowerBound()[1]
+                             << " " << myMap.domain().lowerBound()[2]
+                             << "] [ " << myMap.domain().upperBound()[0]
+                             << " " << myMap.domain().upperBound()[1]
+                             << " " << myMap.domain().upperBound()[2] << "]" << std::endl;
+
         for (unsigned int i = 0; i< myMesh.nbFaces(); i++){
             auto b = myMesh.getFaceBarycenter(i);
             auto p = Z3i::Point((int)floor(b[0]/myCellSize),(int)floor(b[1]/myCellSize),(int)floor(b[2]/myCellSize));
@@ -118,7 +125,12 @@ struct NeighborhoodMeshFace{
     std::vector<unsigned int> faceNeighboring(const Z3i::RealPoint &p){
         std::vector<unsigned int> res;
         auto pp = Z3i::Point((int)floor(p[0]/myCellSize),(int)floor(p[1]/myCellSize),(int)floor(p[2]/myCellSize));
-        return myMap(pp);
+        if (myMap.domain().isInside(pp)){
+            return myMap(pp);
+        }else{
+            trace.warning() << "point outside..." << std::endl;
+            return res;
+        }
     }
 };
 
