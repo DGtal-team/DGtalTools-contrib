@@ -22,7 +22,7 @@
     (Bertrand Kerautret [#74](https://github.com/DGtal-team/DGtalTools-contrib/pull/74))  
   - graph2vol: new tool to transform graph based object into volumetric object. 
     (Bertrand Kerautret [#76](https://github.com/DGtal-team/DGtalTools-contrib/pull/76))
-  - meshAxisCutter: new tool cut the input mesh according one axis into several separate meshes.
+  - meshAxisCutter: new tool that cuts the input mesh according one axis into several separate meshes.
    (Bertrand Kerautret [#71](https://github.com/DGtal-team/DGtalTools-contrib/pull/71))
   - meshAxisCutter: new option to select range meshes.
    (Bertrand Kerautret [#80](https://github.com/DGtal-team/DGtalTools-contrib/pull/80))
