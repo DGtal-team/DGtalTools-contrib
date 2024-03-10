@@ -99,20 +99,15 @@ static const double approxSamePlane = 0.1;
 
 struct NeighborhoodMeshFace{
     typedef ImageContainerBySTLVector<Z3i::Domain, std::vector<unsigned int>> FaceMap;
-    typedef ImageContainerBySTLVector<Z3i::Domain, double> DistMap;
-
     unsigned int myCellSize;
     DGtal::Mesh<Z3i::RealPoint> myMesh;
     FaceMap myMap;
-    DistMap myDist;
     NeighborhoodMeshFace(unsigned int cellSize,
                          DGtal::Mesh<Z3i::RealPoint> aMesh): myMesh(aMesh),
                          myCellSize(cellSize),
-                         myMap(FaceMap(Z3i::Domain())),
-                         myDist(DistMap(Z3i::Domain())){
+                         myMap(FaceMap(Z3i::Domain())){
         auto bb = aMesh.getBoundingBox();
-        myMap =  FaceMap(FaceMap::Domain(bb.first/myCellSize-Z3i::Point(2,2,2), bb.second/myCellSize+Z3i::Point(2,2,2)));
-        myDist =  DistMap(FaceMap::Domain(bb.first/myCellSize-Z3i::Point(2,2,2), bb.second/myCellSize+Z3i::Point(2,2,2)));
+        myMap =  FaceMap(FaceMap::Domain(bb.first/myCellSize-Z3i::Point(1,1,1), bb.second/myCellSize+Z3i::Point(1,1,1)));
 
         trace.info() << "NeighborhoodMeshFace size of digitized domain [" << myMap.domain().lowerBound()[0]
                              << " " << myMap.domain().lowerBound()[1]
@@ -127,43 +122,25 @@ struct NeighborhoodMeshFace{
             std::vector<unsigned int> v = myMap(p);
             v.push_back(i);
             myMap.setValue(p, v);
-            Z3i::RealPoint pRef ((double)myCellSize*p[0]+(myCellSize/2.0),(double)myCellSize* p[1]+(myCellSize/2.0), (double) myCellSize*p[2]+(myCellSize/2.0));
-            myDist.setValue(p, myDist(p)+(b-pRef).norm());
-        }
-        // updating mean value:
-        for (auto p: myDist.domain()){
-            if(myMap(p).size() != 0 ){
-                myDist.setValue(p, myDist(p)/myMap(p).size());
-            }
         }
     }
     std::vector<unsigned int> faceNeighboring(const Z3i::RealPoint &p){
         std::vector<unsigned int> res;
-        auto pp = Z3i::Point((int)floor(p[0]/myCellSize),(int)floor(p[1]/myCellSize),(int)floor(p[2]/myCellSize));
+        auto pp = Z3i::Point((int)floor(p[0]/myCellSize),
+                             (int)floor(p[1]/myCellSize),
+                             (int)floor(p[2]/myCellSize));
         std::vector<Z3i::Point> lVois;
         for(int i = -1; i < 2; i++)
             for(int j = -1; j < 2; j++)
                 for(int k = -1; k < 2; k++)
                     lVois.push_back(pp+Z3i::Point(i,j,k));
-        unsigned int n = 0;
         for (auto pv: lVois){
-            if (myDist(pv) < 0.4*myCellSize){
-                n++;
-            }
             if (myMap.domain().isInside(pv)){
                 auto v = myMap(pv);
                 res.insert(res.begin(), v.begin(), v.end());
-            }else{
-                trace.warning() << "point outside..." << std::endl;
             }
         }
-        if (n >= 9){
-            return res;
-        }
-        trace.warning() << "point empty..." << std::endl;
-
-        std::vector<unsigned int> r;
-        return r;
+        return res;
     }
 };
 
@@ -261,7 +238,7 @@ main(int argc,char **argv)
   bool exportDistanceEstimationType {false};
   double maxScaleDistance {0.1};
   double minScaleDistance {0.0};
-  
+  unsigned int cellGroupSize{10};
   std::stringstream appDescr;
   appDescr << "Computes for each face of a mesh A the minimal distance to another mesh B. For each face of A, the minimal distance to B is computed by a brut force scan and the result can be exported as a mesh where the distances are represented in color scale. The maximal value of all these distances is also given as std output.";
   appDescr <<  "Example of use (from the DGtalTools-contrib directory:"<< "\n" <<
@@ -288,7 +265,8 @@ main(int argc,char **argv)
   app.add_flag("--squaredDistance,-s", squaredDistance, "computes squared distance.");
   app.add_flag("--saveNearestPoint,-n", saveNearestPoint, "save the nearest point obtained during the computation of the minimal distance (point of B).");
   app.add_option("--maxScaleDistance", maxScaleDistance, "set the default max value use to display the distance", true);
-  
+  auto cGroupOpt = app.add_option("--cellGroupSize,-g", cellGroupSize, "set the size of grouping digital space used to speed up computation (by default set to maxScaleDistance/2,5).", true);
+
   app.add_flag("--exportDistanceEstimationType", exportDistanceEstimationType, "Export as face color the type of"
                " distance estimation used for each face (blue for projection, green for edge projection and white"
                "for euclidean distance.)");
@@ -311,12 +289,14 @@ main(int argc,char **argv)
   MeshReader<Z3i::RealPoint>::importOFFFile(inputCompMeshName, theMeshComp, false);
   MeshReader<Z3i::RealPoint>::importOFFFile(inputMeshName, projOkMesh, false);
   
-
+    if (cGroupOpt->count() == 0){
+        cellGroupSize = maxScaleDistance / 2.5;
+    }
   
   trace.info()<< "reading the input Comp mesh ok: "<< theMeshComp.nbVertex() <<  std::endl;
   trace.info()<< "Constructing compared mesh map ...";
-  NeighborhoodMeshFace neighorFaces (20, theMeshComp);
-    trace.info()<< "[done]";
+  NeighborhoodMeshFace neighorFaces (cellGroupSize, theMeshComp);
+  trace.info()<< "[done]";
 
   
   
@@ -407,7 +387,7 @@ main(int argc,char **argv)
         if (!fix){
             vectFaceDistances.push_back(distanceMin);
         }else{
-            vectFaceDistances.push_back(0);
+            vectFaceDistances.push_back(maxScaleDistance);
 
         }
     }
