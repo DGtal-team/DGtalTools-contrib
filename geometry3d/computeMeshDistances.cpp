@@ -83,7 +83,7 @@
 #include "DGtal/io/writers/MeshWriter.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
 #include "DGtal/io/colormaps/HueShadeColorMap.h"
-
+#include "DGtal/images/ImageContainerBySTLVector.h"
 #include "CLI11.hpp"
 
 #include "DGtal/shapes/Mesh.h"
@@ -95,6 +95,54 @@ using namespace DGtal;
 
 
 static const double approxSamePlane = 0.1;
+
+
+struct NeighborhoodMeshFace{
+    typedef ImageContainerBySTLVector<Z3i::Domain, std::vector<unsigned int>> FaceMap;
+    unsigned int myCellSize;
+    DGtal::Mesh<Z3i::RealPoint> myMesh;
+    FaceMap myMap;
+    NeighborhoodMeshFace(unsigned int cellSize,
+                         DGtal::Mesh<Z3i::RealPoint> aMesh): myMesh(aMesh),
+                         myCellSize(cellSize),
+                         myMap(FaceMap(Z3i::Domain())){
+        auto bb = aMesh.getBoundingBox();
+        myMap =  FaceMap(FaceMap::Domain(bb.first/myCellSize-Z3i::Point(1,1,1), bb.second/myCellSize+Z3i::Point(1,1,1)));
+
+        trace.info() << "NeighborhoodMeshFace size of digitized domain [" << myMap.domain().lowerBound()[0]
+                             << " " << myMap.domain().lowerBound()[1]
+                             << " " << myMap.domain().lowerBound()[2]
+                             << "] [ " << myMap.domain().upperBound()[0]
+                             << " " << myMap.domain().upperBound()[1]
+                             << " " << myMap.domain().upperBound()[2] << "]" << std::endl;
+
+        for (unsigned int i = 0; i< myMesh.nbFaces(); i++){
+            auto b = myMesh.getFaceBarycenter(i);
+            auto p = Z3i::Point((int)floor(b[0]/myCellSize),(int)floor(b[1]/myCellSize),(int)floor(b[2]/myCellSize));
+            std::vector<unsigned int> v = myMap(p);
+            v.push_back(i);
+            myMap.setValue(p, v);
+        }
+    }
+    std::vector<unsigned int> faceNeighboring(const Z3i::RealPoint &p){
+        std::vector<unsigned int> res;
+        auto pp = Z3i::Point((int)floor(p[0]/myCellSize),
+                             (int)floor(p[1]/myCellSize),
+                             (int)floor(p[2]/myCellSize));
+        std::vector<Z3i::Point> lVois;
+        for(int i = -1; i < 2; i++)
+            for(int j = -1; j < 2; j++)
+                for(int k = -1; k < 2; k++)
+                    lVois.push_back(pp+Z3i::Point(i,j,k));
+        for (auto pv: lVois){
+            if (myMap.domain().isInside(pv)){
+                auto v = myMap(pv);
+                res.insert(res.begin(), v.begin(), v.end());
+            }
+        }
+        return res;
+    }
+};
 
 template <typename TPoint>
 static
@@ -190,7 +238,7 @@ main(int argc,char **argv)
   bool exportDistanceEstimationType {false};
   double maxScaleDistance {0.1};
   double minScaleDistance {0.0};
-  
+  unsigned int cellGroupSize{10};
   std::stringstream appDescr;
   appDescr << "Computes for each face of a mesh A the minimal distance to another mesh B. For each face of A, the minimal distance to B is computed by a brut force scan and the result can be exported as a mesh where the distances are represented in color scale. The maximal value of all these distances is also given as std output.";
   appDescr <<  "Example of use (from the DGtalTools-contrib directory:"<< "\n" <<
@@ -217,11 +265,12 @@ main(int argc,char **argv)
   app.add_flag("--squaredDistance,-s", squaredDistance, "computes squared distance.");
   app.add_flag("--saveNearestPoint,-n", saveNearestPoint, "save the nearest point obtained during the computation of the minimal distance (point of B).");
   app.add_option("--maxScaleDistance", maxScaleDistance, "set the default max value use to display the distance", true);
-  
+  auto cGroupOpt = app.add_option("--cellGroupSize,-g", cellGroupSize, "set the size of grouping digital space used to speed up computation (by default set to maxScaleDistance/2,5).", true);
+
   app.add_flag("--exportDistanceEstimationType", exportDistanceEstimationType, "Export as face color the type of"
                " distance estimation used for each face (blue for projection, green for edge projection and white"
                "for euclidean distance.)");
-  app.add_option("minScaleDistance",minScaleDistance, "set the default min value use to display the distance", true);
+  app.add_option("--minScaleDistance",minScaleDistance, "set the default min value use to display the distance", true);
 
   
   app.get_formatter()->column_width(40);
@@ -240,10 +289,15 @@ main(int argc,char **argv)
   MeshReader<Z3i::RealPoint>::importOFFFile(inputCompMeshName, theMeshComp, false);
   MeshReader<Z3i::RealPoint>::importOFFFile(inputMeshName, projOkMesh, false);
   
-
+    if (cGroupOpt->count() == 0){
+        cellGroupSize = maxScaleDistance / 2.5;
+    }
   
   trace.info()<< "reading the input Comp mesh ok: "<< theMeshComp.nbVertex() <<  std::endl;
-  
+  trace.info()<< "Constructing compared mesh map ...";
+  NeighborhoodMeshFace neighorFaces (cellGroupSize, theMeshComp);
+  trace.info()<< "[done]";
+
   
   
   double maxOfMin = 0;
@@ -253,84 +307,90 @@ main(int argc,char **argv)
   // for each face of A we search the face which minimizes the distance (by using face projection, edge projection or center point)
   
   int cptFace=0;
-  for (unsigned int i = 0; i<theMeshRef.nbFaces(); i++){
-    std::vector<DGtal::Mesh<Z3i::RealPoint>::Index>  aFace = theMeshRef.getFace(i);
-    cptFace++;
-    trace.progressBar(cptFace, theMeshRef.nbFaces());
-    double distanceMin = std::numeric_limits<double>::max();    
-    RPoint cA = theMeshRef.getFaceBarycenter(i);
-    
-    enum ProjType {INSIDE, EDGE, CENTER};
-    ProjType aProjType = INSIDE;
-    vectNearestPt.push_back(cA);
-    // compute the minimal distance of the point of A to one face of point B.
-    for (unsigned int j=0; j < theMeshComp.nbFaces(); j++){
-      // project center (cA) of a face of A into faces of B.
-      std::vector<DGtal::Mesh<Z3i::RealPoint>::Index>  aFaceB = theMeshComp.getFace(j);
-      RPoint pB0 = theMeshComp.getVertex(aFaceB.at(0));
-      RPoint pB1 = theMeshComp.getVertex(aFaceB.at(1));
-      RPoint pB2 = theMeshComp.getVertex(aFaceB.at(2));
-      RPoint cB =  theMeshComp.getFaceBarycenter(j);
-      
-      if (useFaceCenterDistance){
-        double distance = (cB-cA).norm();
-        if (distance < distanceMin){
-          distanceMin = distance;
-          if (saveNearestPoint) {vectNearestPt[i] = cB;}
-        }
-        continue;
-      }
-      
-      RPoint normal = ((pB0-pB1).crossProduct(pB2 - pB1));
-      RPoint proj = getProjectedPoint(normal, cB, cA);
-      double distance = (proj-cA).norm();
-      
-      if(!isInsideFace(theMeshComp, aFaceB, proj)){
-        // if the projection is outside the face, we approximate the distance with the projection on the face edges
-        RPoint p = cA;
-        bool lineProjOK1 = lineProject(pB0, pB1, p);
-        if(lineProjOK1 && distanceMin > (p-cA).norm()){
-          distanceMin = (p-cA).norm();
-          aProjType = EDGE;
-          if (saveNearestPoint) {vectNearestPt[i] = p;}
-        }
-        p= cA;
-        bool lineProjOK2 = lineProject(pB1, pB2, p);
-        if(lineProjOK2 && distanceMin > (p-cA).norm()){
-          distanceMin = (p-cA).norm();
-          aProjType = EDGE;
-          if (saveNearestPoint) {vectNearestPt[i] = p;}
-        }
-        p= cA;
-        bool lineProjOK3 = lineProject(pB2, pB0, p);
-        if(lineProjOK3 && distanceMin > (p-cA).norm()){
-          distanceMin = (p-cA).norm();
-          aProjType = EDGE;
-          if (saveNearestPoint) {vectNearestPt[i] = p;}
-        }
-        if (!lineProjOK1 && ! lineProjOK2 && ! lineProjOK3 && (cB - cA).norm() < distanceMin){
-        //if the projection is outside the face, we approximate the distance with the center of face B
-          distanceMin = (cB - cA).norm();
-          aProjType = CENTER;
-          if (saveNearestPoint) {vectNearestPt[i] = cB;}
-       }
+    for (unsigned int i = 0; i<theMeshRef.nbFaces(); i++){
+        std::vector<DGtal::Mesh<Z3i::RealPoint>::Index>  aFace = theMeshRef.getFace(i);
+        cptFace++;
+        trace.progressBar(cptFace, theMeshRef.nbFaces());
+        double distanceMin = std::numeric_limits<double>::max();
+        RPoint cA = theMeshRef.getFaceBarycenter(i);
         
-      }else{
-        if (distance < distanceMin){
-          aProjType = INSIDE;
-          distanceMin = distance;
-          if (saveNearestPoint) {vectNearestPt[i] = proj;}
+        enum ProjType {INSIDE, EDGE, CENTER};
+        ProjType aProjType = INSIDE;
+        vectNearestPt.push_back(cA);
+        auto vFaces = neighorFaces.faceNeighboring(cA);
+        bool fix = vFaces.size() == 0;
+        // compute the minimal distance of the point of A to one face of point B.
+        for (unsigned int j=0; j < vFaces.size(); j++){
+            // project center (cA) of a face of A into faces of B.
+            std::vector<DGtal::Mesh<Z3i::RealPoint>::Index>  aFaceB = theMeshComp.getFace(vFaces[j]);
+            RPoint pB0 = theMeshComp.getVertex(aFaceB.at(0));
+            RPoint pB1 = theMeshComp.getVertex(aFaceB.at(1));
+            RPoint pB2 = theMeshComp.getVertex(aFaceB.at(2));
+            RPoint cB =  theMeshComp.getFaceBarycenter(j);
+            
+            if (useFaceCenterDistance){
+                double distance = (cB-cA).norm();
+                if (distance < distanceMin){
+                    distanceMin = distance;
+                    if (saveNearestPoint) {vectNearestPt[i] = cB;}
+                }
+                continue;
+            }
+            
+            RPoint normal = ((pB0-pB1).crossProduct(pB2 - pB1));
+            RPoint proj = getProjectedPoint(normal, cB, cA);
+            double distance = (proj-cA).norm();
+            
+            if(!isInsideFace(theMeshComp, aFaceB, proj)){
+                // if the projection is outside the face, we approximate the distance with the projection on the face edges
+                RPoint p = cA;
+                bool lineProjOK1 = lineProject(pB0, pB1, p);
+                if(lineProjOK1 && distanceMin > (p-cA).norm()){
+                    distanceMin = (p-cA).norm();
+                    aProjType = EDGE;
+                    if (saveNearestPoint) {vectNearestPt[i] = p;}
+                }
+                p= cA;
+                bool lineProjOK2 = lineProject(pB1, pB2, p);
+                if(lineProjOK2 && distanceMin > (p-cA).norm()){
+                    distanceMin = (p-cA).norm();
+                    aProjType = EDGE;
+                    if (saveNearestPoint) {vectNearestPt[i] = p;}
+                }
+                p= cA;
+                bool lineProjOK3 = lineProject(pB2, pB0, p);
+                if(lineProjOK3 && distanceMin > (p-cA).norm()){
+                    distanceMin = (p-cA).norm();
+                    aProjType = EDGE;
+                    if (saveNearestPoint) {vectNearestPt[i] = p;}
+                }
+                if (!lineProjOK1 && ! lineProjOK2 && ! lineProjOK3 && (cB - cA).norm() < distanceMin){
+                    //if the projection is outside the face, we approximate the distance with the center of face B
+                    distanceMin = (cB - cA).norm();
+                    aProjType = CENTER;
+                    if (saveNearestPoint) {vectNearestPt[i] = cB;}
+                }
+                
+            }else{
+                if (distance < distanceMin){
+                    aProjType = INSIDE;
+                    distanceMin = distance;
+                    if (saveNearestPoint) {vectNearestPt[i] = proj;}
+                }
+            }
         }
-      }
-    }
+        
+        if(distanceMin>maxOfMin){
+            maxOfMin = distanceMin;
+        }
+        projOkMesh.setFaceColor(i, aProjType == INSIDE ? DGtal::Color::Blue:  aProjType == EDGE ?  DGtal::Color::Green:  DGtal::Color::White);
+        if (!fix){
+            vectFaceDistances.push_back(distanceMin);
+        }else{
+            vectFaceDistances.push_back(maxScaleDistance);
 
-    if(distanceMin>maxOfMin){
-      maxOfMin = distanceMin;
+        }
     }
-    projOkMesh.setFaceColor(i, aProjType == INSIDE ? DGtal::Color::Blue:  aProjType == EDGE ?  DGtal::Color::Green:  DGtal::Color::White);
-    
-    vectFaceDistances.push_back(distanceMin);
-  }
   
   std::ofstream outDistances;
   outDistances.open(outputFileName.c_str(), std::ofstream::out);
@@ -381,3 +441,4 @@ main(int argc,char **argv)
   }
   
 }
+

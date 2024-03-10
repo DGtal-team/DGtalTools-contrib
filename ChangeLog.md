@@ -26,6 +26,8 @@
    (Bertrand Kerautret [#71](https://github.com/DGtal-team/DGtalTools-contrib/pull/71))
   - meshAxisCutter: new option to select range meshes.
    (Bertrand Kerautret [#80](https://github.com/DGtal-team/DGtalTools-contrib/pull/80))
+  - computeMeshDistances: Reduce complexity with search using face mapping.
+   (Bertrand Kerautret [#81](https://github.com/DGtal-team/DGtalTools-contrib/pull/81))
 
  - *visualisation*
   - polyMeshEdit: tool to edit a mesh (add local noise, remove selected faces).
