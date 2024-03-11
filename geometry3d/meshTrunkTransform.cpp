@@ -209,20 +209,18 @@ int main( int argc, char** argv )
     
     trace.info() << "Reading input mesh...";
     aMesh << inputMeshFileName;
-    trace.info() << " [done] (" << aMesh.nbVertex() << ")" << std::endl;
+    trace.info() << " [done] (#vertices: " << aMesh.nbVertex() << ")" << std::endl;
  
     trace.info() << "Reading input pith coordinates...";
     pith = PointListReader<DGtal::Z3i::RealPoint>::getPointsFromFile(inputPithFileName);
-    trace.info() << " [done] (" << pith.size() << ")" <<  std::endl;
+    trace.info() << " [done] (#pith size:" << pith.size() << ")" <<  std::endl;
     PithSectionCenter pSct (pith);
  
     trace.info() << "Reading input cylinder coordinates... (R,theta,Z)";
     cylCoordinates = PointListReader<DGtal::Z3i::RealPoint>::getPointsFromFile(inputCLineFileName);
-    trace.info() << " [done] (" << cylCoordinates.size() << ")" << std::endl;
+    trace.info() << " [done] (#vertices: " << cylCoordinates.size() << ")" << std::endl;
     
     
-    trace.info() << "Read tab with " << cylCoordinates.size() << std::endl;
-   
     double baseRad = cylCoordinates[0][0];
     mainDir[0] = mainDirV[0];
     mainDir[1] = mainDirV[1];
@@ -279,7 +277,7 @@ int main( int argc, char** argv )
     
     trace.info() << "Cleaning isolated vertices from " << resultingMesh.nbVertex();
     resultingMesh.removeIsolatedVertices();
-    trace.info() << "to " << resultingMesh.nbVertex() << " [done]";
+    trace.info() << " to " << resultingMesh.nbVertex() << " [done]" << std::endl;
 
     if (outMesh->count() > 0 ){
         trace.info() << "Writing output mesh...";
@@ -297,7 +295,6 @@ int main( int argc, char** argv )
         fout.close();
         trace.info() << "[done]." << std::endl;
     }
-
     return 0;
 }
 
