@@ -11,7 +11,7 @@ SET(DGTAL_TOOLS_DEVEL_SRC
     vol2meshAndNormals
     meshAxisCutter
     graph2vol
-    meshTrunk2Pts
+    meshTrunkTransform
 )
 
 

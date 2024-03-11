@@ -34,9 +34,13 @@
 #include "DGtal/io/readers/PointListReader.h"
 #include "DGtal/io/readers/TableReader.h"
 #include "DGtal/io/writers/MeshWriter.h"
+
 #include <time.h>
 #include <cstdlib>
 #include <stdio.h>
+#include <iostream>
+#include <fstream>
+
 #include "CLI11.hpp"
 ///////////////////////////////////////////////////////////////////////////////
 using namespace std;
@@ -154,13 +158,16 @@ int main( int argc, char** argv )
     std::string inputMeshFileName;
     std::string inputCLineFileName;
     std::string inputPithFileName;
-    
-    std::string outputBaseName;
+    std::string outputMesh = "result.off";
+    std::string outputPts = "result.pts";
+
+    std::string outputBaseName {"resDeform"};
     std::stringstream usage;
     double normalAngleRange = 0.6;
     double posAngleRange = 3.0;
     double ampliMaxShift = 100.0;
     double sectSize = 0.3;
+    std::pair<double, double> shiftFacePosParams {1.0, 1.0};
 
     usage << "Usage: " << argv[0] << " [input]\n"
     << "Typical use example:\n \t meshTrunkTransform -i ... \n";
@@ -174,12 +181,12 @@ int main( int argc, char** argv )
     app.add_option("--InputPithCoords,-p,3", inputPithFileName, "Input file containing pith coordinates")
     ->required()->check(CLI::ExistingFile);
 
-    app.add_option("--normalAngleRange,-a",normalAngleRange , "angle range of accepted face orientations.");
-    app.add_option("--posAngleRange,-r",posAngleRange , "position angle range of accepted mesh points.");
-    app.add_option("--ampliMaxShift,-s",ampliMaxShift , "maximal amplitude of sector shift.");
-    app.add_option("--sectSize,-S",sectSize , "sector size of the deformation.");
-
-    app.add_option("--outputBaseName,-o,3", outputBaseName, "Output SDP filename")->required();
+    auto filterFaceNormal = app.add_option("--filterFaceNormal,-F",normalAngleRange , "filter mesh faces using their normal vector: the  accepted face orientations are defined the face normal and filtering direction (see option --filterDir). ");
+    auto filterFacePosition = app.add_option("--filterFacePosition,-P", posAngleRange , "filter mesh faces using angle defined from the face barycenter position with its associated pith center (angle in radians) and the filtering direction (see option --filterDir).");
+    auto shiftFacePos = app.add_option("--shiftFacePos,-s", shiftFacePosParams, "shift face position using maximal amplitude (first parameter value) of sector shift (sector size defined with the second parameter value).")
+    ->expected(1);
+    auto outMesh = app.add_option("--outputMesh,-o,3", outputMesh, "Output mesh file name.");
+    auto outPts = app.add_option("--outputPoints", outputPts, "Output pts file name");
 
     
     app.get_formatter()->column_width(40);
@@ -224,13 +231,24 @@ int main( int argc, char** argv )
     
     
     // First sector extraction
-    std::string extr1NamePts = outputBaseName+"_Extr1.pts";
-    std::string extr1NameMesh = outputBaseName+"_Extr1.off";
 
     Z3i::RealPoint aNormal (1,0,0);
     aNormal = aNormal.getNormalized();
 
-    //a) filter faces from face normal vector
+   
+    //a) applying shift on sector
+    if (shiftFacePos->count()>0){
+        ampliMaxShift = shiftFacePosParams.first;
+        sectSize = shiftFacePosParams.second;
+        TrunkDeformator tDef (pSct, ampliMaxShift, sectSize);
+        for (unsigned int i = 0; i < resultingMesh.nbVertex(); i++){
+            Z3i::RealPoint &pt = resultingMesh.getVertex(i);
+            Z3i::RealPoint ptCyl = cylCoordinates[i];
+            Z3i::RealPoint newP = tDef.deform(pt, ptCyl);
+            pt[0] = newP[0]; pt[1] = newP[1]; pt[2] = newP[2];
+        }
+    }
+    //b) filter faces from face normal vector
     for (auto it = aMesh.faceBegin();
          it!= aMesh.faceEnd(); it++){
         DGtal::Mesh<Z3i::RealPoint>::MeshFace aFace = *it;
@@ -238,38 +256,45 @@ int main( int argc, char** argv )
         Z3i::RealPoint p0 = aMesh.getVertex(aFace.at(1));
         Z3i::RealPoint p1 = aMesh.getVertex(aFace.at(0));
         Z3i::RealPoint p2 = aMesh.getVertex(aFace.at(2));
-        Z3i::RealPoint vectNormal = ((p1-p0).crossProduct(p2 - p0)).getNormalized();
-        vectNormal /= vectNormal.norm();
-        okOrientation = vectNormal.dot(aNormal) > cos(normalAngleRange);
-        
+        if (filterFaceNormal -> count() > 0 ){
+               Z3i::RealPoint vectNormal = ((p1-p0).crossProduct(p2 - p0)).getNormalized();
+            vectNormal /= vectNormal.norm();
+            okOrientation = vectNormal.dot(aNormal) > cos(normalAngleRange/2.0);
+        }
         bool sectorCompatible = true;
-        auto pB = (p0+p1+p2)/3.0;
-        Z3i::RealPoint pC = pSct.pithRepresentant(pB);
-        Z3i::RealPoint vectDir = pB - pC;
-        vectDir /= vectDir.norm();
-        sectorCompatible = vectDir.dot(aNormal) > cos(posAngleRange/2.0);
-
+        if (filterFacePosition -> count() > 0 ){
+            auto pB = (p0+p1+p2)/3.0;
+            Z3i::RealPoint pC = pSct.pithRepresentant(pB);
+            Z3i::RealPoint vectDir = pB - pC;
+            vectDir /= vectDir.norm();
+            sectorCompatible = vectDir.dot(aNormal) > cos(posAngleRange/2.0);
+        }
         if( okOrientation && sectorCompatible ){
             resultingMesh.addFace(aFace);
         }
-    }
-    //b) applying shift on sector
-    TrunkDeformator tDef (pSct, ampliMaxShift, sectSize);
-    for (unsigned int i = 0; i < resultingMesh.nbVertex(); i++){
-        Z3i::RealPoint &pt = resultingMesh.getVertex(i);
-        Z3i::RealPoint ptCyl = cylCoordinates[i];
-        Z3i::RealPoint newP = tDef.deform(pt, ptCyl);
-        pt[0] = newP[0]; pt[1] = newP[1]; pt[2] = newP[2];
-        
     }
     
     trace.info() << "Cleaning isolated vertices from " << resultingMesh.nbVertex();
     resultingMesh.removeIsolatedVertices();
     trace.info() << "to " << resultingMesh.nbVertex() << " [done]";
 
-    trace.info() << "Writing output mesh...";
-    resultingMesh >> extr1NameMesh;
-    trace.info() << "[done]." << std::endl;
+    if (outMesh->count() > 0 ){
+        trace.info() << "Writing output mesh...";
+        resultingMesh >> outputMesh;
+        trace.info() << "[done]." << std::endl;
+    }
+    if (outPts->count() > 0 ){
+        trace.info() << "Writing output points...";
+        
+        ofstream fout;
+        fout.open(outputPts);
+        for (auto it = resultingMesh.vertexBegin(); it != resultingMesh.vertexEnd(); it++){
+            fout << (*it)[0] << " " << (*it)[1] << " " << (*it)[2] << std::endl;
+        }
+        fout.close();
+        trace.info() << "[done]." << std::endl;
+    }
+
     return 0;
 }
 
