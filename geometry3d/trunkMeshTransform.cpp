@@ -51,12 +51,33 @@ using namespace DGtal;
 /**
  @page trunkMeshTransform trunkMeshTransform
  
- @brief  Description of the tool...
- à)d
+ @brief Transform an input mesh into points cloud simulating acquisition process like lidar Scan .
+
  @b Usage:   trunkMeshTransform [input]
+ Usage: ./geometry3d/trunkMeshTransform [input]
+
+ Typical use example:
+       trunkMeshTransform ../Samples/TrunkSample/chene1.off -c ../Samples/TrunkSample/chene1-cyl  -p ../Samples/TrunkSample/chene1_centerline.xyz  resTransform.off -s 200 1  --outputPoints resTransform.pts  -F 0.8 -P 5.0 --mainDir 0 -1 0
+
+ Positionals:
+   1 TEXT:FILE REQUIRED                  Input file
+   2 TEXT:FILE REQUIRED                  Input file containing cylinder coordinates
+   3 TEXT:FILE REQUIRED                  Input file containing pith coordinates
+   3 TEXT                                Output mesh file name.
+
  
  @b Allowed @b options @b are :
- 
+   -h,--help                             Print this help message and exit
+   -i,--inputMesh TEXT:FILE REQUIRED     Input file
+   -c,--InputCCoords TEXT:FILE REQUIRED  Input file containing cylinder coordinates
+   -p,--InputPithCoords TEXT:FILE REQUIRED
+                                         Input file containing pith coordinates
+   -F,--filterFaceNormal FLOAT           Filter mesh faces using their normal vector: the  accepted face orientations are defined the face normal and filtering direction (see option --filterDir).
+   -P,--filterFacePosition FLOAT         Filter mesh faces using angle defined from the face barycenter position with its associated pith center (angle in radians) and the filtering direction (see option --filterDir).
+   -s,--shiftFacePos [FLOAT,FLOAT]       Shift face position using maximal amplitude (first parameter value) of sector shift (sector size defined with the second parameter value).
+   -m,--mainDir FLOAT x 3                Define the main direction to define the filtering angle based (see --filterFacePosition and --filterFaceNormal
+   -o,--outputMesh TEXT                  Output mesh file name.
+   --outputPoints TEXT                   Output pts file name
  @code
  -h [ --help ]           display this message
  -i [ --input ] arg      an input file...
@@ -171,7 +192,9 @@ int main( int argc, char** argv )
     Z3i::RealPoint mainDir {1.0,0.0,0.0};
     std::vector<double> mainDirV {1.0,0.0,0.0};
     usage << "Usage: " << argv[0] << " [input]\n"
-    << "Typical use example:\n \t trunkMeshTransform -i ... \n";
+    << "Typical use example:\n \t trunkMeshTransform ../Samples/TrunkSample/chene1.off -c ../Samples/TrunkSample/chene1-cyl  "
+    <<"-p ../Samples/TrunkSample/chene1_centerline.xyz  resTransform.off -s 200 1  --outputPoints resTransform.pts  "
+    << "-F 0.8 -P 5.0 --mainDir 0 -1 0 \n";
     // parse command line using CLI-------------------------------------------------------
     CLI::App app;
     app.description("Transform an input mesh into points cloud simulating acquisition process like lidar Scan .\n" + usage.str() );
