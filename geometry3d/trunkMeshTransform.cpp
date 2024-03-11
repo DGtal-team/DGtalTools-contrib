@@ -22,7 +22,7 @@
  *
  * @date 2024/03/05
  *
- * Source file of the tool meshTrunkTransform
+ * Source file of the tool trunkMeshTransform
  *
  * This file is part of the DGtal library/DGtalTools-contrib Project.
  */
@@ -49,11 +49,11 @@ using namespace DGtal;
 
 
 /**
- @page meshTrunkTransformmeshTrunkTransform
+ @page trunkMeshTransform trunkMeshTransform
  
  @brief  Description of the tool...
  à)d
- @b Usage:   meshTrunkTransform [input]
+ @b Usage:   trunkMeshTransform [input]
  
  @b Allowed @b options @b are :
  
@@ -66,13 +66,13 @@ using namespace DGtal;
  @b Example:
  
  @code
- meshTrunkTransform -i  $DGtal/examples/samples/....
+ trunkMeshTransform -i  $DGtal/examples/samples/....
  @endcode
  
- @image html resmeshTrunkTransform.png "Example of result. "
+ @image html restrunkMeshTransform.png "Example of result. "
  
  @see
- @ref meshTrunkTransform.cpp
+ @ref trunkMeshTransform.cpp
  
  */
 double
@@ -171,7 +171,7 @@ int main( int argc, char** argv )
     Z3i::RealPoint mainDir {1.0,0.0,0.0};
     std::vector<double> mainDirV {1.0,0.0,0.0};
     usage << "Usage: " << argv[0] << " [input]\n"
-    << "Typical use example:\n \t meshTrunkTransform -i ... \n";
+    << "Typical use example:\n \t trunkMeshTransform -i ... \n";
     // parse command line using CLI-------------------------------------------------------
     CLI::App app;
     app.description("Transform an input mesh into points cloud simulating acquisition process like lidar Scan .\n" + usage.str() );
