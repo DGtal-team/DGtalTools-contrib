@@ -52,7 +52,7 @@ using namespace DGtal;
  @page meshTrunkTransformmeshTrunkTransform
  
  @brief  Description of the tool...
- 
+ à)d
  @b Usage:   meshTrunkTransform [input]
  
  @b Allowed @b options @b are :
@@ -168,7 +168,8 @@ int main( int argc, char** argv )
     double ampliMaxShift = 100.0;
     double sectSize = 0.3;
     std::pair<double, double> shiftFacePosParams {1.0, 1.0};
-
+    Z3i::RealPoint mainDir {1.0,0.0,0.0};
+    std::vector<double> mainDirV {1.0,0.0,0.0};
     usage << "Usage: " << argv[0] << " [input]\n"
     << "Typical use example:\n \t meshTrunkTransform -i ... \n";
     // parse command line using CLI-------------------------------------------------------
@@ -181,14 +182,14 @@ int main( int argc, char** argv )
     app.add_option("--InputPithCoords,-p,3", inputPithFileName, "Input file containing pith coordinates")
     ->required()->check(CLI::ExistingFile);
 
-    auto filterFaceNormal = app.add_option("--filterFaceNormal,-F",normalAngleRange , "filter mesh faces using their normal vector: the  accepted face orientations are defined the face normal and filtering direction (see option --filterDir). ");
-    auto filterFacePosition = app.add_option("--filterFacePosition,-P", posAngleRange , "filter mesh faces using angle defined from the face barycenter position with its associated pith center (angle in radians) and the filtering direction (see option --filterDir).");
-    auto shiftFacePos = app.add_option("--shiftFacePos,-s", shiftFacePosParams, "shift face position using maximal amplitude (first parameter value) of sector shift (sector size defined with the second parameter value).")
+    auto filterFaceNormal = app.add_option("--filterFaceNormal,-F",normalAngleRange , "Filter mesh faces using their normal vector: the  accepted face orientations are defined the face normal and filtering direction (see option --filterDir). ");
+    auto filterFacePosition = app.add_option("--filterFacePosition,-P", posAngleRange , "Filter mesh faces using angle defined from the face barycenter position with its associated pith center (angle in radians) and the filtering direction (see option --filterDir).");
+    auto shiftFacePos = app.add_option("--shiftFacePos,-s", shiftFacePosParams, "Shift face position using maximal amplitude (first parameter value) of sector shift (sector size defined with the second parameter value).")
     ->expected(1);
+    auto mainDirOpt = app.add_option("--mainDir,-m", mainDirV, "Define the main direction to define the filtering angle based (see --filterFacePosition and --filterFaceNormal ")
+    ->expected(3);
     auto outMesh = app.add_option("--outputMesh,-o,3", outputMesh, "Output mesh file name.");
     auto outPts = app.add_option("--outputPoints", outputPts, "Output pts file name");
-
-    
     app.get_formatter()->column_width(40);
     CLI11_PARSE(app, argc, argv);
     // END parse command line using CLI ----------------------------------------------
@@ -223,7 +224,10 @@ int main( int argc, char** argv )
     trace.info() << "Read tab with " << cylCoordinates.size() << std::endl;
    
     double baseRad = cylCoordinates[0][0];
-
+    mainDir[0] = mainDirV[0];
+    mainDir[1] = mainDirV[1];
+    mainDir[2] = mainDirV[2];
+    
     // prepare resulting mesh
     for (auto it = aMesh.vertexBegin(); it != aMesh.vertexEnd(); it++){
         resultingMesh.addVertex(*it);
@@ -232,8 +236,7 @@ int main( int argc, char** argv )
     
     // First sector extraction
 
-    Z3i::RealPoint aNormal (1,0,0);
-    aNormal = aNormal.getNormalized();
+    mainDir = mainDir.getNormalized();
 
    
     //a) applying shift on sector
@@ -259,7 +262,7 @@ int main( int argc, char** argv )
         if (filterFaceNormal -> count() > 0 ){
                Z3i::RealPoint vectNormal = ((p1-p0).crossProduct(p2 - p0)).getNormalized();
             vectNormal /= vectNormal.norm();
-            okOrientation = vectNormal.dot(aNormal) > cos(normalAngleRange/2.0);
+            okOrientation = vectNormal.dot(mainDir) > cos(normalAngleRange/2.0);
         }
         bool sectorCompatible = true;
         if (filterFacePosition -> count() > 0 ){
@@ -267,7 +270,7 @@ int main( int argc, char** argv )
             Z3i::RealPoint pC = pSct.pithRepresentant(pB);
             Z3i::RealPoint vectDir = pB - pC;
             vectDir /= vectDir.norm();
-            sectorCompatible = vectDir.dot(aNormal) > cos(posAngleRange/2.0);
+            sectorCompatible = vectDir.dot(mainDir) > cos(posAngleRange/2.0);
         }
         if( okOrientation && sectorCompatible ){
             resultingMesh.addFace(aFace);
