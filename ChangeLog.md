@@ -14,18 +14,19 @@
   - rotNmap: new tools to apply a rotation in the input normal map (it
     rotates both the position and normals orientation to be
     consistant. (Bertrand Kerautret [#70](https://github.com/DGtal-team/DGtalTools-contrib/pull/70))
-  - meshAxisCutter: new tool cut the input mesh according one axis into several separate meshes.
-   (Bertrand Kerautret [#71](https://github.com/DGtal-team/DGtalTools-contrib/pull/71))
   - basicEditMesh: improvement of mesh read using generic reader/writer. 
     (Bertrand Kerautret [#72](https://github.com/DGtal-team/DGtalTools-contrib/pull/72))
  
  - *Geometry3d*
   - basicMorphoFilter: fix a bug on the dilate/erode options. 
     (Bertrand Kerautret [#74](https://github.com/DGtal-team/DGtalTools-contrib/pull/74))  
-
   - graph2vol: new tool to transform graph based object into volumetric object. 
     (Bertrand Kerautret [#76](https://github.com/DGtal-team/DGtalTools-contrib/pull/76))
-    
+  - meshAxisCutter: new tool that cuts the input mesh according one axis into several separate meshes.
+   (Bertrand Kerautret [#71](https://github.com/DGtal-team/DGtalTools-contrib/pull/71))
+  - meshAxisCutter: new option to select range meshes.
+   (Bertrand Kerautret [#80](https://github.com/DGtal-team/DGtalTools-contrib/pull/80))
+
  - *visualisation*
   - polyMeshEdit: tool to edit a mesh (add local noise, remove selected faces).
     (Bertrand Kerautret [#78](https://github.com/DGtal-team/DGtalTools-contrib/pull/78))

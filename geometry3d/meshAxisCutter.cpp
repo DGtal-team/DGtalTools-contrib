@@ -88,6 +88,7 @@ int main( int argc, char** argv )
 
   unsigned int nbP {2};
   unsigned int axis {2};
+  std::pair<unsigned int, unsigned int> selectedParts {0, 1};
   std::string inputFileName;
   std::string outputFileName;
   std::stringstream usage;
@@ -100,6 +101,7 @@ int main( int argc, char** argv )
   app.add_option("--output,-o,2", outputFileName, "Output filename base")->required();
   app.add_option("--nbParts,-p,3", nbP, "the number of parts", true);
   app.add_option("--axis,-a", axis, "the axis to cut the mesh", true);
+  auto selOpt = app.add_option("--selectedParts,-s", selectedParts, "selected part");
 
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
@@ -116,7 +118,9 @@ int main( int argc, char** argv )
   double maxZ = bb.second[axis];
   double rangeZ = maxZ - minZ;
   double sliceHeight = rangeZ / nbP;
-
+  if (selOpt->count() == 0 ){
+      selectedParts.second = nbP-1;
+  }
   vector<Mesh<PointVector<3,double> > > meshParts;
   // including input vertex for eacg mesh parts
   for (unsigned int i=0; i<=nbP; i++){
@@ -129,16 +133,19 @@ int main( int argc, char** argv )
   for (unsigned int i = 0; i< inputMesh.nbFaces(); i++){
        auto fc = inputMesh.getFaceBarycenter(i);
        unsigned int indexP = floor((fc[axis]-minZ)/sliceHeight);
-      meshParts[indexP].addFace(inputMesh.getFace(i), inputMesh.getFaceColor(i));
+      if (indexP >= selectedParts.first && indexP <= selectedParts.second){
+          meshParts[indexP - selectedParts.first].addFace(inputMesh.getFace(i), inputMesh.getFaceColor(i));
+      }
       
   }
    
   // Write output meshes
-  for(int i = 0; i <=nbP; i++) {
+  for(int i = selectedParts.first; i <=selectedParts.second; i++) {
       stringstream ss;
       ss << outputFileName << "_" << i << "." << ext;
       string outputFile = ss.str();
-      meshParts[i] >> outputFile;
+      meshParts[i].removeIsolatedVertices();
+      meshParts[i-selectedParts.first] >> outputFile;
    }
 
   return 0;
