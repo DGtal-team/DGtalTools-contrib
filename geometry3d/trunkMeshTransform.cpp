@@ -223,6 +223,11 @@ int main( int argc, char** argv )
     std::pair<double, double> shiftFacePosParams {1.0, 1.0};
     Z3i::RealPoint mainDir {1.0,0.0,0.0};
     std::vector<double> mainDirV {1.0,0.0,0.0};
+   
+    double vSampleDist {5000.0};
+    double vSampleAngularResol = 0.001;
+    double vSampleAngularSensi = 0.1;
+    
     usage << "Usage: " << argv[0] << " [input]\n"
     << "Typical use example:\n \t trunkMeshTransform ../Samples/TrunkSample/chene1.off -c ../Samples/TrunkSample/chene1-cyl  "
     <<"-p ../Samples/TrunkSample/chene1_centerline.xyz  resTransform.off -s 200 1  --outputPoints resTransform.pts  "
@@ -243,6 +248,11 @@ int main( int argc, char** argv )
     ->expected(1);
     auto mainDirOpt = app.add_option("--mainDir,-m", mainDirV, "Define the main direction to define the filtering angle based (see --filterFacePosition and --filterFaceNormal ")
     ->expected(3);
+    auto vertSampleOpt = app.add_flag("--verticalSampling", "Apply a vertical sampling simulation by considering the laser scan.");
+    app.add_option("--scannerDistance", vSampleDist, "Define the laser scan position distance. (effect only with --verticalSampling) .", true);
+    
+    auto vROpt = app.add_option("--vSampleAngularResol", vSampleAngularResol, "Define the vertical angular resolution of the laser scanner. (effect only with --verticalSampling) ");
+    auto vSOpt = app.add_option("--vSampleAngularSensi", vSampleAngularSensi, "Defines the vertical angular sensibility laser scan intersection detection. (effect only with --verticalSampling) ");
     auto outMesh = app.add_option("--outputMesh,-o,3", outputMesh, "Output mesh file name.");
     auto outPts = app.add_option("--outputPoints", outputPts, "Output pts file name");
     app.get_formatter()->column_width(40);
@@ -301,7 +311,15 @@ int main( int argc, char** argv )
             pt[0] = newP[0]; pt[1] = newP[1]; pt[2] = newP[2];
         }
     }
-    TrunkAngularSamplor tSamplor (aMesh, pSct, 5000);
+    
+    TrunkAngularSamplor tSamplor (aMesh, pSct, vSampleDist);
+    if (vROpt -> count()>0){
+        tSamplor.myAngularVSize = vSampleAngularResol;
+    }
+    if (vSOpt -> count()>0){
+        tSamplor.myAngularToleranceFactor = vSampleAngularSensi;
+    }
+
     //b) filter faces from face normal vector and c) applying sampling simulation
     for (unsigned int i = 0; i< aMesh.nbFaces(); i++){
         
@@ -312,7 +330,7 @@ int main( int argc, char** argv )
         Z3i::RealPoint p0 = aMesh.getVertex(aFace.at(1));
         Z3i::RealPoint p1 = aMesh.getVertex(aFace.at(0));
         Z3i::RealPoint p2 = aMesh.getVertex(aFace.at(2));
-        okSampling = tSamplor.isScanned(i);
+        okSampling = (vertSampleOpt-> count()>0) ? tSamplor.isScanned(i) : true;
 
         if (filterFaceNormal -> count() > 0 && okSampling ){
                Z3i::RealPoint vectNormal = ((p1-p0).crossProduct(p2 - p0)).getNormalized();
