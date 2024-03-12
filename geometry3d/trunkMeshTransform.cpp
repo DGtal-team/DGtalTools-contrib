@@ -96,6 +96,9 @@ using namespace DGtal;
  @ref trunkMeshTransform.cpp
  
  */
+
+typedef DGtal::Mesh<DGtal::Z3i::RealPoint> Mesh3D;
+
 double
 gaussF(double x, double mu, double sigma){
     double max = exp((-(mu)*(mu))/(2.0*sigma*sigma))*(1.0/(sigma*sqrt(2*M_PI)));
@@ -141,6 +144,35 @@ struct PithSectionCenter {
     }
 };
 
+
+struct TrunkAngularSamplor {
+    double myDistanceScan;
+    double myAngularVSize; // the vertical angular scan resolution
+    Mesh3D myMesh;
+    double myAngularToleranceFactor = 0.1; // the angle factor sensibility to consider a face is intersected by a laser bean. For instance a factor of 1 will consider all faces where face barycenters exactly intersect the laser bean while a value of 0.1 will a marge of myAngularVSize/10.
+    TrunkAngularSamplor(const Mesh3D &aMesh, const PithSectionCenter &pSectCenter,
+                        double distanceScan, double angularTolFact=0.1,
+                        double angularVSize = 0.1, bool estimateScanVRes = true):
+                 myDistanceScan(distanceScan),
+                        myMesh(aMesh), myAngularVSize(angularVSize){
+        if (estimateScanVRes) {
+            double dz = pSectCenter.myPith[0][2]-pSectCenter.myPith[1][2];
+            double l = sqrt(dz*dz+myDistanceScan*myDistanceScan);
+            myAngularVSize = abs(asin(dz/l));
+            trace.info() << "estimated vertical scan angle size: " << myAngularVSize << std::endl;
+        }
+    }
+    bool isScanned(Mesh3D::Index aFaceId){
+            auto p = myMesh.getFaceBarycenter(aFaceId);
+            double l = sqrt( (p[2])*(p[2]) + myDistanceScan*myDistanceScan);
+            double a =   asin(p[2]/l);
+            double rS =  ceil(a / myAngularVSize)*myAngularVSize-a;
+            double rI =  a-floor(a / myAngularVSize)*myAngularVSize;
+            
+        return abs(rI) < myAngularVSize*myAngularToleranceFactor ||
+               abs(rS) < myAngularVSize*myAngularToleranceFactor ;
+    }
+};
 
 struct TrunkDeformator {
     double mySectorSize;
@@ -217,12 +249,11 @@ int main( int argc, char** argv )
     CLI11_PARSE(app, argc, argv);
     // END parse command line using CLI ----------------------------------------------
     
-    DGtal::Mesh<DGtal::Z3i::RealPoint> resultingMesh;
+    Mesh3D resultingMesh;
 
     // Reading input mesh   --------------------------------------------------
-    DGtal::Mesh<DGtal::Z3i::RealPoint> aMesh;
+    Mesh3D aMesh;
 
-    DGtal::Mesh<DGtal::Z3i::RealPoint> aCenterLine;
     std::vector<DGtal::Z3i::RealPoint> cylCoordinates;
     std::vector<DGtal::Z3i::RealPoint> pith;
     
@@ -253,10 +284,8 @@ int main( int argc, char** argv )
     for (auto it = aMesh.vertexBegin(); it != aMesh.vertexEnd(); it++){
         resultingMesh.addVertex(*it);
     }
-    
-    
-    // First sector extraction
 
+    // First sector extraction
     mainDir = mainDir.getNormalized();
 
    
@@ -272,31 +301,40 @@ int main( int argc, char** argv )
             pt[0] = newP[0]; pt[1] = newP[1]; pt[2] = newP[2];
         }
     }
-    //b) filter faces from face normal vector
-    for (auto it = aMesh.faceBegin();
-         it!= aMesh.faceEnd(); it++){
-        DGtal::Mesh<Z3i::RealPoint>::MeshFace aFace = *it;
+    TrunkAngularSamplor tSamplor (aMesh, pSct, 5000);
+    //b) filter faces from face normal vector and c) applying sampling simulation
+    for (unsigned int i = 0; i< aMesh.nbFaces(); i++){
+        
+        DGtal::Mesh<Z3i::RealPoint>::MeshFace aFace = aMesh.getFace(i);
         bool okOrientation = true;
+        bool okSampling = true;
+
         Z3i::RealPoint p0 = aMesh.getVertex(aFace.at(1));
         Z3i::RealPoint p1 = aMesh.getVertex(aFace.at(0));
         Z3i::RealPoint p2 = aMesh.getVertex(aFace.at(2));
-        if (filterFaceNormal -> count() > 0 ){
+        okSampling = tSamplor.isScanned(i);
+
+        if (filterFaceNormal -> count() > 0 && okSampling ){
                Z3i::RealPoint vectNormal = ((p1-p0).crossProduct(p2 - p0)).getNormalized();
             vectNormal /= vectNormal.norm();
             okOrientation = vectNormal.dot(mainDir) > cos(normalAngleRange/2.0);
         }
         bool sectorCompatible = true;
-        if (filterFacePosition -> count() > 0 ){
+        if (filterFacePosition -> count() > 0 && okSampling){
             auto pB = (p0+p1+p2)/3.0;
             Z3i::RealPoint pC = pSct.pithRepresentant(pB);
             Z3i::RealPoint vectDir = pB - pC;
             vectDir /= vectDir.norm();
             sectorCompatible = vectDir.dot(mainDir) > cos(posAngleRange/2.0);
         }
-        if( okOrientation && sectorCompatible ){
+        
+        if( okOrientation && sectorCompatible && okSampling){
             resultingMesh.addFace(aFace);
         }
     }
+    
+   
+
     
     trace.info() << "Cleaning isolated vertices from " << resultingMesh.nbVertex();
     resultingMesh.removeIsolatedVertices();
@@ -320,5 +358,6 @@ int main( int argc, char** argv )
     }
     return 0;
 }
+
 
 
