@@ -5,7 +5,8 @@ SET(DGTAL_TOOLS_CONTRIB
 )
 
 SET(DGTAL_TOOLS_CONTRIB_POLY
-   polyMeshEdit 
+   polyMeshEdit
+   polyMeshColorize
 )
 
 

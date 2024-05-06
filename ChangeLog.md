@@ -30,7 +30,8 @@
  - *visualisation*
   - polyMeshEdit: tool to edit a mesh (add local noise, remove selected faces).
     (Bertrand Kerautret [#78](https://github.com/DGtal-team/DGtalTools-contrib/pull/78))
-
+   - polyMeshColorize: tool to colorize a mesh.
+    (Bertrand Kerautret [#83](https://github.com/DGtal-team/DGtalTools-contrib/pull/83))
 
 # DGtalTools-contrib  1.3 
 
