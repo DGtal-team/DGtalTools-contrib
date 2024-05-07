@@ -55,7 +55,7 @@ using namespace DGtal;
 /**
  @page polyMeshColorize polyMeshColorize
  
- @brief  polyMeshColorize tool to colorize a mesh (faces). Note that the rendering is based on index color and the real colors are exported from the associated RGB colors. Note also that the process relies on the halfedge data structure that can fail if the input is not topologically consistant. If you want use other type of mesh, you can use meshViewerEdit that is based on the simple soup of triangles process (slower selection process).
+ @brief  polyMeshColorize tool to colorize a mesh (faces). Note that the process relies on the halfedge data structure that can fail if the input is not topologically consistant. If you want use other type of mesh, you can use meshViewerEdit that is based on the simple soup of triangles process (slower selection process).
 
 
  @b Usage:   polyMeshColorize [OPTIONS] 1 [2]
@@ -363,7 +363,7 @@ int main(int argc, char** argv)
     
     // parse command line using CLI ----------------------------------------------
     CLI::App app;
-    app.description("polyMeshColorize tool to colorize a mesh (faces). Note that the rendering is based on index color and the real colors are exported from the associated RGB colors. Note also that the process relies on the halfedge data structure that can fail if the input is not topologically consistant. If you want use other type of mesh, you can use meshViewerEdit that is based on the simple soup of triangles process (slower selection process). \n"
+    app.description("polyMeshColorize tool to colorize a mesh (faces). Note that the process relies on the halfedge data structure that can fail if the input is not topologically consistant. If you want use other type of mesh, you can use meshViewerEdit that is based on the simple soup of triangles process (slower selection process). \n"
                     " polyMeshColorize $DGtal/examples/samples/bunnyhead.obj  bunnyColored.obj \n");
     app.add_option("-i,--input,1", inputFileName, "an input mesh file in .obj or .off format." )
     ->required()
@@ -401,7 +401,6 @@ int main(int argc, char** argv)
             color3Selected[2] = (*it).first.blue()/255.0;
         }
     }
-    DGtal::trace.info() << "color index recovered with:" << indexColoring.size() << std::endl;
     // Setting scale mesh dependant parameters
     minPaintRad = (bb.second - bb.first).norm()/1000.0;
     maxPaintRad = (bb.second - bb.first).norm()/2.0;
