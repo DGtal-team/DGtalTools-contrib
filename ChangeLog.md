@@ -32,6 +32,8 @@
  - *visualisation*
   - polyMeshEdit: tool to edit a mesh (add local noise, remove selected faces).
     (Bertrand Kerautret [#78](https://github.com/DGtal-team/DGtalTools-contrib/pull/78))
+  - polyMeshEdit: fix preformance issue in display loop.
+    (Bertrand Kerautret [#84](https://github.com/DGtal-team/DGtalTools-contrib/pull/84))
 
 
 # DGtalTools-contrib  1.3 

@@ -156,7 +156,7 @@ std::vector<PolySurface::Face> faceAround(const PolySurface &polysurff,
     }
     fVisited[faceId] = true;
     bool addNewFaces = true;
-    while (!q.empty() ) 
+    while (!q.empty() )
     {
         PolySurface::Vertex v = q.front(); q.pop();
         auto listFace = polysurff.facesAroundVertex(v);
@@ -283,7 +283,7 @@ void callbackFaceID() {
     ImGui::Separator();
 
     ImGui::Text("Action:");
-    if (ImGui::Button("Clear selection")) 
+    if (ImGui::Button("Clear selection"))
     {
         for(auto &i : vectSelection)
         {
@@ -303,14 +303,14 @@ void callbackFaceID() {
     ImGui::Separator();
     ImGui::Text("IO");
 
-    if (ImGui::Button("save in .obj")) 
+    if (ImGui::Button("save in .obj"))
     {
         std::ofstream obj_stream( outputFileName.c_str() );
         MeshHelpers::exportOBJ(obj_stream, currentPolysurf);
     }
     ImGui::SameLine();
 
-    if (ImGui::Button("reload src")) 
+    if (ImGui::Button("reload src"))
     {
         currentPolysurf = firstPolysurf;
         addSurfaceInPolyscope(currentPolysurf);
@@ -415,3 +415,4 @@ int main(int argc, char** argv)
     return 0;
     
 }
+
