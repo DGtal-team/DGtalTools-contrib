@@ -26,6 +26,8 @@
    (Bertrand Kerautret [#71](https://github.com/DGtal-team/DGtalTools-contrib/pull/71))
   - meshAxisCutter: new option to select range meshes.
    (Bertrand Kerautret [#80](https://github.com/DGtal-team/DGtalTools-contrib/pull/80))
+  - meshAxisCutter: new tools to transform trunk mesh from input centerline and cylinder coordinates.
+   (Bertrand Kerautret [#82](https://github.com/DGtal-team/DGtalTools-contrib/pull/82))
 
  - *visualisation*
   - polyMeshEdit: tool to edit a mesh (add local noise, remove selected faces).
