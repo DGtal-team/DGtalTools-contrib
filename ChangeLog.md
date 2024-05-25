@@ -16,6 +16,9 @@
     consistant. (Bertrand Kerautret [#70](https://github.com/DGtal-team/DGtalTools-contrib/pull/70))
   - basicEditMesh: improvement of mesh read using generic reader/writer. 
     (Bertrand Kerautret [#72](https://github.com/DGtal-team/DGtalTools-contrib/pull/72))
+  - meshBasicEdit: new name of basicEditMesh and addition of a new
+    option to rescale a shape according to its bounding box and a new size.
+    (Bertrand Kerautret [#73](https://github.com/DGtal-team/DGtalTools-contrib/pull/73))
  
  - *Geometry3d*
   - basicMorphoFilter: fix a bug on the dilate/erode options. 
