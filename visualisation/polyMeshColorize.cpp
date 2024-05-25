@@ -55,7 +55,7 @@ using namespace DGtal;
 /**
  @page polyMeshColorize polyMeshColorize
  
- @brief  polyMeshColorize tool to colorize a mesh (faces). Note that the process relies on the halfedge data structure that can fail if the input is not topologically consistant. If you want use other type of mesh, you can use meshViewerEdit that is based on the simple soup of triangles process (slower selection process).
+ @brief  polyMeshColorize tool to colorize a mesh (faces). Note that the process relies on the halfedge data structure that can fail if the input is not topologically consistent. If you want use other type of mesh, you can use meshViewerEdit that is based on the simple soup of triangles process (slower selection process).
 
 
  @b Usage:   polyMeshColorize [OPTIONS] 1 [2]
