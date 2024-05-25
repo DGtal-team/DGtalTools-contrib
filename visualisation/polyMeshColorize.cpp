@@ -363,7 +363,7 @@ int main(int argc, char** argv)
     
     // parse command line using CLI ----------------------------------------------
     CLI::App app;
-    app.description("polyMeshColorize tool to colorize a mesh (faces). Note that the process relies on the halfedge data structure that can fail if the input is not topologically consistant. If you want use other type of mesh, you can use meshViewerEdit that is based on the simple soup of triangles process (slower selection process). \n"
+    app.description("polyMeshColorize tool to colorize a mesh (faces). Note that the process relies on the halfedge data structure that can fail if the input is not topologically consistent. If you want use other type of mesh, you can use meshViewerEdit that is based on the simple soup of triangles process (slower selection process). \n"
                     " polyMeshColorize $DGtal/examples/samples/bunnyhead.obj  bunnyColored.obj \n");
     app.add_option("-i,--input,1", inputFileName, "an input mesh file in .obj or .off format." )
     ->required()
