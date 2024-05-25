@@ -1,5 +1,5 @@
 SET(DGTAL_TOOLS_DEVEL_SRC
-    basicEditMesh
+    meshBasicEdit
     computeMeshDistances
     volLocalMax
     basicMorphoFilter
@@ -11,6 +11,7 @@ SET(DGTAL_TOOLS_DEVEL_SRC
     vol2meshAndNormals
     meshAxisCutter
     graph2vol
+    trunkMeshTransform
 )
 
 
