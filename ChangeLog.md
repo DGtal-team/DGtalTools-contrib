@@ -21,6 +21,9 @@
 
 # DGtalTools-contrib  1.3 
  
+  - meshBasicEdit: new name of basicEditMesh and addition of a new
+    option to rescale a shape according to its bounding box and a new size.
+    (Bertrand Kerautret [#73](https://github.com/DGtal-team/DGtalTools-contrib/pull/73))
  
 - *global*
   - Continuous integration does not use Travis anymore but Github Actions.
