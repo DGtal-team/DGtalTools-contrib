@@ -4,8 +4,6 @@
     no more usefull since DGtal PR [175](https://github.com/DGtal-team/DGtal/pull/1715) 
     (Bertrand Kerautret [#79](https://github.com/DGtal-team/DGtalTools-contrib/pull/79))
 
-
-
 - *global*
   - Continuous integration on windows does not use Appveyopr anymore but Github Actions.
    (Bertrand Kerautret [#77](https://github.com/DGtal-team/DGtalTools-contrib/pull/77))
@@ -16,7 +14,21 @@
     consistant. (Bertrand Kerautret [#70](https://github.com/DGtal-team/DGtalTools-contrib/pull/70))
   - basicEditMesh: improvement of mesh read using generic reader/writer. 
     (Bertrand Kerautret [#72](https://github.com/DGtal-team/DGtalTools-contrib/pull/72))
+
+- *visualisation*
+  - graphViewer: new options to apply a scale factors on the radius input values
+    and to display constant tube section. (Bertrand Kerautret [#74](https://github.com/DGtal-team/DGtalTools-contrib/pull/74))
+
+# DGtalTools-contrib  1.3 
  
+  - meshBasicEdit: new name of basicEditMesh and addition of a new
+    option to rescale a shape according to its bounding box and a new size.
+    (Bertrand Kerautret [#73](https://github.com/DGtal-team/DGtalTools-contrib/pull/73))
+ 
+- *global*
+  - Continuous integration does not use Travis anymore but Github Actions.
+   (Bertrand Kerautret [#58](https://github.com/DGtal-team/DGtalTools-contrib/pull/58))
+
  - *Geometry3d*
   - basicMorphoFilter: fix a bug on the dilate/erode options. 
     (Bertrand Kerautret [#74](https://github.com/DGtal-team/DGtalTools-contrib/pull/74))  
@@ -32,13 +44,8 @@
  - *visualisation*
   - polyMeshEdit: tool to edit a mesh (add local noise, remove selected faces).
     (Bertrand Kerautret [#78](https://github.com/DGtal-team/DGtalTools-contrib/pull/78))
-
-
-# DGtalTools-contrib  1.3 
-
-- *global*
-  - Continuous integration does not use Travis anymore but Github Actions.
-   (Bertrand Kerautret [#58](https://github.com/DGtal-team/DGtalTools-contrib/pull/58))
+  - polyMeshEdit: fix preformance issue in display loop.
+    (Bertrand Kerautret [#84](https://github.com/DGtal-team/DGtalTools-contrib/pull/84))
 
 - *Geometry3d*
   - volFillCCSize: new tool to fill each Connected Component with a value corresponding to the number of voxels of the CC.
