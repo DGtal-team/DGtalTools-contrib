@@ -49,11 +49,13 @@ Options:
   -v,--inputVertex TEXT:FILE REQUIRED   input file containing the vertex list.
   -e,--inputEdge TEXT:FILE REQUIRED     input file containing the edge list.
   -a,--autoEdge                         generate edge list from vertex order.
+  --cstSectionEdgeRad                   use a constant edge radius between two consecutive vertices.
   -r,--inputRadii TEXT                  input file containing the radius for each vertex.
   -b,--ballRadius FLOAT=1               radius of vertex balls.
   -m,--addMesh TEXT                     add mesh in the display.
   --meshColor UINT ...                  specify the color of mesh.
   --vertexColor UINT ...                specify the color of vertex.
+  -s,--scaleRadius FLOAT=1              apply a scale factors on the radius input values
   --edgeColor UINT ...                  specify the color of edges.
   -c,--colormap                         display vertex colored by order in vertex file or by radius scale if the radius file is specidfied (-r).
   -d,--doSnapShotAndExit TEXT           save display snapshot into file. Notes that the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D). If the camera setting was not saved it will use the default camera setting.
@@ -92,8 +94,10 @@ int main( int argc, char** argv )
   std::string nameFileVertex;  
   std::string nameFileEdge;
   double r {1.0};
+  double scaleRadius {1.0};
   bool useRadiiFile {false};
   bool autoEdgeOpt {false};
+  bool cstSectionEdgeRad {false};
   std::vector<unsigned int> vectColMesh;
   std::vector<unsigned int> vectColVertex;
   std::vector<unsigned int> vectColEdge;
@@ -104,11 +108,13 @@ int main( int argc, char** argv )
   app.add_option("--inputVertex,-v", nameFileVertex, "input file containing the vertex list.")->required()->check(CLI::ExistingFile);
   app.add_option("--inputEdge,-e", nameFileEdge, "input file containing the edge list.")->required()->check(CLI::ExistingFile);
   app.add_flag("--autoEdge,-a", autoEdgeOpt, "generate edge list from vertex order.");
+  app.add_flag("--cstSectionEdgeRad",cstSectionEdgeRad,  "use a constant edge radius between two consecutive vertices.");
   auto inputRadiiOpt = app.add_option("--inputRadii,-r", nameFileRadii, "input file containing the radius for each vertex.");
   app.add_option("--ballRadius,-b", r, "radius of vertex balls.", true);
   auto addMeshOpt = app.add_option("--addMesh,-m", meshName, "add mesh in the display.");
   auto meshColorOpt = app.add_option("--meshColor", vectColMesh, "specify the color of mesh.");
   auto vertexColorOpt = app.add_option("--vertexColor", vectColVertex, "specify the color of vertex.");
+  app.add_option("--scaleRadius,-s", scaleRadius, "apply a scale factors on the radius input values", true);
   auto edgeColorOpt = app.add_option("--edgeColor", vectColEdge, "specify the color of edges.");
   auto colormapOpt = app.add_flag("--colormap, -c","display vertex colored by order in vertex file or by radius scale if the radius file is specidfied (-r).");
   auto doSnapShotAndExitOpt = app.add_option("--doSnapShotAndExit,-d", name, "save display snapshot into file. Notes that the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D). If the camera setting was not saved it will use the default camera setting.");
@@ -180,7 +186,15 @@ int main( int argc, char** argv )
                    << vectRadii.size() << ")." << std::endl;
       return 1;
     }
-    hueShade = HueShadeColorMap<int>((*(std::min_element(vectRadii.begin(),vectRadii.end())))*10000,(*(std::max_element(vectRadii.begin(),vectRadii.end())))*10000);
+    hueShade = HueShadeColorMap<int>((*(std::min_element(vectRadii.begin(),
+                                                         vectRadii.end())))*10000,
+                                     (*(std::max_element(vectRadii.begin(),
+                                                         vectRadii.end())))*10000);
+    if (scaleRadius != 1.0){
+      for(auto &v: vectRadii){
+        v *= scaleRadius; 
+      }
+    }
   }
 
 
@@ -219,9 +233,16 @@ int main( int argc, char** argv )
     {
       Mesh<Z3i::RealPoint> aMesh;
       vertex = { vectVertex[e[0]], vectVertex[e[1]] };
-      radii = { vectRadii[e[0]], vectRadii[e[1]] };
+      if (cstSectionEdgeRad) {
+        radii = { std::min(vectRadii[e[0]], vectRadii[e[1]]), std::min(vectRadii[e[0]], vectRadii[e[1]]) };  
+      }
+      else {
+        radii = { vectRadii[e[0]], vectRadii[e[1]] };
+      }
       Mesh<Z3i::RealPoint>::createTubularMesh(aMesh, vertex, radii, 0.05);
-      viewer << (useRadiiFile ? CustomColors3D( hueShade(radii[0]*10000), hueShade(radii[1]*10000) ) : CustomColors3D( hueShade(e[0]), hueShade(e[1]) ));
+      viewer << (useRadiiFile ? CustomColors3D( hueShade(radii[0]*10000),
+                                                hueShade(radii[1]*10000) ) : CustomColors3D( hueShade(e[0]),
+                                                                                             hueShade(e[1]) ));
       viewer << aMesh;
     }
   }
@@ -231,7 +252,12 @@ int main( int argc, char** argv )
     for ( const auto& e: vectEdges )
     {
       vertex = { vectVertex[e[0]], vectVertex[e[1]] };
-      radii = { vectRadii[e[0]], vectRadii[e[1]] };
+      if (cstSectionEdgeRad) {
+        radii = { std::min(vectRadii[e[0]], vectRadii[e[1]]), std::min(vectRadii[e[0]], vectRadii[e[1]]) };  
+        }
+        else {
+          radii = { vectRadii[e[0]], vectRadii[e[1]] };
+        }
       Mesh<Z3i::RealPoint>::createTubularMesh(aMesh, vertex, radii, 0.05);
     }
     viewer << CustomColors3D(DGtal::Color::Black, edgeColor);
@@ -249,7 +275,7 @@ int main( int argc, char** argv )
 
   viewer << Viewer3D<>::updateDisplay;
   
-  if(doSnapShotAndExitOpt->count() > 0){
+ if(doSnapShotAndExitOpt->count() > 0){
     // Appy cleaning just save the last snap
     DGtal::trace.info() << "sorting surfel according camera position....";
     viewer.sortSurfelFromCamera();
