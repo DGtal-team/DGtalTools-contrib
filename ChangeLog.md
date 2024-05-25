@@ -38,7 +38,7 @@
    (Bertrand Kerautret [#71](https://github.com/DGtal-team/DGtalTools-contrib/pull/71))
   - meshAxisCutter: new option to select range meshes.
    (Bertrand Kerautret [#80](https://github.com/DGtal-team/DGtalTools-contrib/pull/80))
-  - computeMeshDistances: Reduce complexity with search using face mapping.
+  - computeMeshDistances: Reduce the complexity using face mapping.
    (Bertrand Kerautret [#81](https://github.com/DGtal-team/DGtalTools-contrib/pull/81))
 
  - *visualisation*
