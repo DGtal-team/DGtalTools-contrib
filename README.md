@@ -15,8 +15,8 @@ More Information
 * Release 0.9.3 DOI [![DOI](https://zenodo.org/badge/43562168.svg)](https://zenodo.org/badge/latestdoi/43562168)
 * Release 0.9.2 DOI [![DOI](https://zenodo.org/badge/4888/DGtal-team/DGtalTools-contrib.svg)](https://zenodo.org/badge/latestdoi/4888/DGtal-team/DGtalTools-contrib)
 * Release 0.9.1 DOI [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.45131.svg)](http://dx.doi.org/10.5281/zenodo.45131)
-* Continuous Integration (Linux/MacOS) ![Build status](https://github.com/DGtal-team/DGtalTools-contrib/actions/workflows/build.yml/badge.svg)
-* Continuous Integration (Windows): [![Build status](https://ci.appveyor.com/api/projects/status/sq9w7r1xs8078g7j?svg=true)](https://ci.appveyor.com/project/kerautret/dgtaltools-contrib)
+* Continuous Integration (Linux/MacOS/Windows) ![Build status](https://github.com/DGtal-team/DGtalTools-contrib/actions/workflows/build.yml/badge.svg)
+
 
 Organisation
 ============
@@ -66,13 +66,15 @@ As the previous section but in 3d, it contains actually these tools:
    - basicEditMesh: to apply basic mesh edition (scale change, mesh face contraction, face filtering).
    - basicMorphoFilter: apply basic morpho filter from a ball structural element.
    - computeMeshDistances: computes for each face of a mesh A the minimal distance to another mesh B.
+   - graph2vol: converts graph object into volumetric image.
    - meshAxisCutter: cuts the input mesh according one axis into sereral separate meshes.
    - volLocalMax: extract the local maximas of a vol image within a spherical kernel.
    - xyzScale: a basic tool to adjust the scale of an xyz file.
    - off2obj: tool to convert a mesh represented in off format into obj format.
    - obj2off: tool to convert a .obj mesh into the .off format.
    - off2sdp: converts a mesh into a set of points (.sdp).
-   - volFillCCSize: fills each Connected Component with a value corresponding to the number of voxels of the CC.   
+   - volFillCCSize: fills each Connected Component with a value corresponding to the number of voxels of the CC.
+   - meshAxisCutter: tools to transform trunk mesh from input centerline and cylinder coordinates.
 <table><tr>
 <td> <img width="268" src="https://cloud.githubusercontent.com/assets/772865/12481207/d20d246c-c047-11e5-8986-ae17a582c977.png"  </td>
 <td> <img width="268" alt="result after olFillCSSize" src="https://user-images.githubusercontent.com/772865/138257925-60b3d30e-3a00-46ee-b9bc-fc44dff65f65.png">
@@ -91,8 +93,23 @@ This section, can contain all tools related to visualisation:
    - displayTgtCoverAlphaTS: to display alpha-thick segment given on a simple contour.
    - meshViewerEdit: tool to visualize a mesh and to apply simple edits (face removal, color edits...).
    - graphViewer: tool to display graphs from a list of edges, a list of vertex and an optionnal list of radius for each edge.
+   - polyMeshEdit: tool to edit a mesh (add local noise, remove selected faces).
 
-
-|![](https://cloud.githubusercontent.com/assets/772865/12538777/cd8c2d28-c2e2-11e5-93ab-cb4a6cfadc8e.png)| ![](https://cloud.githubusercontent.com/assets/772865/12523276/22205f46-c156-11e5-827d-ec788baf7029.png) |<img width="260" alt="capture d ecran 2016-03-04 a 19 46 54" src="https://cloud.githubusercontent.com/assets/772865/13536787/02f16df6-e242-11e5-8541-88f8ca3f0a48.png">|
-| :-: | :-: | :-: |
-|displayTgtCoverAlphaTS|meshViewerEdit|graphViewer|
+<table>
+<tr>
+  <td><img width="260" src="https://cloud.githubusercontent.com/assets/772865/12538777/cd8c2d28-c2e2-11e5-93ab-cb4a6cfadc8e.png"></td>
+  <td> <img width="260" src="https://cloud.githubusercontent.com/assets/772865/12523276/22205f46-c156-11e5-827d-ec788baf7029.png"> </td>
+  <td><img width="260" src="https://cloud.githubusercontent.com/assets/772865/13536787/02f16df6-e242-11e5-8541-88f8ca3f0a48.png"></td>
+</tr> 
+ <tr>
+ <td>displayTgtCoverAlphaTS</td>
+ <td>meshViewerEdit</td>
+ <td>graphViewer</td>
+ </tr>
+  <tr>
+   <td><img width="260" src="https://github.com/DGtal-team/DGtalTools-contrib/assets/772865/5da7e052-d332-4c1e-95bd-bfd06d4cd1e7"></td>   
+  </tr>
+ <tr>
+ <td>polyMeshEdit</td>
+ </tr>
+</table>

@@ -1,11 +1,17 @@
 # DGtalTools-contrib  1.4 (beta)
+- *build*
+  - Remove STBimage preprocessor instruction used to fix MVSC that is 
+    no more usefull since DGtal PR [175](https://github.com/DGtal-team/DGtal/pull/1715) 
+    (Bertrand Kerautret [#79](https://github.com/DGtal-team/DGtalTools-contrib/pull/79))
+
+- *global*
+  - Continuous integration on windows does not use Appveyopr anymore but Github Actions.
+   (Bertrand Kerautret [#77](https://github.com/DGtal-team/DGtalTools-contrib/pull/77))
 
 - *Geometry2d*
   - rotNmap: new tools to apply a rotation in the input normal map (it
     rotates both the position and normals orientation to be
     consistant. (Bertrand Kerautret [#70](https://github.com/DGtal-team/DGtalTools-contrib/pull/70))
-  - meshAxisCutter: new tool cut the input mesh according one axis into several separate meshes.
-   (Bertrand Kerautret [#71](https://github.com/DGtal-team/DGtalTools-contrib/pull/71))
   - basicEditMesh: improvement of mesh read using generic reader/writer. 
     (Bertrand Kerautret [#72](https://github.com/DGtal-team/DGtalTools-contrib/pull/72))
 
@@ -13,11 +19,30 @@
   - graphViewer: new options to apply a scale factors on the radius input values
     and to display constant tube section. (Bertrand Kerautret [#74](https://github.com/DGtal-team/DGtalTools-contrib/pull/74))
 
- # DGtalTools-contrib  1.3 
-
+# DGtalTools-contrib  1.3 
+ 
+ 
 - *global*
   - Continuous integration does not use Travis anymore but Github Actions.
    (Bertrand Kerautret [#58](https://github.com/DGtal-team/DGtalTools-contrib/pull/58))
+
+ - *Geometry3d*
+  - basicMorphoFilter: fix a bug on the dilate/erode options. 
+    (Bertrand Kerautret [#74](https://github.com/DGtal-team/DGtalTools-contrib/pull/74))  
+  - graph2vol: new tool to transform graph based object into volumetric object. 
+    (Bertrand Kerautret [#76](https://github.com/DGtal-team/DGtalTools-contrib/pull/76))
+  - meshAxisCutter: new tool that cuts the input mesh according one axis into several separate meshes.
+   (Bertrand Kerautret [#71](https://github.com/DGtal-team/DGtalTools-contrib/pull/71))
+  - meshAxisCutter: new option to select range meshes.
+   (Bertrand Kerautret [#80](https://github.com/DGtal-team/DGtalTools-contrib/pull/80))
+  - meshAxisCutter: new tools to transform trunk mesh from input centerline and cylinder coordinates.
+   (Bertrand Kerautret [#82](https://github.com/DGtal-team/DGtalTools-contrib/pull/82))
+
+ - *visualisation*
+  - polyMeshEdit: tool to edit a mesh (add local noise, remove selected faces).
+    (Bertrand Kerautret [#78](https://github.com/DGtal-team/DGtalTools-contrib/pull/78))
+  - polyMeshEdit: fix preformance issue in display loop.
+    (Bertrand Kerautret [#84](https://github.com/DGtal-team/DGtalTools-contrib/pull/84))
 
 - *Geometry3d*
   - volFillCCSize: new tool to fill each Connected Component with a value corresponding to the number of voxels of the CC.
