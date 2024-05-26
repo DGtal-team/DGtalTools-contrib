@@ -46,6 +46,14 @@
     (Bertrand Kerautret [#78](https://github.com/DGtal-team/DGtalTools-contrib/pull/78))
   - polyMeshEdit: fix preformance issue in display loop.
     (Bertrand Kerautret [#84](https://github.com/DGtal-team/DGtalTools-contrib/pull/84))
+  - polyMeshColorize: tool to colorize a mesh.
+    (Bertrand Kerautret [#83](https://github.com/DGtal-team/DGtalTools-contrib/pull/83))
+
+# DGtalTools-contrib  1.3 
+
+- *global*
+  - Continuous integration does not use Travis anymore but Github Actions.
+   (Bertrand Kerautret [#58](https://github.com/DGtal-team/DGtalTools-contrib/pull/58))
 
 - *Geometry3d*
   - volFillCCSize: new tool to fill each Connected Component with a value corresponding to the number of voxels of the CC.
