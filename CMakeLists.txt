@@ -21,7 +21,7 @@ include(polyscope)
  set (CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 
-FIND_PACKAGE(DGtal 1.4 REQUIRED)
+FIND_PACKAGE(DGtal 1.5 REQUIRED)
 INCLUDE_DIRECTORIES(${DGTAL_INCLUDE_DIRS})
 LINK_DIRECTORIES(${DGTAL_LIBRARY_DIRS})
 
@@ -58,8 +58,8 @@ include_directories(${PROJECT_SOURCE_DIR})
 # -----------------------------------------------------------------------------
 # SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 SET(DGtalToolsContrib_VERSION_MAJOR 1)
-SET(DGtalToolsContrib_VERSION_MINOR 4)
-#SET(DGtalToolsContrib_VERSION_PATCH beta)
+SET(DGtalToolsContrib_VERSION_MINOR 5)
+SET(DGtalToolsContrib_VERSION_PATCH beta)
 SET(DGTALTOOLSContrib_VERSION "${DGtalToolsContrib_VERSION_MAJOR}.${DGtalToolsContrib_VERSION_MINOR}.${DGtalToolsContrib_VERSION_PATCH}")
 SET(PROJECT_VERSION "${DGtalToolsContrib_VERSION_MAJOR}.${DGtalToolsContrib_VERSION_MINOR}.${DGtalToolsContrib_VERSION_PATCH}")
 SET(VERSION ${DGtalToolsContrib_VERSION_MAJOR}.${DGtalToolsContrib_VERSION_MINOR}.${DGtalToolsContrib_VERSION_PATCH})
