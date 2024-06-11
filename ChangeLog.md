@@ -1,3 +1,8 @@
+# DGtalTools-contrib  1.5 (beta)
+
+
+
+
 # DGtalTools-contrib  1.4 
 - *build*
   - Remove STBimage preprocessor instruction used to fix MVSC that is 
