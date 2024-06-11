@@ -12,13 +12,20 @@
   - rotNmap: new tools to apply a rotation in the input normal map (it
     rotates both the position and normals orientation to be
     consistant. (Bertrand Kerautret [#70](https://github.com/DGtal-team/DGtalTools-contrib/pull/70))
+    
+- *Geometry3d*
   - basicEditMesh: improvement of mesh read using generic reader/writer. 
     (Bertrand Kerautret [#72](https://github.com/DGtal-team/DGtalTools-contrib/pull/72))
+  - trunkMeshTransform: new tools to transform trunk mesh from input centerline and cylinder coordinates.
+    (Bertrand Kerautret [#82](https://github.com/DGtal-team/DGtalTools-contrib/pull/82))
 
 - *visualisation*
   - graphViewer: new options to apply a scale factors on the radius input values
     and to display constant tube section. (Bertrand Kerautret [#74](https://github.com/DGtal-team/DGtalTools-contrib/pull/74))
-
+  - polyMeshColorize: new tool to colorize a mesh. (Bertrand Kerautret [#83](https://github.com/DGtal-team/DGtalTools-contrib/pull/83)
+  - polyMeshEdit: new tool to edit mesh based on polyscope (Bertrand Kerautret [#78](https://github.com/DGtal-team/DGtalTools-contrib/pull/78)
+   
+ 
 # DGtalTools-contrib  1.3 
  
   - meshBasicEdit: new name of basicEditMesh and addition of a new
