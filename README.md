@@ -39,7 +39,7 @@ This section can contains various utilities related to 2d geometry (2d estimator
    - houghLineDetect: line detection from the hough transform (from OpenCV implementation, use cmake option:-DWITH_OPENCV=true).
    - meaningFullThickness: to display the meaningful thickness of digital contour.
      [Bertrand Kerautret, Jacques-Olivier Lachaud and  Mouhammad Said;
-      ~Meaningful Thickness Detection on Polygonal Curve~ ;
+      Meaningful Thickness Detection on Polygonal Curve ;
       Proceedings of the 1st International Conference on Pattern Recognition Applications and Methods
        2012 pp. 372--379)]
 
@@ -102,7 +102,6 @@ This section, can contain all tools related to visualisation:
   <td><img width="260" src="https://cloud.githubusercontent.com/assets/772865/12538777/cd8c2d28-c2e2-11e5-93ab-cb4a6cfadc8e.png"></td>
   <td> <img width="260" src="https://cloud.githubusercontent.com/assets/772865/12523276/22205f46-c156-11e5-827d-ec788baf7029.png"> </td>
   <td><img width="260" src="https://cloud.githubusercontent.com/assets/772865/13536787/02f16df6-e242-11e5-8541-88f8ca3f0a48.png"></td>
-  <td><img width="260" src="https://github.com/DGtal-team/DGtalTools-contrib/assets/772865/10592c26-40b4-4cd4-8118-b30a82ab0be3"></td>
 </tr> 
  <tr>
  <td>displayTgtCoverAlphaTS</td>
@@ -111,6 +110,7 @@ This section, can contain all tools related to visualisation:
  </tr>
   <tr>
    <td><img width="260" src="https://github.com/DGtal-team/DGtalTools-contrib/assets/772865/5da7e052-d332-4c1e-95bd-bfd06d4cd1e7"></td>   
+<td><img width="260" src="https://github.com/DGtal-team/DGtalTools-contrib/assets/772865/10592c26-40b4-4cd4-8118-b30a82ab0be3"></td>
   </tr>
  <tr>
  <td>polyMeshEdit</td><td>polyMeshColorize</td>
