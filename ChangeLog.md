@@ -1,8 +1,8 @@
 # DGtalTools-contrib  1.5 (beta)
 
 - *global*
-  - Continuous integration fix on update on conan version following DGtal.
-   (Bertrand Kerautret [#90](https://github.com/DGtal-team/DGtalTools-contrib/pull/90))
+  - Continuous integration fix using new version on conan following DGtal changes.
+    (Bertrand Kerautret [#90](https://github.com/DGtal-team/DGtalTools-contrib/pull/90))
 
 
 
