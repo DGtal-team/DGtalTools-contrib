@@ -75,6 +75,7 @@ As the previous section but in 3d, it contains actually these tools:
    - obj2off: tool to convert a .obj mesh into the .off format.
    - off2sdp: converts a mesh into a set of points (.sdp).
    - trunkMeshTransform: tools to transform trunk mesh from input centerline and cylinder coordinates.
+   - splitMeshFromCol: tool to split mesh from its color face attributes.
    - volFillCCSize: fills each Connected Component with a value corresponding to the number of voxels of the CC.
 
 <table><tr>
