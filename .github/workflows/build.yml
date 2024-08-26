@@ -40,17 +40,17 @@ jobs:
        id: conan
        uses: turtlebrowser/get-conan@main
        with:
-         version: 1.57.0
+         version: 2.4.0
 
      - name: Create conan default profile
        if: matrix.os == 'windows-latest'
-       run: conan profile new default --detect
+       run: conan profile detect --force
 
-     - uses: actions/cache@v3
+     - uses: actions/cache@v4
        if: matrix.os == 'windows-latest'
        with:
          path: ~/.conan
-         key: ${{ runner.os }}-conan-Release
+         key: ${{ runner.os }}-conan2-Release
 
 
      - name: Create Build Environment
@@ -82,17 +82,19 @@ jobs:
            echo  cmake .. $CONFIG_MAC -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  -G Ninja
            cmake .. $CONFIG_MAC -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  -G Ninja
            ninja
+           
      - name: DGtalBuild (windows)
        if: matrix.os == 'windows-latest'
        shell: bash
        working-directory: ${{runner.workspace}}/build
        run: |
+           conan install $GITHUB_WORKSPACE --build=missing
            git clone --depth 1 https://github.com/DGtal-team/DGtal.git
            cd DGtal
            mkdir buildDGtal
            cd buildDGtal
-           echo  cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_WINDOWS -DBUILD_EXAMPLES=false -DBUILD_TESTING=false 
-           cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_WINDOWS -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  
+           echo  cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_WINDOWS -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake"  -DBUILD_EXAMPLES=false -DBUILD_TESTING=false 
+           cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_WINDOWS -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake" -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  
            cmake --build . --config Release --parallel 3
 
      - name: Configure CMake (linux)
@@ -110,7 +112,9 @@ jobs:
        if: matrix.os == 'windows-latest'
        shell: bash
        working-directory: "${{runner.workspace}}/build"
-       run: cmake $GITHUB_WORKSPACE -DCMAKE_MODULE_PATH="D:/a/DGtalTools-contrib/build/DGtal/buildDGtal" -DDGtal_DIR="D:/a/DGtalTools-contrib/build/DGtal/buildDGtal"  -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DDGTAL_RANDOMIZED_TESTING_WHITELIST="${{ steps.whitelist.outputs.WHITELIST }}"
+       run: |
+           conan install $GITHUB_WORKSPACE --build=missing
+           cmake $GITHUB_WORKSPACE -DCMAKE_MODULE_PATH="D:/a/DGtalTools-contrib/build/DGtal/buildDGtal" -DDGtal_DIR="D:/a/DGtalTools-contrib/build/DGtal/buildDGtal"  -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DDGTAL_RANDOMIZED_TESTING_WHITELIST="${{ steps.whitelist.outputs.WHITELIST }}"
 
      - name: Build
        working-directory: ${{runner.workspace}}/build
