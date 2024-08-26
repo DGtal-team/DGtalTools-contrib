@@ -45,22 +45,27 @@ using namespace DGtal;
 /**
  @page splitMeshFromCol splitMeshFromCol
  
- @brief  Description of the tool...
+ @brief  Simple tools to split mesh from its color face attributes. From a color partition of the input mesh containing N different colors it exports N mesh incuding faces associated to the considered color (and it remove non used vertices.
  
- @b Usage:   splitMeshFromCol [input]
+ @b Usage:    ./geometry3d/splitMeshFromCol [OPTIONS] 1 2
  
  @b Allowed @b options @b are :
  
  @code
- -h [ --help ]           display this message
- -i [ --input ] arg      an input file...
- -p [ --parameter] arg   a double parameter...
+ Positionals:
+   1 TEXT:FILE REQUIRED                  Input file
+   2 TEXT REQUIRED                       Output basename
+
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED         Input file
+   -o,--output TEXT REQUIRED             Output basename
  @endcode
  
  @b Example:
  
  @code
- splitMeshFromCol -i  $DGtal/examples/samples/....
+ splitMeshFromCol inputMeshCol.obj resBase
  @endcode
  
  @image html ressplitMeshFromCol.png "Example of result. "
@@ -79,7 +84,7 @@ void extractMeshFromCol(const Mesh3DR &aMesh, const DGtal::Color &colorRef,
         resMesh.addVertex(aMesh.getVertex(i));
     }
     for (auto i = 0; i< indColFaces.size(); i++){
-            resMesh.addFace(aMesh.getFace(indColFaces[i]));
+        resMesh.addFace(aMesh.getFace(indColFaces[i]));
     }
     resMesh.removeIsolatedVertices();
 }
@@ -92,13 +97,12 @@ int main( int argc, char** argv )
     std::string outputFileName;
     std::stringstream usage;
     usage << "Usage: " << argv[0] << " [input]\n"
-    << "Typical use example:\n \t splitMeshFromCol -i ... \n";
+    << "Typical use example:\n \t splitMeshFromCol inputMeshCol.obj resBase \n";
     // parse command line using CLI-------------------------------------------------------
     CLI::App app;
-    app.description("Your program description.\n" + usage.str() );
+    app.description("Simple tools to split mesh from its color face attributes. From a color partition of the input mesh containing N different colors it exports N mesh incuding faces associated to the considered color (and it remove non used vertices.\n" + usage.str() );
     app.add_option("--input,-i,1", inputFileName, "Input file")->required()->check(CLI::ExistingFile);
     app.add_option("--output,-o,2", outputFileName, "Output basename")->required();
-    app.add_option("--parameter,-p", parameter, "a double parameter", true);
     
     app.get_formatter()->column_width(40);
     CLI11_PARSE(app, argc, argv);
@@ -109,8 +113,7 @@ int main( int argc, char** argv )
     
     
     trace.info() << "Starting " << argv[0]  << "with input: " <<  inputFileName
-    << " and output :" << outputFileName
-    << " param: " << parameter <<std::endl;
+    << " and output basename :" << outputFileName <<std::endl;
     trace.info() << "Reading mesh...  ";
     DGtal::Mesh<DGtal::Z3i::RealPoint> aMesh(true);
     aMesh << inputFileName;
@@ -120,9 +123,12 @@ int main( int argc, char** argv )
     trace.info() << "Partionning colors of the mesh " ;
     std::map<DGtal::Color, std::vector<Face> > mapColorFaces;
     for (auto i = 0; i< aMesh.nbFaces(); i++){
-        if ( mapColorFaces.count(aMesh.getFaceColor(i)) == 0){
+        if ( mapColorFaces.count(aMesh.getFaceColor(i)) == 0)
+        {
             mapColorFaces[aMesh.getFaceColor(i)] = std::vector<Face>();
-        }else{
+        }
+        else
+        {
             mapColorFaces[aMesh.getFaceColor(i)].push_back(i);
         }
     }
@@ -139,8 +145,6 @@ int main( int argc, char** argv )
         trace.info() << "[done]" << std::endl;
         n++;
     }
-    
-    
     return 0;
 }
 
