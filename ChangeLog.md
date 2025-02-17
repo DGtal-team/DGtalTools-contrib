@@ -4,6 +4,10 @@
   - Continuous integration fix using new version on conan following DGtal changes.
     (Bertrand Kerautret [#90](https://github.com/DGtal-team/DGtalTools-contrib/pull/90))
 
+- *build*
+  - Fix cmake compulation issue from CPP 17 configuration. 
+    (Bertrand Kerautret [#91](https://github.com/DGtal-team/DGtalTools-contrib/pull/91))
+
 
 
 # DGtalTools-contrib  1.4 
