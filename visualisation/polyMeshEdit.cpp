@@ -107,6 +107,8 @@ static const int unselectFlag = 200;
 static const int selectFlag = 50;
 static const int cursorFlag = 1;
 
+static bool noiseDeformFace = true;
+
 
 static std::string outputFileName {"result.obj"};
 
@@ -206,20 +208,28 @@ void partialSelect(int selFreq=1){
     }
 }
 
-void noisify(double scale = 0.01){
+void noisify(double scale = 0.01, bool deformFace = true){
     srand((unsigned) time(NULL));
     for ( unsigned int i = 0; i< currentPolysurf.nbFaces(); i++ )
     {
-        Z3i::RealPoint pDep((((double)(rand()%randLarge)-randLarge/2.0)/randLarge)*scale,
-                            (((double)(rand()%randLarge)-randLarge/2.0)/randLarge)*scale,
-                            (((double)(rand()%randLarge)-randLarge/2.0)/randLarge)*scale);
-        if (vectSelection[i]==selectFlag)
+        if (vectSelection[i]==selectFlag || vectSelection[i] == cursorFlag)
         {
+	  Z3i::RealPoint pDep;
+	  if (!deformFace){
+	    pDep = Z3i::RealPoint ((((double)(rand()%randLarge)-randLarge/2.0)/randLarge)*scale,
+				  (((double)(rand()%randLarge)-randLarge/2.0)/randLarge)*scale,
+				  (((double)(rand()%randLarge)-randLarge/2.0)/randLarge)*scale);
+	  }
             for (auto f: currentPolysurf.verticesAroundFace(i))
             {
-                currentPolysurf.positions()[f][0] += pDep[0];
-                currentPolysurf.positions()[f][1] += pDep[1];
-                currentPolysurf.positions()[f][2] += pDep[2];
+	      if (deformFace) {
+		pDep = Z3i::RealPoint ((((double)(rand()%randLarge)-randLarge/2.0)/randLarge)*scale,
+				       (((double)(rand()%randLarge)-randLarge/2.0)/randLarge)*scale,
+				       (((double)(rand()%randLarge)-randLarge/2.0)/randLarge)*scale);
+	      }
+	      currentPolysurf.positions()[f][0] += pDep[0];
+	      currentPolysurf.positions()[f][1] += pDep[1];
+	      currentPolysurf.positions()[f][2] += pDep[2];
             }
         }
     }
@@ -280,6 +290,7 @@ void callbackFaceID() {
     ImGui::Separator();
     ImGui::Text("Noise parameters:");
     ImGui::SliderFloat("noise scale", &noiseLevel, minNoiseLevel, maxNoiseLevel, "scale = %f");
+    ImGui::Checkbox("deform face:", &noiseDeformFace);
     ImGui::Separator();
 
     ImGui::Text("Action:");
@@ -298,7 +309,7 @@ void callbackFaceID() {
     ImGui::SameLine();
     if (ImGui::Button("noisify selected faces"))
     {
-        noisify(noiseLevel);
+      noisify(noiseLevel, noiseDeformFace);
     }
     ImGui::Separator();
     ImGui::Text("IO");
@@ -378,7 +389,7 @@ void callbackFaceID() {
 int main(int argc, char** argv)
 {
     std::string inputFileName {""};
-    
+    double noiseFactor = 1.0;
     // parse command line using CLI ----------------------------------------------
     CLI::App app;
     app.description("polyMeshEdit tool to edit a mesh (add local noise and remove selected faces). Note that the process relies on the halfedge data structure that can fail if the input is not topologically consistant. If you want use other type of mesh, you can use meshViewerEdit that is based on the simple soup of triangles process (slower selection process). \n"
@@ -386,6 +397,7 @@ int main(int argc, char** argv)
     app.add_option("-i,--input,1", inputFileName, "an input mesh file in .obj or .off format." )
     ->required()
     ->check(CLI::ExistingFile);
+    app.add_option("-f,--noiseFactor", noiseFactor, "increase noise scale by using a factor (1.0 default scale)." );
     app.add_option("-o,--output,2", outputFileName, "an output mesh file in .obj or .off format.", true );
     
     
@@ -403,8 +415,8 @@ int main(int argc, char** argv)
     minPaintRad = (bb.second - bb.first).norm()/1000.0;
     maxPaintRad = (bb.second - bb.first).norm()/2.0;
     minNoiseLevel = (bb.second - bb.first).norm()/10000.0;
-    maxNoiseLevel = (bb.second - bb.first).norm()/100.0;
-    noiseLevel = (bb.second - bb.first).norm()/1000.0;
+    maxNoiseLevel = noiseFactor*(bb.second - bb.first).norm()/100.0;
+    noiseLevel = noiseFactor*(bb.second - bb.first).norm()/1000.0;
     paintRad = (bb.second - bb.first).norm()/50.0;
     
     DGtal::MeshHelpers::mesh2PolygonalSurface(aMesh, currentPolysurf);
