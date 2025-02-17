@@ -14,14 +14,26 @@ include(polyscope)
 
 
 
-# -----------------------------------------------------------------------------
-# CPP11 
-# -----------------------------------------------------------------------------
- set (CMAKE_CXX_STANDARD 11)
- set (CMAKE_CXX_STANDARD_REQUIRED TRUE)
+
+ # -----------------------------------------------------------------------------
+ # CPP17
+ # -----------------------------------------------------------------------------
+set(DGTALTOOLS_CONTRIB_CMAKE_CXX_STANDARD_MIN_REQUIRED 17)
+ if(NOT CMAKE_CXX_STANDARD)
+   set(CMAKE_CXX_STANDARD ${DGTALTOOLS_CONTRIB_CMAKE_CXX_STANDARD_MIN_REQUIRED})
+ else()
+  # Throw if CMAKE_CXX_STANDARD is 98
+  if(${CMAKE_CXX_STANDARD} EQUAL 98)
+    message(FATAL_ERROR "CMAKE_CXX_STANDARD is set to ${CMAKE_CXX_STANDARD}, "
+      "but DGtalTools requires at least ${DGTALTOOLS_CONTRIB_CMAKE_CXX_STANDARD_MIN_REQUIRED}.")
+  endif()
+endif()
+if(NOT CMAKE_CXX_STANDARD_REQUIRED)
+  set(CMAKE_CXX_STANDARD_REQUIRED ON)
+endif()
 
 
-FIND_PACKAGE(DGtal 1.5 REQUIRED)
+FIND_PACKAGE(DGtal 1.4 REQUIRED)
 INCLUDE_DIRECTORIES(${DGTAL_INCLUDE_DIRS})
 LINK_DIRECTORIES(${DGTAL_LIBRARY_DIRS})
 
