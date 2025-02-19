@@ -8,7 +8,9 @@
   - Fix cmake compulation issue from CPP 17 configuration. 
     (Bertrand Kerautret [#91](https://github.com/DGtal-team/DGtalTools-contrib/pull/91))
 
-
+- *visualisation*
+  - polyMeshEdit: new option to handle noise deformation and scale.
+    (Bertrand Kerautret [#92](https://github.com/DGtal-team/DGtalTools-contrib/pull/92)) 
 
 # DGtalTools-contrib  1.4 
 - *build*
