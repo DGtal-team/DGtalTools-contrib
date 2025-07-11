@@ -12,6 +12,7 @@ SET(DGTAL_TOOLS_DEVEL_SRC
     meshAxisCutter
     graph2vol
     trunkMeshTransform
+    splitMeshFromCol
 )
 
 

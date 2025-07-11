@@ -1,5 +1,9 @@
 # DGtalTools-contrib  1.5 (beta)
 
+- *Geometry3d*
+  - splitMeshFromCol: new simple tool to split mesh from its color face attributes.
+    (Bertrand Kerautret [#89](https://github.com/DGtal-team/DGtalTools-contrib/pull/89))
+
 - *global*
   - Continuous integration fix using new version on conan following DGtal changes.
     (Bertrand Kerautret [#90](https://github.com/DGtal-team/DGtalTools-contrib/pull/90))
