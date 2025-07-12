@@ -14,7 +14,7 @@ SET(DGTAL_TOOLS_CONTRIB_POLY
 
 
 FOREACH(FILE ${DGTAL_TOOLS_CONTRIB})
-  add_executable(${FILE} ${FILE})
+  add_executable(${FILE} ${FILE}.cpp)
   target_link_libraries (${FILE} ${DGTAL_LIBRARIES} ${DGtalToolsContribLibDependencies})
   install(TARGETS ${FILE} 
         RUNTIME DESTINATION bin
@@ -24,8 +24,8 @@ ENDFOREACH(FILE)
 
 
 FOREACH(FILE ${DGTAL_TOOLS_CONTRIB_POLY})
-  add_executable(${FILE} ${FILE})
-  target_link_libraries (${FILE}  polyscope ${DGTAL_LIBRARIES} ${DGtalToolsContribLibDependencies})
+  add_executable(${FILE} ${FILE}.cpp)
+  target_link_libraries (${FILE}  polyscope ${DGTAL_LIBRARIES} ${DGtalLibDependencies}  ${DGtalToolsContribLibDependencies})
   install(TARGETS ${FILE} 
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib
@@ -42,8 +42,8 @@ if (  WITH_VISU3D_QGLVIEWER )
   )
 
   FOREACH(FILE ${DGTAL_TOOLS_CONTRIB_WITH_QGLVIEWER})
-    add_executable(${FILE} ${FILE})
-    target_link_libraries (${FILE} ${DGTAL_LIBRARIES} ${DGtalToolsContribLibDependencies})
+    add_executable(${FILE} ${FILE}.cpp)
+    target_link_libraries (${FILE} ${DGTAL_LIBRARIES} ${DGtalLibDependencies} ${DGtalToolsContribLibDependencies})
     install(TARGETS ${FILE} 
           RUNTIME DESTINATION bin
           LIBRARY DESTINATION lib
@@ -57,7 +57,7 @@ if (  WITH_VISU3D_QGLVIEWER )
     QT4_WRAP_CPP(meshViewerEdit_HEADERS_MOC meshViewerEdit.h  OPTIONS -DBOOST_TT_HAS_OPERATOR_HPP_INCLUDED)
     add_executable(meshViewerEdit meshViewerEdit.cpp compClass/ViewerMesh ${meshViewerEdit_HEADERS_MOC}
                                                ${ui_meshViewerEdit_FORMS_HEADERS})
-    target_link_libraries (meshViewerEdit ${DGTAL_LIBRARIES}  ${DGtalToolsContribLibDependencies})
+    target_link_libraries (meshViewerEdit ${DGTAL_LIBRARIES} ${DGtalLibDependencies}  ${DGtalToolsContribLibDependencies})
 
   elseif (WITH_QT5)
     set(CMAKE_AUTOMOC ON)
@@ -67,8 +67,8 @@ if (  WITH_VISU3D_QGLVIEWER )
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5OpenGL_EXECUTABLE_COMPILE_FLAGS}")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Xml_EXECUTABLE_COMPILE_FLAGS}")
-    add_executable(meshViewerEdit meshViewerEdit compClass/ViewerMesh ${ui_meshViewerEdit_FORMS_HEADERS})
-    target_link_libraries(meshViewerEdit ${DGTAL_LIBRARIES}  ${DGtalToolsContribLibDependencies})
+    add_executable(meshViewerEdit meshViewerEdit.cpp compClass/ViewerMesh ${ui_meshViewerEdit_FORMS_HEADERS})
+    target_link_libraries(meshViewerEdit ${DGTAL_LIBRARIES}  ${DGtalLibDependencies} ${DGtalToolsContribLibDependencies})
     qt5_use_modules(meshViewerEdit Widgets OpenGL Xml)
   endif (WITH_QT4)
 
