@@ -116,7 +116,7 @@ jobs:
        working-directory: "${{runner.workspace}}/build"
        run: |
            conan install $GITHUB_WORKSPACE --build=missing -s:a compiler.cppstd=20
-           cmake $GITHUB_WORKSPACE -DCMAKE_POLICY_DEFAULT_CMP0091=NEW  -DCMAKE_MODULE_PATH="D:/a/DGtalTools-contrib/build/DGtal/buildDGtal" -DDGtal_DIR="D:/a/DGtalTools-contrib/build/DGtal/buildDGtal"  -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake"  -DCMAKE_BUILD_TYPE=$BUILD_TYPE "
+           cmake $GITHUB_WORKSPACE -DCMAKE_POLICY_DEFAULT_CMP0091=NEW  -DCMAKE_MODULE_PATH="D:/a/DGtalTools-contrib/build/DGtal/buildDGtal" -DDGtal_DIR="D:/a/DGtalTools-contrib/build/DGtal/buildDGtal"  -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake"  -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
      - name: Build
        working-directory: ${{runner.workspace}}/build
