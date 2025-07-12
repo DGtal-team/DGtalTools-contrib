@@ -92,7 +92,7 @@ jobs:
        run: |
            git clone --depth 1 https://github.com/DGtal-team/DGtal.git
            cd DGtal
-           conan install . --build=missing
+           conan install . --build=missing -s:a compiler.cppstd=20
            mkdir buildDGtal
            cd buildDGtal
            echo  cmake .. -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_WINDOWS -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake"  -DBUILD_EXAMPLES=false -DBUILD_TESTING=false 
@@ -115,7 +115,7 @@ jobs:
        shell: bash
        working-directory: "${{runner.workspace}}/build"
        run: |
-           conan install $GITHUB_WORKSPACE --build=missing
+           conan install $GITHUB_WORKSPACE --build=missing -s:a compiler.cppstd=20
            cmake $GITHUB_WORKSPACE -DCMAKE_POLICY_DEFAULT_CMP0091=NEW  -DCMAKE_MODULE_PATH="D:/a/DGtalTools-contrib/build/DGtal/buildDGtal" -DDGtal_DIR="D:/a/DGtalTools-contrib/build/DGtal/buildDGtal"  -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DDGTAL_RANDOMIZED_TESTING_WHITELIST="${{ steps.whitelist.outputs.WHITELIST }}"
 
      - name: Build
