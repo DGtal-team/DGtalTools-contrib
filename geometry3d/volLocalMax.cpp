@@ -29,8 +29,7 @@
 #include "DGtal/base/Common.h"
 #include "DGtal/helpers/StdDefs.h"
 #include "DGtal/io/readers/GenericReader.h"
-#include "DGtal/io/boards/Board3D.h"
-#include "DGtal/io/DrawWithDisplay3DModifier.h"
+#include "DGtal/images/ImageContainerBySTLVector.h"
 #include "DGtal/shapes/implicit/ImplicitBall.h"
 #include "DGtal/shapes/GaussDigitizer.h"
 
@@ -95,7 +94,7 @@ int main( int argc, char** argv )
   
   app.add_option("--input,-i,1", inputFilename, "vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm (with 3 dims)) file")->required()->check(CLI::ExistingFile);
   app.add_option("--output,-o,2", outputFilename, "Output SDP filename")->required();
-  app.add_option("--ballSize,-b", ballSize, "set the ball size", true);
+  app.add_option("--ballSize,-b", ballSize, "set the ball size");
 
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);

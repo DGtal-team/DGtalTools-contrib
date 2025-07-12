@@ -180,13 +180,13 @@ main(int argc,char **argv)
   app.add_option("-i,--input,1", inputFileName, "input file name in 3d volume." )
   ->required()
   ->check(CLI::ExistingFile);
-  app.add_option("--output,-o,2", outputFileName, "export the filtered volume extracted", true);
+  app.add_option("--output,-o,2", outputFileName, "export the filtered volume extracted");
   app.add_option("--sizeFilter,-s", sizeFilter, "size of the filter");
   app.add_flag("--erode,-e", erode, "apply erosion");
   app.add_flag("--median,-m", median, "apply median filter");
   app.add_flag("--dilate,-d", dilate, "apply dilatation");
   app.add_flag("--closure,-c", "apply closure");
-  app.add_option("--nbRepeat,-n",nbRepeat, "repeat the selected type of operation", true);
+  app.add_option("--nbRepeat,-n",nbRepeat, "repeat the selected type of operation");
   
   
   app.get_formatter()->column_width(40);

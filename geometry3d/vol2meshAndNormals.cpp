@@ -268,13 +268,13 @@ int main( int argc, char** argv )
    app.add_option("-i,--input,1", inputFileName, "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
     ->required()
     ->check(CLI::ExistingFile);
-   app.add_option("--thresholdMin,-m", thresholdMin, "threshold min (excluded) to define binary shape", true);
-   app.add_option("--thresholdMax,-M", thresholdMax, "threshold max (excluded) to define binary shape", true);
-   app.add_option("--R-radius,-R", R, "the parameter R in the VCM.", true);
-   app.add_option("--r-radius,-r", r, "the parameter r in the VCM.", true);
-   app.add_option("--kernel,-k", kernel, "the function chi_r, either hat or ball.", true)
+   app.add_option("--thresholdMin,-m", thresholdMin, "threshold min (excluded) to define binary shape");
+   app.add_option("--thresholdMax,-M", thresholdMax, "threshold max (excluded) to define binary shape");
+   app.add_option("--R-radius,-R", R, "the parameter R in the VCM.");
+   app.add_option("--r-radius,-r", r, "the parameter r in the VCM.");
+   app.add_option("--kernel,-k", kernel, "the function chi_r, either hat or ball.")
       -> check(CLI::IsMember({"ball", "hat"}));
-   app.add_option("--trivial-radius,-t", t, "the parameter r for the trivial normal estimator.", true);
+   app.add_option("--trivial-radius,-t", t, "the parameter r for the trivial normal estimator.");
    app.add_option("--embedding,-E", E, "the surfel -> point embedding: 0: Pointels, 1: InnerSpel, 2: OuterSpel.")
      -> check(CLI::IsMember({0, 1, 2}));
    app.add_option("--output,-o", basename, "the output base filename (without extension)");

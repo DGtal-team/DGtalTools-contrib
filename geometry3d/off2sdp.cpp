@@ -93,7 +93,7 @@ int main( int argc, char** argv )
   ->required()
   ->check(CLI::ExistingFile);
   
-  app.add_option("--output,-o,2",outputFileName, "the output filename (.sdp).", true);
+  app.add_option("--output,-o,2",outputFileName, "the output filename (.sdp).");
   app.add_flag("--faceCenter,-f", faceCenter, "export the face centers instead the mesh vertex.");
   
   

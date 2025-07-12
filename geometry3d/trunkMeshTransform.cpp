@@ -249,7 +249,7 @@ int main( int argc, char** argv )
     auto mainDirOpt = app.add_option("--mainDir,-m", mainDirV, "Define the main direction to define the filtering angle based (see --filterFacePosition and --filterFaceNormal ")
     ->expected(3);
     auto vertSampleOpt = app.add_flag("--verticalSampling", "Apply a vertical sampling simulation by considering the laser scan.");
-    app.add_option("--scannerDistance", vSampleDist, "Define the laser scan position distance. (effect only with --verticalSampling) .", true);
+    app.add_option("--scannerDistance", vSampleDist, "Define the laser scan position distance. (effect only with --verticalSampling) .");
     
     auto vROpt = app.add_option("--vSampleAngularResol", vSampleAngularResol, "Define the vertical angular resolution of the laser scanner. (effect only with --verticalSampling) ");
     auto vSOpt = app.add_option("--vSampleAngularSensi", vSampleAngularSensi, "Defines the vertical angular sensibility laser scan intersection detection. (effect only with --verticalSampling) ");

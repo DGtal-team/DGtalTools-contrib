@@ -1,6 +1,7 @@
 add_executable(RationalBeattySequenceTest RationalBeattySequenceTest.cpp)
-
 add_executable(CumulativeSequenceTest CumulativeSequence.cpp CumulativeSequenceTest.cpp)
+target_include_directories(RationalBeattySequenceTest PRIVATE ${Boost_INCLUDE_DIRS})
+target_include_directories(CumulativeSequenceTest PRIVATE ${Boost_INCLUDE_DIRS})
 #target_link_libraries(CumulativeSequenceTest sequence)
 
 set(LUTBasedNSDistanceTransform_LIBRARIES)

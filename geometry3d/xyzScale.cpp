@@ -37,8 +37,8 @@ main(int argc,char **argv)
   double scale {1.0};
   
   app.add_option("--input,-i,1", inputName, "input file name of the xyz point set.")->required()->check(CLI::ExistingFile);
-  app.add_option("--output,-o", outputName, "output file name of the resulting xyz point set.", true);
-  app.add_option("--scale", scale, "change the scale factor", true);
+  app.add_option("--output,-o", outputName, "output file name of the resulting xyz point set.");
+  app.add_option("--scale", scale, "change the scale factor");
 
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);

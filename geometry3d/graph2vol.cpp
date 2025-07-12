@@ -148,7 +148,7 @@ int main( int argc, char** argv )
   app.add_option("--inputRadii,-r", nameFileRadii, "input file containing the radius for each vertex.")
     ->required()->check(CLI::ExistingFile);
   app.add_option("--gridSize,-g", gridSize, "grid size.");
-  app.add_option("--volMargin,-m", brdVol, "add volume margin from graph bouding box.", true);
+  app.add_option("--volMargin,-m", brdVol, "add volume margin from graph bouding box.");
   app.add_option("--output,-o", outputFileName, "Output volumic filename")->required();
   app.add_flag("--interpolRadius", interpolRadius, "Interpolation of radius");
     

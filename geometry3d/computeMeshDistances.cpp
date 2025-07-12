@@ -257,20 +257,20 @@ main(int argc,char **argv)
       ->required()
       ->check(CLI::ExistingFile);
 
-  app.add_option("--output,-o", outputFileName, "arg = file.dat : output file containing all the distances of each input mesh faces (faces of A)", false);
+  app.add_option("--output,-o", outputFileName, "arg = file.dat : output file containing all the distances of each input mesh faces (faces of A)");
   
   app.add_option("--outputMesh,-m",outputMeshFileName, "arg = file.off : export the resulting distances represented with a color scale on the faces of the reference mesh A.");
   
   app.add_flag("--faceCenterDistance,-f",useFaceCenterDistance, "approximates the minimal distance by using the euclidean distance of the face centers (instead using the minimal distance given by projection).");
   app.add_flag("--squaredDistance,-s", squaredDistance, "computes squared distance.");
   app.add_flag("--saveNearestPoint,-n", saveNearestPoint, "save the nearest point obtained during the computation of the minimal distance (point of B).");
-  app.add_option("--maxScaleDistance", maxScaleDistance, "set the default max value use to display the distance", true);
-  auto cGroupOpt = app.add_option("--cellGroupSize,-g", cellGroupSize, "set the size of grouping digital space used to speed up computation (by default set to maxScaleDistance/2,5).", true);
+  app.add_option("--maxScaleDistance", maxScaleDistance, "set the default max value use to display the distance");
+  auto cGroupOpt = app.add_option("--cellGroupSize,-g", cellGroupSize, "set the size of grouping digital space used to speed up computation (by default set to maxScaleDistance/2,5).");
 
   app.add_flag("--exportDistanceEstimationType", exportDistanceEstimationType, "Export as face color the type of"
                " distance estimation used for each face (blue for projection, green for edge projection and white"
                "for euclidean distance.)");
-  app.add_option("--minScaleDistance",minScaleDistance, "set the default min value use to display the distance", true);
+  app.add_option("--minScaleDistance",minScaleDistance, "set the default min value use to display the distance");
 
   
   app.get_formatter()->column_width(40);

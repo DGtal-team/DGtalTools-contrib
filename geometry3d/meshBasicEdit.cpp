@@ -92,12 +92,12 @@ main(int argc,char **argv)
   ->expected(5);
   auto filterVisOpt = app.add_option("--filterVisiblePart", theMaxAngle , "arg = angle nx ny nz: filter the mesh visible part (according the mesh part in the direction  nx, ny, nz and a maximal angle).");
   
-  app.add_option("--nx,-x", nx , "arg = define the nx of the direction of filtering, see --filterVisiblePart.", true);
-  app.add_option("--ny,-y", ny, "arg = define the ny of the direction of filtering, see --filterVisiblePart.", true);
-  app.add_option("--nz,-z", nz, "arg = define the nz of the direction of filtering, see --filterVisiblePart.", true);
+  app.add_option("--nx,-x", nx , "arg = define the nx of the direction of filtering, see --filterVisiblePart.");
+  app.add_option("--ny,-y", ny, "arg = define the ny of the direction of filtering, see --filterVisiblePart.");
+  app.add_option("--nz,-z", nz, "arg = define the nz of the direction of filtering, see --filterVisiblePart.");
   auto scaleOpt = app.add_option("--scale",scale, "change the scale factor" );
-  auto rescaleToCubeOpt = app.add_option("--rescaleToCube", rescaleToCube, "change the scale factor of the input mesh such that its bounding box size corresponds to the size of a cube given as argument.", true);
-  app.add_option("--rescaleInterToCube", rescaleInterToCube, "same than rescaleToCube but only if the bounding box max size is outside the interval given as parameters, in the other cases nothing is done (even using --rescaleToCube).", false)
+  auto rescaleToCubeOpt = app.add_option("--rescaleToCube", rescaleToCube, "change the scale factor of the input mesh such that its bounding box size corresponds to the size of a cube given as argument.");
+  app.add_option("--rescaleInterToCube", rescaleInterToCube, "same than rescaleToCube but only if the bounding box max size is outside the interval given as parameters, in the other cases nothing is done (even using --rescaleToCube).")
     ->expected(2);
 
   auto filterFF = app.add_option("--filterFirstFaces",percentFirst,"arg= X : filters the X% of the first faces of the input mesh.");

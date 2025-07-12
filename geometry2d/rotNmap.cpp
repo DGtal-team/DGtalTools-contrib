@@ -95,7 +95,7 @@ int main( int argc, char** argv )
     app.description("Applies a rotation in the input normal map (it rotates both the position and normals orientation to be consistant. \n" + usage.str() );
     app.add_option("--input,-i,1", inputFileName, "Input file")->required()->check(CLI::ExistingFile);
     app.add_option("--output,-o,2", outputFileName, "Output SDP filename")->required();
-    app.add_option("--angle,-a, 3", alpha, "a double angle", true);
+    app.add_option("--angle,-a, 3", alpha, "a double angle");
     app.add_flag("--onlyNormal,-n", onlyNormal, "rotate only normal not the map itself");
     app.add_flag("--fillFlat,-f", fillFlat, "fill area with missing information by vertical normal (ie Color (128, 128, 255))");
     

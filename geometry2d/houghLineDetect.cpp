@@ -106,11 +106,11 @@ int main( int argc, char** argv )
   ->required()
   ->check(CLI::ExistingFile);
   app.add_option("--output,-o", outputFileName,  "the output file containing the resulting lines segments (one segment per lines).");
-  app.add_option("--rho,-r", rho,  "The resolution of the parameter r in pixels. We use 1 pixel.", true );
-  app.add_option("--theta,-t", theta,"The resolution of the parameter \theta in radians.", true );
-  app.add_option("--threshold,-T", threshold, "The minimum number of intersections to “detect” a line.", true);
-  app.add_option("--minLinLength,-m", minLength," The minimum number of points that can form a line. Lines with less than this number of points are disregarded (use only with --useProbabilist option).", true );
-  app.add_option("--maxLineGap,-g",maxLineGap, "The maximum gap between two points to be considered in the same line (use only with --useProbabilist option)",true );
+  app.add_option("--rho,-r", rho,  "The resolution of the parameter r in pixels. We use 1 pixel." );
+  app.add_option("--theta,-t", theta,"The resolution of the parameter \theta in radians." );
+  app.add_option("--threshold,-T", threshold, "The minimum number of intersections to “detect” a line.");
+  app.add_option("--minLinLength,-m", minLength," The minimum number of points that can form a line. Lines with less than this number of points are disregarded (use only with --useProbabilist option).");
+  app.add_option("--maxLineGap,-g",maxLineGap, "The maximum gap between two points to be considered in the same line (use only with --useProbabilist option)" );
   app.add_flag("--useProbabilist,-P", "use improved probabilist algorithm");
   
   

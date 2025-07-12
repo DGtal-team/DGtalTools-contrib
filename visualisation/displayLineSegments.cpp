@@ -258,7 +258,7 @@ int main( int argc, char** argv )
   app.add_option("--backgroundImage", backgroundImage, "backgroundImage <filename> : display image as background");
   app.add_option("--alphaBG", alpha, "alphaBG <value> 0-1.0 to display the background image in transparency (default 1.0), (transparency works only if cairo is available)");
   
-  app.add_option("--scale",scale, "scale <value> 1: normal; >1 : larger ; <1 lower resolutions  )", true );
+  app.add_option("--scale",scale, "scale <value> 1: normal; >1 : larger ; <1 lower resolutions  )" );
   
   
   app.get_formatter()->column_width(40);

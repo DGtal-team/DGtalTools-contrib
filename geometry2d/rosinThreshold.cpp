@@ -204,8 +204,8 @@ int main( int argc, char** argv )
   app.add_option("-i,--input,1", inputFileName, "an input file." )
       ->required()
       ->check(CLI::ExistingFile);
-  app.add_option("-d,--dataIndex",indexData, "the index to read input data.", true);
-  app.add_option("--binSize,-b", binSize, "binSize for the x axis.", true);
+  app.add_option("-d,--dataIndex",indexData, "the index to read input data.");
+  app.add_option("--binSize,-b", binSize, "binSize for the x axis.");
     
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);

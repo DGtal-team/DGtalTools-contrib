@@ -206,12 +206,12 @@ int main( int argc, char** argv )
       ->required()
   ->check(CLI::ExistingFile);
   
-  auto optOutDAT = app.add_option("-o,--outputDat", outFileNamDAT, "the output dat file name.", true );
-  auto optOutEPS = app.add_option("-e,--outputEPS", outFileNamDAT, "the output eps file name.", true );
-  auto optOutFIG = app.add_option("-f,--outputFIG", outFileNamDAT, "the output fig file name.", true );
-  app.add_option("--scaleMax,-m", scaleMax, "scale step to compute MT.", true);
-  app.add_option("--drawingScale", scaleDrawing,  "scale step to compute MT.", true);
-  app.add_option("--scaleStep,-s",scaleStep, "scale step to compute MT.", true);
+  auto optOutDAT = app.add_option("-o,--outputDat", outFileNamDAT, "the output dat file name." );
+  auto optOutEPS = app.add_option("-e,--outputEPS", outFileNamDAT, "the output eps file name." );
+  auto optOutFIG = app.add_option("-f,--outputFIG", outFileNamDAT, "the output fig file name." );
+  app.add_option("--scaleMax,-m", scaleMax, "scale step to compute MT.");
+  app.add_option("--drawingScale", scaleDrawing,  "scale step to compute MT.");
+  app.add_option("--scaleStep,-s",scaleStep, "scale step to compute MT.");
   app.add_flag("--EuclThickness,-E", useEuclThickness, "use the euclidean thickness instead vertical/horizontal one.");
  
   functions::Hull2D::ThicknessDefinition thicknessDef = useEuclThickness ? functions::Hull2D::EuclideanThickness:
