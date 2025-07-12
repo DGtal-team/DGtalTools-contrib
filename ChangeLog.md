@@ -1,10 +1,18 @@
-# DGtalTools-contrib  1.5 (beta)
+
+
+
+
+# DGtalTools-contrib 2.0
+
 
 - *Geometry3d*
   - splitMeshFromCol: new simple tool to split mesh from its color face attributes.
     (Bertrand Kerautret [#89](https://github.com/DGtal-team/DGtalTools-contrib/pull/89))
 
 - *global*
+  - DGtal 2.0 update and CLI11 2.5.0 and integrate polyscope tool update.
+    (Bertrand Kerautret [#94](https://github.com/DGtal-team/DGtalTools-contrib/pull/94))
+  
   - Continuous integration fix using new version on conan following DGtal changes.
     (Bertrand Kerautret [#90](https://github.com/DGtal-team/DGtalTools-contrib/pull/90))
 
