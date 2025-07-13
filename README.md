@@ -79,9 +79,9 @@ As the previous section but in 3d, it contains actually these tools:
    - volFillCCSize: fills each Connected Component with a value corresponding to the number of voxels of the CC.
 
 <table><tr>
-<td> <img width="268" src="https://cloud.githubusercontent.com/assets/772865/12481207/d20d246c-c047-11e5-8986-ae17a582c977.png"  </td>
-<td> <img width="268" alt="result after olFillCSSize" src="https://user-images.githubusercontent.com/772865/138257925-60b3d30e-3a00-46ee-b9bc-fc44dff65f65.png">
-<img width="268" alt="input vol" src="https://user-images.githubusercontent.com/772865/138257856-5d7a134f-3d0c-41ce-86a4-bfff6b126d14.png"></td>
+<td> <img width="100%" src="https://cloud.githubusercontent.com/assets/772865/12481207/d20d246c-c047-11e5-8986-ae17a582c977.png"  </td>
+<td> <img width="49%" alt="result after olFillCSSize" src="https://user-images.githubusercontent.com/772865/138257925-60b3d30e-3a00-46ee-b9bc-fc44dff65f65.png">
+<img width="49%" alt="input vol" src="https://user-images.githubusercontent.com/772865/138257856-5d7a134f-3d0c-41ce-86a4-bfff6b126d14.png"></td>
 </tr>
 <tr>
 <td> computeMeshDistances </td> <td>volFillCCSize  (visualisation of input (left) and result (right)</td>
@@ -94,19 +94,16 @@ Visualisation
 This section, can contain all tools related to visualisation:
    - displayLineSegments: to display lines as vectorial image.
    - displayTgtCoverAlphaTS: to display alpha-thick segment given on a simple contour.
-   - meshViewerEdit: tool to visualize a mesh and to apply simple edits (face removal, color edits...).
    - graphViewer: tool to display graphs from a list of edges, a list of vertex and an optionnal list of radius for each edge.
    - polyMeshEdit: tool to edit a mesh (add local noise, remove selected faces).
    - polyMeshColorize: tool to  colorize a mesh.
 <table>
 <tr>
   <td><img width="260" src="https://cloud.githubusercontent.com/assets/772865/12538777/cd8c2d28-c2e2-11e5-93ab-cb4a6cfadc8e.png"></td>
-  <td> <img width="260" src="https://cloud.githubusercontent.com/assets/772865/12523276/22205f46-c156-11e5-827d-ec788baf7029.png"> </td>
   <td><img width="260" src="https://cloud.githubusercontent.com/assets/772865/13536787/02f16df6-e242-11e5-8541-88f8ca3f0a48.png"></td>
 </tr> 
  <tr>
  <td>displayTgtCoverAlphaTS</td>
- <td>meshViewerEdit</td>
  <td>graphViewer</td>
  </tr>
   <tr>
