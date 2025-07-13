@@ -45,26 +45,28 @@
 
 /**
 @code
-Basic display graph.
-
-Usage: ./graphViewer [OPTIONS]
-
-Options:
-  -h,--help                             Print this help message and exit
-  -v,--inputVertex TEXT:FILE REQUIRED   input file containing the vertex list.
-  -e,--inputEdge TEXT:FILE REQUIRED     input file containing the edge list.
-  -a,--autoEdge                         generate edge list from vertex order.
-  --cstSectionEdgeRad                   use a constant edge radius between two consecutive vertices.
-  -r,--inputRadii TEXT                  input file containing the radius for each vertex.
-  -b,--ballRadius FLOAT=1               radius of vertex balls.
-  -m,--addMesh TEXT                     add mesh in the display.
-  --meshColor UINT ...                  specify the color of mesh.
-  --vertexColor UINT ...                specify the color of vertex.
-  -s,--scaleRadius FLOAT=1              apply a scale factors on the radius input values
-  --edgeColor UINT ...                  specify the color of edges.
-  -c,--colormap                         display vertex colored by order in vertex file or by radius scale if the radius file is specidfied (-r).
-  -d,--doSnapShotAndExit TEXT           save display snapshot into file. Notes that the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D). If the camera setting was not saved it will use the default camera setting.
-
+ Basic display graph.
+ ./visualisation/graphViewer [OPTIONS]
+ Typical use:
+ graphViewer --inputVertex ../Samples/skelet3D_vertex.sdp --inputEdge ../Samples/skelet3D_edges.dat -r ../Samples/skelet3D_radii.dat
+ OPTIONS:
+   -h,        --help                     Print this help message and exit
+   -v,        --inputVertex TEXT:FILE REQUIRED
+                                         input file containing the vertex list.
+   -e,        --inputEdge TEXT:FILE REQUIRED
+                                         input file containing the edge list.
+   -a,        --autoEdge                 generate edge list from vertex order.
+              --cstSectionEdgeRad        use a constant edge radius between two consecutive vertices.
+   -r,        --inputRadii TEXT          input file containing the radius for each vertex.
+   -b,        --ballRadius FLOAT         radius of vertex balls.
+   -m,        --addMesh TEXT             add mesh in the display.
+              --meshColor UINT ...       specify the color of mesh.
+              --vertexColor UINT ...     specify the color of vertex.
+   -s,        --scaleRadius FLOAT        apply a scale factors on the radius input values
+              --edgeColor UINT ...       specify the color of edges.
+   -c,        --colormap                 display vertex colored by order in vertex file or by radius scale
+                                         if the radius file is specidfied (-r).
+   -d,        --doSnapShotAndExit TEXT   save display snapshot into file.
 */
 
 using namespace std;
@@ -125,7 +127,8 @@ int main( int argc, char** argv )
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
   // END parse command line using CLI ----------------------------------------------
-  
+  polyscope::options::programName = "grapgViewer - (DGtalToolsContrib)";
+
   PolyscopeViewer viewer;
  
   DGtal::Color meshColor(240,240,240);
