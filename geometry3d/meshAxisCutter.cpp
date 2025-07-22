@@ -99,8 +99,8 @@ int main( int argc, char** argv )
   app.description("Cut the input mesh according one axis into several separate meshes.\n" + usage.str() );
   app.add_option("--input,-i,1", inputFileName, "Input file")->required()->check(CLI::ExistingFile);
   app.add_option("--output,-o,2", outputFileName, "Output filename base")->required();
-  app.add_option("--nbParts,-p,3", nbP, "the number of parts", true);
-  app.add_option("--axis,-a", axis, "the axis to cut the mesh", true);
+  app.add_option("--nbParts,-p,3", nbP, "the number of parts");
+  app.add_option("--axis,-a", axis, "the axis to cut the mesh");
   auto selOpt = app.add_option("--selectedParts,-s", selectedParts, "selected part");
 
   app.get_formatter()->column_width(40);

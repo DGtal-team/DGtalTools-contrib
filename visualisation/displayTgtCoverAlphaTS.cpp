@@ -126,7 +126,7 @@ int main( int argc, char** argv )
   auto outFileNameFIGOpt = app.add_option("--outputFIG,-f", outFileNameFIG, "the output fig file name.");
   auto openContourOpt = app.add_flag("--openContour","consider the contour as open.");
   auto indexOpt = app.add_option("--index", index, "the index of the interest point.");
-  app.add_option("--width,-w", width, "width.", true);
+  app.add_option("--width,-w", width, "width.");
   auto euclideanThicknessOpt = app.add_flag("--euclideanThickness,-e", "use euclidean thickness instead horizontal/vertical.");
   
   app.get_formatter()->column_width(40);

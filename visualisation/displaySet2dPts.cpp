@@ -123,8 +123,8 @@ int main( int argc, char** argv )
   app.add_option("-i,--input,1", fileName, "the input file, each line containing one set points.")->required()->check(CLI::ExistingFile);
   app.add_option("--outputFile,-o,2", outputFileName, "save output file automatically according the file format extension.")->required();
   auto backgroundImageOpt = app.add_option("--backgroundImage", imageName, "display image as background.");
-  app.add_option("--alphaBG", alpha, "alphaBG <value> 0-1.0 to display the background image in transparency (default 1.0), (transparency works only if cairo is available)", true);
-  app.add_option("--scale", scale, "scale <value> 1: normal; >1 : larger ; <1 lower resolutions)", true);
+  app.add_option("--alphaBG", alpha, "alphaBG <value> 0-1.0 to display the background image in transparency (default 1.0), (transparency works only if cairo is available)");
+  app.add_option("--scale", scale, "scale <value> 1: normal; >1 : larger ; <1 lower resolutions)");
 
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);

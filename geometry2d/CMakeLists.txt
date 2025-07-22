@@ -6,8 +6,8 @@ SET(DGTAL_TOOLS_DEVEL_SRC
 
 
 FOREACH(FILE ${DGTAL_TOOLS_DEVEL_SRC})
-  add_executable(${FILE} ${FILE})
-  target_link_libraries (${FILE} ${DGTAL_LIBRARIES} ${DGtalToolsContribLibDependencies} )
+  add_executable(${FILE} ${FILE}.cpp)
+  target_link_libraries (${FILE} ${DGTAL_LIBRARIES} ${DGtalLibDependencies} ${DGtalToolsContribLibDependencies} )
   install(TARGETS ${FILE} 
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib
@@ -16,7 +16,7 @@ ENDFOREACH(FILE)
 
 if(WITH_OPENCV)
     add_executable(houghLineDetect houghLineDetect)
-    target_link_libraries (houghLineDetect ${DGTAL_LIBRARIES} ${DGtalToolsContribLibDependencies} ${OpenCV_LIBS}  )
+    target_link_libraries (houghLineDetect ${DGTAL_LIBRARIES} ${DGtalLibDependencies}  ${DGtalToolsContribLibDependencies} ${OpenCV_LIBS}  )
   install(TARGETS houghLineDetect 
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib

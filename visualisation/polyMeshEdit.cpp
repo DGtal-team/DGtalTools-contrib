@@ -344,20 +344,20 @@ void callbackFaceID() {
     auto digsurf = polyscope::getSurfaceMesh("InputMesh");
     if (io.MouseDoubleClicked[0])
     {
-        unsigned long indexSelect = polyscope::pick::getSelection().second;
+        unsigned long indexSelect = polyscope::getSelection().localIndex;
         unsigned long nb = 0;
         // face selected
         if (indexSelect >= currentPolysurf.nbVertices())
         {
-            nb = (unsigned long) polyscope::pick::getSelection().second - currentPolysurf.nbVertices();
+            nb = (unsigned long) polyscope::getSelection().localIndex - currentPolysurf.nbVertices();
         }
         else
         {
             // vertex selected (selecting a face connected to it)
-            if(currentPolysurf.facesAroundVertex(polyscope::pick::getSelection().second)
+            if(currentPolysurf.facesAroundVertex(polyscope::getSelection().localIndex)
                .size()> 0)
             {
-                nb = currentPolysurf.facesAroundVertex(polyscope::pick::getSelection().second)[0];
+                nb = currentPolysurf.facesAroundVertex(polyscope::getSelection().localIndex)[0];
             }
         }
 
@@ -398,7 +398,7 @@ int main(int argc, char** argv)
     ->required()
     ->check(CLI::ExistingFile);
     app.add_option("-f,--noiseFactor", noiseFactor, "increase noise scale by using a factor (1.0 default scale)." );
-    app.add_option("-o,--output,2", outputFileName, "an output mesh file in .obj or .off format.", true );
+    app.add_option("-o,--output,2", outputFileName, "an output mesh file in .obj or .off format." );
     
     
     app.get_formatter()->column_width(40);
