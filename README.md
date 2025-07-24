@@ -97,20 +97,23 @@ This section, can contain all tools related to visualisation:
    - graphViewer: tool to display graphs from a list of edges, a list of vertex and an optionnal list of radius for each edge.
    - polyMeshEdit: tool to edit a mesh (add local noise, remove selected faces).
    - polyMeshColorize: tool to  colorize a mesh.
+   
+<div align="center">
 <table>
 <tr>
-  <td><img width="260" src="https://cloud.githubusercontent.com/assets/772865/12538777/cd8c2d28-c2e2-11e5-93ab-cb4a6cfadc8e.png"></td>
-  <td><img width="260" src="https://cloud.githubusercontent.com/assets/772865/13536787/02f16df6-e242-11e5-8541-88f8ca3f0a48.png"></td>
+  <td align="center"><img width="95%" src="https://cloud.githubusercontent.com/assets/772865/12538777/cd8c2d28-c2e2-11e5-93ab-cb4a6cfadc8e.png"></td>
+  <td align="center" ><img width="95%" src="https://raw.githubusercontent.com/DGtal-team/DGtalTools-contrib/refs/heads/master/doc/images/previewGraphViewer.png"></td>
 </tr> 
  <tr>
- <td>displayTgtCoverAlphaTS</td>
- <td>graphViewer</td>
+ <td align="center">displayTgtCoverAlphaTS</td>
+ <td align="center" >graphViewer</td>
  </tr>
   <tr>
-   <td><img width="260" src="https://github.com/DGtal-team/DGtalTools-contrib/assets/772865/5da7e052-d332-4c1e-95bd-bfd06d4cd1e7"></td>   
-<td><img width="260" src="https://github.com/DGtal-team/DGtalTools-contrib/assets/772865/10592c26-40b4-4cd4-8118-b30a82ab0be3"></td>
+   <td align="center"><img width="95%" src="https://github.com/DGtal-team/DGtalTools-contrib/assets/772865/5da7e052-d332-4c1e-95bd-bfd06d4cd1e7"></td>   
+<td align="center"><img width="95%" src="https://github.com/DGtal-team/DGtalTools-contrib/assets/772865/10592c26-40b4-4cd4-8118-b30a82ab0be3"></td>
   </tr>
  <tr>
- <td>polyMeshEdit</td><td>polyMeshColorize</td>
+ <td align="center">polyMeshEdit</td><td align="center">polyMeshColorize</td>
  </tr>
 </table>
+</div>
