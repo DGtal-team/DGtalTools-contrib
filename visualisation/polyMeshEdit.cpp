@@ -101,6 +101,8 @@ static float maxNoiseLevel = 100.0;
 
 static float paintRad = 1.0;
 static float noiseLevel = 1.0;
+static float maxFilterAngle = 45.0;
+
 static int partialF = 1;
 static int randLarge = 100000;
 static const int unselectFlag = 200;
@@ -208,6 +210,44 @@ void partialSelect(int selFreq=1){
     }
 }
 
+/**
+ * Select faces with normals in the direction of the camera
+ * 
+ */
+void selectVisibleFaces(const double anAngleMax){
+    for ( unsigned int i = 0; i< currentPolysurf.nbFaces(); i++ )
+    {
+        Z3i::RealPoint baryCenter(0,0,0);
+        auto face = currentPolysurf.verticesAroundFace( i );
+        unsigned long nb = face.size();
+        if (nb < 3) continue;
+        for (auto v: face){
+            for (auto k = 0; k < nb; k++){
+                baryCenter[k] += currentPolysurf.position(v)[k];
+            }
+            baryCenter += v;
+        }
+        DGtal::Z3i::RealPoint p0 = currentPolysurf.position(face[0]);
+        DGtal::Z3i::RealPoint p1 = currentPolysurf.position(face[1]);
+        DGtal::Z3i::RealPoint p2 = currentPolysurf.position(face[2]);
+        auto camParams = polyscope::view::getCameraParametersForCurrentView();
+        auto extr = camParams.extrinsics;
+        auto [look, up, right] = extr.getCameraFrame();
+        DGtal::Z3i::RealPoint mainDir (look[0], look[1], look[2]);
+        DGtal::Z3i::RealPoint vectNormal = ((p1-p0).crossProduct(p2 - p0)).getNormalized();
+        vectNormal /= vectNormal.norm();
+        if((mainDir.getNormalized()).dot(vectNormal) > cos(anAngleMax))
+        {
+            vectSelection[i]=unselectFlag;
+            
+        }
+        else {
+            vectSelection[i]=selectFlag;
+        }
+    }
+}
+
+
 void noisify(double scale = 0.01, bool deformFace = true){
     srand((unsigned) time(NULL));
     for ( unsigned int i = 0; i< currentPolysurf.nbFaces(); i++ )
@@ -291,6 +331,14 @@ void callbackFaceID() {
     ImGui::Text("Noise parameters:");
     ImGui::SliderFloat("noise scale", &noiseLevel, minNoiseLevel, maxNoiseLevel, "scale = %f");
     ImGui::Checkbox("deform face:", &noiseDeformFace);
+    ImGui::Separator();
+    ImGui::Text("Face selection from normal (and camera dir):");
+    if (ImGui::Button("select"))
+    {
+        selectVisibleFaces(3.14 - maxFilterAngle/180*3.14);
+    }
+    ImGui::SameLine();
+    ImGui::SliderFloat("angle select", &maxFilterAngle, 1, 180, "angle =  %f");
     ImGui::Separator();
 
     ImGui::Text("Action:");

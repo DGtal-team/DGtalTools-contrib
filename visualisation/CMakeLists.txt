@@ -5,6 +5,7 @@ SET(DGTAL_TOOLS_CONTRIB
 )
 
 SET(DGTAL_TOOLS_CONTRIB_POLY
+   graphViewer
    polyMeshEdit
    polyMeshColorize
 )
