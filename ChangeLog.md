@@ -23,9 +23,11 @@
 - *visualisation*
   - polyMeshEdit: new option to handle noise deformation and scale.
     (Bertrand Kerautret [#92](https://github.com/DGtal-team/DGtalTools-contrib/pull/92)) 
- - polyMeshEdit: new possibilty to select faces from normals vector and camera direction.
+  - polyMeshEdit: new possibilty to select faces from normals vector and camera direction.
     (feature from removed meshViewerEdit)
     (Bertrand Kerautret [#95](https://github.com/DGtal-team/DGtalTools-contrib/pull/95)) 
+  - graphViewer: update tools with polyscope viewer
+    (Bertrand Kerautret [#98](https://github.com/DGtal-team/DGtalTools-contrib/pull/98)) 
 
 # DGtalTools-contrib  1.4 
 - *build*

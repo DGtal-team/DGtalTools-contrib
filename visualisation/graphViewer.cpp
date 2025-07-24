@@ -18,7 +18,8 @@
  
  * @author Adrien Krähenbühl  (\c adrien.krahenbuhl@loria.fr)
  * LORIA (CNRS, UMR 7503), University of Nancy, France
- *
+ * @author Bertrand Kerautret  (\c bertrand.kerautret@univ-lyon2.fr )
+ * LIRIS (CNRS, UMR 5205), Université Lumière Lyon 2, France
  * @date 2016/02/29
  *
  * This file is part of the DGtal library.
@@ -28,7 +29,8 @@
 #include <iostream>
 
 #include <cstdlib>
-#include <DGtal/io/viewers/Viewer3D.h>
+#include <DGtal/io/viewers/PolyscopeViewer.h>
+
 #include <DGtal/base/Common.h>
 #include <DGtal/helpers/StdDefs.h>
 #include <DGtal/io/readers/PointListReader.h>
@@ -36,57 +38,60 @@
 #include <DGtal/io/readers/MeshReader.h>
 #include <DGtal/io/colormaps/HueShadeColorMap.h>
 
+
+
+
 #include "CLI11.hpp"
 
 /**
 @code
-Basic display graph.
-
-Usage: ./graphViewer [OPTIONS]
-
-Options:
-  -h,--help                             Print this help message and exit
-  -v,--inputVertex TEXT:FILE REQUIRED   input file containing the vertex list.
-  -e,--inputEdge TEXT:FILE REQUIRED     input file containing the edge list.
-  -a,--autoEdge                         generate edge list from vertex order.
-  --cstSectionEdgeRad                   use a constant edge radius between two consecutive vertices.
-  -r,--inputRadii TEXT                  input file containing the radius for each vertex.
-  -b,--ballRadius FLOAT=1               radius of vertex balls.
-  -m,--addMesh TEXT                     add mesh in the display.
-  --meshColor UINT ...                  specify the color of mesh.
-  --vertexColor UINT ...                specify the color of vertex.
-  -s,--scaleRadius FLOAT=1              apply a scale factors on the radius input values
-  --edgeColor UINT ...                  specify the color of edges.
-  -c,--colormap                         display vertex colored by order in vertex file or by radius scale if the radius file is specidfied (-r).
-  -d,--doSnapShotAndExit TEXT           save display snapshot into file. Notes that the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D). If the camera setting was not saved it will use the default camera setting.
-
+ Basic display graph.
+ ./visualisation/graphViewer [OPTIONS]
+ Typical use:
+ graphViewer --inputVertex ../Samples/skelet3D_vertex.sdp --inputEdge ../Samples/skelet3D_edges.dat -r ../Samples/skelet3D_radii.dat
+ OPTIONS:
+   -h,        --help                     Print this help message and exit
+   -v,        --inputVertex TEXT:FILE REQUIRED
+                                         input file containing the vertex list.
+   -e,        --inputEdge TEXT:FILE REQUIRED
+                                         input file containing the edge list.
+   -a,        --autoEdge                 generate edge list from vertex order.
+              --cstSectionEdgeRad        use a constant edge radius between two consecutive vertices.
+   -r,        --inputRadii TEXT          input file containing the radius for each vertex.
+   -b,        --ballRadius FLOAT         radius of vertex balls.
+   -m,        --addMesh TEXT             add mesh in the display.
+              --meshColor UINT ...       specify the color of mesh.
+              --vertexColor UINT ...     specify the color of vertex.
+   -s,        --scaleRadius FLOAT        apply a scale factors on the radius input values
+              --edgeColor UINT ...       specify the color of edges.
+   -c,        --colormap                 display vertex colored by order in vertex file or by radius scale
+                                         if the radius file is specidfied (-r).
+   -d,        --doSnapShotAndExit TEXT   save display snapshot into file.
 */
-
-template < typename Space = DGtal::Z3i::Space, typename KSpace = DGtal::Z3i::KSpace>
-struct ViewerSnap: DGtal::Viewer3D <Space, KSpace>
-{
-
-  ViewerSnap(bool saveSnap): DGtal::Viewer3D<Space, KSpace>(), mySaveSnap(saveSnap){
-  };
-
-  virtual  void
-  init(){
-    DGtal::Viewer3D<>::init();
-    if(mySaveSnap){
-      QObject::connect(this, SIGNAL(drawFinished(bool)), this, SLOT(saveSnapshot(bool)));
-    }
-  };
-  bool mySaveSnap;
-};
 
 using namespace std;
 using namespace DGtal;
 
+void addBall(const Z3i::RealPoint pt, double raduis)
+{
+    // Coordonnées du centre de la balle
+    std::vector<glm::vec3> points = { glm::vec3(pt[0], pt[1], pt[2]) };
+
+    // Enregistre un nuage de points (même pour une seule balle)
+    stringstream ss("grapgV_"); ss << pt[0] << "_" << pt[1] << "_" <<pt[2];
+    auto* psCloud = polyscope::registerPointCloud(ss.str(), points);
+
+    // Attribue un rayon particulier
+    std::vector<double> rayons = { raduis }; // rayon de la sphère
+    psCloud->setPointRadius(raduis, false);
+    psCloud->setPointRenderMode(polyscope::PointRenderMode::Sphere);
+
+}
+
+
 int main( int argc, char** argv )
 { 
-  QApplication application(argc,argv);
 
-  typedef ViewerSnap<> Viewer;
 
   // parse command line CLI-------------------------------------------------------
   CLI::App app;
@@ -110,25 +115,22 @@ int main( int argc, char** argv )
   app.add_flag("--autoEdge,-a", autoEdgeOpt, "generate edge list from vertex order.");
   app.add_flag("--cstSectionEdgeRad",cstSectionEdgeRad,  "use a constant edge radius between two consecutive vertices.");
   auto inputRadiiOpt = app.add_option("--inputRadii,-r", nameFileRadii, "input file containing the radius for each vertex.");
-  app.add_option("--ballRadius,-b", r, "radius of vertex balls.", true);
+  app.add_option("--ballRadius,-b", r, "radius of vertex balls.");
   auto addMeshOpt = app.add_option("--addMesh,-m", meshName, "add mesh in the display.");
   auto meshColorOpt = app.add_option("--meshColor", vectColMesh, "specify the color of mesh.");
   auto vertexColorOpt = app.add_option("--vertexColor", vectColVertex, "specify the color of vertex.");
-  app.add_option("--scaleRadius,-s", scaleRadius, "apply a scale factors on the radius input values", true);
+  app.add_option("--scaleRadius,-s", scaleRadius, "apply a scale factors on the radius input values");
   auto edgeColorOpt = app.add_option("--edgeColor", vectColEdge, "specify the color of edges.");
   auto colormapOpt = app.add_flag("--colormap, -c","display vertex colored by order in vertex file or by radius scale if the radius file is specidfied (-r).");
-  auto doSnapShotAndExitOpt = app.add_option("--doSnapShotAndExit,-d", name, "save display snapshot into file. Notes that the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D). If the camera setting was not saved it will use the default camera setting.");
+  auto doSnapShotAndExitOpt = app.add_option("--doSnapShotAndExit,-d", name, "save display snapshot into file.");
   
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
   // END parse command line using CLI ----------------------------------------------
-  
-  Viewer viewer(doSnapShotAndExitOpt->count());
-  viewer.show();	
-  if(doSnapShotAndExitOpt->count()>0){
-    viewer.setSnapshotFileName(QString(name.c_str()));
-  }
+  polyscope::options::programName = "grapgViewer - (DGtalToolsContrib)";
 
+  PolyscopeViewer viewer;
+ 
   DGtal::Color meshColor(240,240,240);
   DGtal::Color edgeColor(240,240,240);
   DGtal::Color vertexColor(240,240,240);
@@ -175,7 +177,7 @@ int main( int argc, char** argv )
   }
   
   // Create the color scale dpending on the specified radius file
-  HueShadeColorMap<int> hueShade(0,vectVertex.size()-1);
+  HueShadeColorMap<int> hueShade(0, (int)(vectVertex.size() - 1));
   if ( useRadiiFile )
   {
     vectRadii = TableReader<double>::getColumnElementsFromFile(nameFileRadii,0);
@@ -204,22 +206,23 @@ int main( int argc, char** argv )
     Color currentColor;
     for ( int i=0 ; i<vectVertex.size() ; ++i )
     {
-      
       currentColor = (useRadiiFile ? hueShade(vectRadii[i]*10000) : hueShade(i));
-      viewer << CustomColors3D( currentColor, currentColor );
-      viewer.addBall(vectVertex[i], vectRadii[i]);
+      viewer <<  currentColor;
+        addBall(vectVertex[i], vectRadii[i]);
+    //  viewer.addBall(vectVertex[i], vectRadii[i]);
     }
   }
   else
   {
     if(vertexColorOpt->count() > 0)
     {
-        viewer << CustomColors3D( vertexColor, vertexColor );
+        viewer << vertexColor;
     }
     
      for ( int i=0 ; i<vectVertex.size() ; ++i )
     {
-      viewer.addBall(vectVertex[i], vectRadii[i]);
+        addBall(vectVertex[i], vectRadii[i]);
+
     }
   }
 
@@ -240,9 +243,7 @@ int main( int argc, char** argv )
         radii = { vectRadii[e[0]], vectRadii[e[1]] };
       }
       Mesh<Z3i::RealPoint>::createTubularMesh(aMesh, vertex, radii, 0.05);
-      viewer << (useRadiiFile ? CustomColors3D( hueShade(radii[0]*10000),
-                                                hueShade(radii[1]*10000) ) : CustomColors3D( hueShade(e[0]),
-                                                                                             hueShade(e[1]) ));
+      viewer << (useRadiiFile ? hueShade(radii[1]*10000) : hueShade(e[1]));
       viewer << aMesh;
     }
   }
@@ -260,7 +261,7 @@ int main( int argc, char** argv )
         }
       Mesh<Z3i::RealPoint>::createTubularMesh(aMesh, vertex, radii, 0.05);
     }
-    viewer << CustomColors3D(DGtal::Color::Black, edgeColor);
+    viewer << edgeColor;
     viewer << aMesh;
   }
 
@@ -268,40 +269,22 @@ int main( int argc, char** argv )
   if(addMeshOpt->count() > 0){
     Mesh<Z3i::RealPoint> mesh;
     mesh << meshName ;
-    viewer << CustomColors3D(DGtal::Color::Black, meshColor);
+    viewer << meshColor;
     viewer << mesh;
   }
 
+    if(doSnapShotAndExitOpt->count() > 0){
+        viewer.renderNewData();
+        viewer.renderClippingPlanes();
+        polyscope::screenshot(name, false);
+       return 0;
+     }
 
-  viewer << Viewer3D<>::updateDisplay;
   
- if(doSnapShotAndExitOpt->count() > 0){
-    // Appy cleaning just save the last snap
-    DGtal::trace.info() << "sorting surfel according camera position....";
-    viewer.sortSurfelFromCamera();
-    viewer.sortQuadFromCamera();
-    viewer.sortTriangleFromCamera();
-    viewer.updateList(false);    
-    if(!viewer.restoreStateFromFile())
-      {
-        viewer.update();
-      }    
-    std::string extension = name.substr(name.find_last_of(".") + 1);
-    std::string basename = name.substr(0, name.find_last_of("."));
-    for(int i=0; i< viewer.snapshotCounter()-1; i++){
-      std::stringstream s;
-      s << basename << "-"<< setfill('0') << setw(4)<<  i << "." << extension;
-      trace.info() << "erase temp file: " << s.str() << std::endl;
-      remove(s.str().c_str());
-    }
-    std::stringstream s;
-    s << basename << "-"<< setfill('0') << setw(4)<<  viewer.snapshotCounter()-1 << "." << extension;
-    rename(s.str().c_str(), name.c_str());
-    return 0;
-  }
-
-
-  return application.exec();
+ 
+    
+  viewer.show();
+  return EXIT_SUCCESS;
 }
 
 
