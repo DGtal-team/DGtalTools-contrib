@@ -12,7 +12,10 @@
   - polyscope version to fix CI. 
     (Bertrand Kerautret [#97](https://github.com/DGtal-team/DGtalTools-contrib/pull/97))
 
-
+- *Geometry3d*
+  - meshFaceOrderColor: new tool to color a mesh based on face order and optionally sorts the faces lexicographically.
+    (Bertrand Kerautret [#99](https://github.com/DGtal-team/DGtalTools-contrib/pull/99))
+    
 # DGtalTools-contrib 2.0
 
 

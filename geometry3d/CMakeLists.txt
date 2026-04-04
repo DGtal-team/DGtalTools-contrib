@@ -10,6 +10,7 @@ SET(DGTAL_TOOLS_DEVEL_SRC
     volFillCCSize
     vol2meshAndNormals
     meshAxisCutter
+    meshFaceOrderColor
     graph2vol
     trunkMeshTransform
     splitMeshFromCol
