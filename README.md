@@ -153,9 +153,9 @@ off2obj data/sphere.off  data/sphere.obj
 ```
 
 
-If you want to use the tools in other image simply do in your Dockerfile:
+If you want to use the tools in other image simply do in your Dockerfile (including DGtalTools and DGtalTools-contrib):
 
 ```
-FROM docker.io/ker69/dgtaltools:latest
+FROM docker.io/ker69/dgtaltools-contrib:latest
 ```
 
