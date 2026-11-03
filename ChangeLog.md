@@ -2,8 +2,10 @@
 
 - *global*
   - Default branch set to main instead old master.
-   (Bertrand Kerautret [498](https://github.com/DGtal-team/DGtalTools/pull/98)) 
-
+   (Bertrand Kerautret [98](https://github.com/DGtal-team/DGtalTools/pull/98)) 
+ - Add Docker image for the tools including link to DockerHub image.
+   (Bertrand Kerautret [99](https://github.com/DGtal-team/DGtalTools/pull/99)) 
+ 
 
 
 
