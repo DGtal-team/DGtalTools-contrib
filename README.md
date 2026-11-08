@@ -117,3 +117,45 @@ This section, can contain all tools related to visualisation:
  </tr>
 </table>
 </div>
+
+
+
+  
+Docker
+======
+A Dockerfile is included in the repository to allow users to build a
+Docker image with DGtalTools-contrib installed. The image is based on the
+DGtal Docker image and includes the DGtalTools and DGtalTools-contrib project and its
+dependencies.
+
+To build the Docker image, Docker should be installed in the system (see [Docker installation](https://docs.docker.com/engine/install/)). Download the *Dockerfile* inside the [DGtalTools-contrib repository](https://github.com/DGtal-team/DGtalTools-contrib) and, in the directory containing the *Dockerfile*, execute:
+
+```docker build -t dgtaltools-contrib:latest .```
+
+Alternatively, users who do not wish to build the image themselves can
+directly download the prebuilt image from Docker Hub:
+
+```docker pull ker69/dgtaltools-contrib:latest```
+
+To run an interactive terminal inside the Docker container and access local data:
+
+```
+docker run -it --rm \
+    -v $(pwd)/Samples:/data \
+    dgtaltools-contrib:latest bash
+```
+
+
+For example, to run a tools:
+
+```
+off2obj data/sphere.off  data/sphere.obj
+```
+
+
+If you want to use the tools in other image simply do in your Dockerfile (including DGtalTools and DGtalTools-contrib):
+
+```
+FROM docker.io/ker69/dgtaltools-contrib:latest
+```
+
